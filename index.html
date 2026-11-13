@@ -423,6 +423,12 @@ body.hasnav .sheet{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 .lc .lt{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
 .lc .lt b{font-size:17px;font-weight:700;overflow-wrap:anywhere}
 .lc .lt small{color:var(--mu);font-size:12px;white-space:nowrap}
+.lc .cv{font-style:normal;font-size:11px;margin-left:2px}
+.lc{cursor:pointer}
+.lc .lx{margin-top:8px;padding-top:8px;border-top:1px dashed var(--ln)}
+.lc .lpw{margin-top:8px}
+.lc .lph{display:inline-block;font-size:12px;font-weight:700;color:var(--k,var(--mu));border:1px solid var(--k,var(--ln));border-radius:999px;padding:3px 10px}
+.lc .lx .ls{margin-top:6px;display:block;overflow:visible}
 .lc .ld{color:var(--tx);font-size:15px;margin-top:3px;font-weight:600;touch-action:manipulation;-webkit-user-select:none;user-select:none;min-height:20px}
 .lc .ld.no{color:#8a94a3;font-weight:400;font-style:italic;font-size:13.5px}
 .lc .lo{color:var(--mu);font-size:12px;font-weight:500;margin-left:6px}
@@ -738,7 +744,9 @@ function newAuto(L,gid){if(gid==='cartera'||gid==='referidos')return [];const sm
 function markSeen(L,gid){const a=newAuto(L,gid);if(!a.length)return;const sm=seenMap();a.forEach(l=>{sm[l.tel]=1});const ks=Object.keys(sm);if(ks.length>1500)ks.slice(0,ks.length-1000).forEach(k=>delete sm[k]);lset('crm-seen',JSON.stringify(sm))}
 function welcome(){const pn=phN();return '<div class="wel"><div class="wn">'+esc(pname(String(ME))[0])+'</div>'+(RO||ROLE==='admin'?'':'<div class="qs"><button id="qsb" data-qs="1"'+(QSBUSY?' disabled':'')+'>'+(QSBUSY?'Ubicando\u2026':'\u2316 Guardar ubicaci\u00f3n y llenar despu\u00e9s'+(pn?' \u00b7 '+pn:''))+'</button></div><div class="addl"><div class="ab"><button data-add="ia">IA</button><button data-add="man">Manual</button></div><div class="al">\u2196 Agregar leads \u2197</div></div>')+'</div>'}
 
-const P2={cat:'neu',lim:50,act:{},at:{},ed:0,tp:null,eli:0,win:0,tmp:null,sending:0};
+const P2={cat:'neu',lim:50,act:{},at:{},ed:0,tp:null,eli:0,win:0,tmp:null,sending:0,open:null,tt:0};
+const P2PH={empezar:['Preguntar uso','g1'],ofrecer:['Fotos de motos','g3'],aprobar:['En aprobaci\u00f3n','g4'],visita:['Buscar visita','g5'],vendidos:['Caducidad promoci\u00f3n','g6'],apartar:['Apartar o firmar','g8']};
+function p2Phase(l){let b=null,t=0;Object.keys(l.st||{}).forEach(k=>{if(P2PH[k]&&(l.st[k]||0)>=t){t=l.st[k]||0;b=k}});if(!b&&l.st&&l.st.referidos)b='empezar';return b?P2PH[b]:null}
 const p2cat=l=>l.cat==='imp'?'imp':l.cat==='bas'?'bas':l.cat==='ven'?'ven':l.cat==='eli'?'eli':'neu';
 const p2real=l=>{const n=String(l.name||'').trim();return n&&!/^[\d\s+()-]{6,}$/.test(n)&&!/^sin nombre$/i.test(n)?n:''};
 const p2Name=l=>{const n=p2real(l);return n?n.split(/\s+/)[0]:'Sin nombre'};
@@ -784,7 +792,10 @@ function p2Card(l,c){
     if(c==='bas')ac+=B('eli','Eliminar','dl');
   }
   const D=(f,cls,txt)=>'<div class="'+cls+'" data-p2="ed" data-fld="'+f+'" data-id="'+l.id+'">'+txt+'</div>';
-  return '<div class="lc" data-id="'+l.id+'"><div class="lt"><span class="ln"><b data-p2="ed" data-fld="name" data-id="'+l.id+'">'+esc(p2Name(l))+'</b>'+(c==='imp'&&ADMIN?'<span class="lo">'+esc(l.own)+'</span>':'')+'</span><small>'+esc(p2T(p2Last(l)))+'</small></div>'+D('idf','ld'+(idf?'':' no'),idf?esc(idf):'\u00bfC\u00f3mo identificarlo? (doble toque)')+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+D('ctx','ls'+(sm?'':' no'),sm?esc(sm):'Sin contexto (doble toque para escribir)')+'<div class="la">'+ac+'</div></div>';
+  const op=P2.open===l.id,ph=p2Phase(l);
+  const chip=ph?'<div class="lpw"><span class="lph" style="--k:var(--'+ph[1]+')">'+esc(ph[0])+'</span></div>':'';
+  const more=op?'<div class="lx">'+D('ctx','ls'+(sm?'':' no'),sm?esc(p2SumFull(l)):'Sin contexto (doble toque para escribir)')+'</div>':'';
+  return '<div class="lc'+(op?' op':'')+'" data-id="'+l.id+'" data-c="'+c+'"><div class="lt"><span class="ln"><b data-p2="ed" data-fld="name" data-id="'+l.id+'">'+esc(p2Name(l))+'</b>'+(c==='imp'&&ADMIN?'<span class="lo">'+esc(l.own)+'</span>':'')+'</span><small>'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+D('idf','ld'+(idf?'':' no'),idf?esc(idf):'\u00bfC\u00f3mo identificarlo? (doble toque)')+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+chip+more+(op?'<div class="la">'+ac+'</div>':'')+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -792,6 +803,7 @@ function p2Render(){
   T.forEach(([k])=>{L[k]=p2Pool(k)});const EL=p2Pool('eli');
   const list=L[P2.cat],show=list.slice(0,P2.lim);
   P2E.imp=ADMIN_TXT();
+  S.leads.filter(l=>l.ph&&l.own===S.ag&&!l.pn).forEach(l=>{l.pn=phNext()});
   const PH=S.leads.filter(l=>l.ph&&!l.fld&&l.own===S.ag).sort((x,y)=>(x.pn||0)-(y.pn||0));
   const BN=PH.length?'<div class="p2f"><b>Ubicaciones por llenar ('+PH.length+')</b><span>Toca el n\u00famero y dicta a la IA qui\u00e9n es. Ej: 1- Juan, carnicer\u00eda San Miguel, cotizar INE</span><div class="cn">'+PH.map(l=>'<button data-p2="fill" data-n="'+(l.pn||'')+'">'+(l.pn||'?')+'</button>').join('')+'</div></div>':'';
   b.innerHTML=BN+'<div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span></button>').join('')+'</div>'+(show.length?show.map(l=>p2Card(l,P2.cat)).join(''):'<div class="p2e">'+P2E[P2.cat]+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
@@ -960,14 +972,16 @@ function p2Chat(l){
     p2Win(r,l);
     if(!r||!r.ok){show('No pude cargar la conversación ahora. Abre WhatsApp con el botón de abajo.');return}
     const ms=p2Parse(r.h);
-    if(!ms.length){show('Todavía no hay conversación guardada de este número.');return}
+    if(!ms.length){show(r.tmo?'Make tardó demasiado buscando este número. Intenta de nuevo en un momento.':'Todavía no hay conversación guardada de este número.');return}
     show('',ms.map(x=>x.who==='nota'?'<div class="wnote">'+esc(x.text)+'</div>':'<div class="wm '+(x.who==='cliente'?'in':'out')+'">'+(x.who==='cliente'?'':'<small>'+esc(x.lab)+'</small>')+esc(x.text)+'</div>').join(''));
   }).catch(()=>{p2Win(null,l);show('No pude cargar la conversación ahora. Abre WhatsApp con el botón de abajo.')});
 }
+function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
 document.addEventListener('click',e=>{
-  if(e.target.tagName==='INPUT')return;const t=e.target.closest&&e.target.closest('[data-p2]');if(!t)return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;const t=e.target.closest&&e.target.closest('[data-p2]');
+  if(!t){const cd=e.target.closest&&e.target.closest('.lc');if(cd&&!e.target.closest('button,a,.nm'))p2Tog(cd.dataset.id);return}
   const a=t.dataset.p2,id=t.dataset.id,l=id?(S.leads.find(x=>x.id===id)||(P2.tmp&&P2.tmp.id===id?P2.tmp:null)):null;
-  if(a==='cat'){P2.ed=0;P2.cat=t.dataset.v;P2.lim=50;P2.eli=0;p2Render();return p2Act()}
+  if(a==='cat'){P2.ed=0;P2.open=null;P2.cat=t.dataset.v;P2.lim=50;P2.eli=0;p2Render();return p2Act()}
   if(a==='elis'){P2.eli=P2.eli?0:1;return p2Render()}
   if(a==='add'){if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Fer vendedor para agregar.',1);return p2Add()}
   if(a==='tools')return p2TlOpen();
@@ -984,7 +998,7 @@ document.addEventListener('click',e=>{
   if(a==='more'){P2.lim+=50;return p2Render()}
   if(a==='back')return p2Close();
   if(!l)return;
-  if(a==='ed'){const n=Date.now(),k=id+t.dataset.fld;if(P2.tp&&P2.tp.k===k&&n-P2.tp.t<450){P2.tp=null;return p2Edit(l,t,t.dataset.fld)}P2.tp={k:k,t:n};return}
+  if(a==='ed'){const n=Date.now(),k=id+t.dataset.fld;if(P2.tp&&P2.tp.k===k&&n-P2.tp.t<450){P2.tp=null;clearTimeout(P2.tt);return p2Edit(l,t,t.dataset.fld)}P2.tp={k:k,t:n};clearTimeout(P2.tt);P2.tt=setTimeout(()=>p2Tog(id),430);return}
   if(a==='num'){const card=t.closest('.lc');if(card){P2.ed=1;const la=card.querySelector('.la');la.innerHTML='<div class="nm"><input class="p2i" inputmode="tel" placeholder="WhatsApp, 10 d\u00edgitos" maxlength="16"><button class="p2a st" data-p2="numok">Guardar</button></div>';la.querySelector('input').focus()}return}
   if(a==='chat')return p2Chat(l);
   if(a==='copy')return copyTel(l.tel);
