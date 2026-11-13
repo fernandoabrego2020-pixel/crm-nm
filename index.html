@@ -683,6 +683,9 @@ body.p2lock #toast{z-index:90}
 .p2mb{display:flex;flex-direction:column;gap:6px;padding-bottom:4px}
 .p2ml{font-size:12px;font-weight:600;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin-top:2px}
 .p2a.ia{width:100%;margin-top:6px;border-color:var(--g1);color:var(--g1)}
+.p2rs{margin-top:8px;display:flex;flex-direction:column;gap:2px}
+.p2rs .ls{margin-top:2px;display:block;-webkit-line-clamp:unset;overflow:visible}
+.p2tel{font-size:12px;color:var(--mu);margin-top:4px;letter-spacing:.02em}
 </style>
 </head>
 <body>
@@ -974,8 +977,9 @@ function p2Card(l,c){
   const gk=ph?P2GRP[ph[2]]:'';
   const chip=P2.ph===l.id?'<div class="lpw pk">'+P2OPT.map(o=>'<button class="lph pb'+(o[0]===gk?' on':'')+'" style="--k:var(--'+o[2]+')" data-p2="setph" data-v="'+o[0]+'" data-id="'+l.id+'">'+o[1]+'</button>').join('')+'</div>':'<div class="lpw"><button class="lph pb'+(ph?'':' no')+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+' data-p2="ph" data-id="'+l.id+'">'+(ph?esc(ph[0]):'Elegir etapa')+' <i class="cv">\u25be</i></button></div>';
   const mo=P2.mo===l.id;
-  const more=op?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb"><div class="p2ml">Resumen</div>'+D('ctx','ls'+(sm?'':' no'),sm?esc(p2SumFull(l)):'Sin resumen (doble toque para escribir)')+(RO?'':'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA sobre este cliente</button>')+'</div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b'+(mt?'':' class="no"')+' data-p2="ed" data-fld="moto" data-id="'+l.id+'">'+(mt?esc(mt):'\u00bfC\u00f3mo identificarlo? (doble clic)')+'</b>'+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+(op?'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+D('name','ld lnm','<span class="lnl">Nombre</span>'+esc(p2real(l)||'Sin nombre'))+chip+'</div>':'')+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+(op?'<div class="la">'+ac+'</div>':'')+more+'</div>';
+  const res=op?'<div class="p2rs"><div class="p2ml">Resumen</div>'+D('ctx','ls'+(sm?'':' no'),sm?esc(p2SumFull(l)):'Sin resumen (doble toque para escribir)')+'</div>':'';
+  const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb"><button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA sobre este cliente</button></div>':'')+'</div>':'';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b'+(mt?'':' class="no"')+' data-p2="ed" data-fld="moto" data-id="'+l.id+'">'+(mt?esc(mt):'\u00bfC\u00f3mo identificarlo? (doble clic)')+'</b>'+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+(op?'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+D('name','ld lnm','<span class="lnl">Nombre</span>'+esc(p2real(l)||'Sin nombre'))+chip+'</div>':'')+(op&&l.tel&&!l.ph?'<div class="p2tel">'+esc(fmt(l.tel))+'</div>':'')+res+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+(op?'<div class="la">'+ac+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
