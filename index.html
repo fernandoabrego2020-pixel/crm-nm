@@ -365,6 +365,7 @@ body.hasnav .sheet{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 .mps .pt.add{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px dashed var(--ln);background:var(--card);color:var(--mu);text-decoration:none;text-align:center}
 .mps .pt.add span{font-size:26px;line-height:1;font-weight:300}.mps .pt.add small{position:static;background:none;color:var(--mu);padding:4px 6px 0;font-weight:600;white-space:normal;text-align:center}
 .mps .mpn{color:var(--mu);font-size:13px;padding:6px 2px}
+#mtp>.mpn{color:var(--mu);font-size:13px;font-weight:700;padding:2px 2px 6px}
 .mlb{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center}
 .mlb img{max-width:100%;max-height:100%;object-fit:contain}
 .mlb button{position:absolute;top:14px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.18);color:#fff;font-size:28px;line-height:1}
@@ -1796,16 +1797,21 @@ function mFirst(m,w){const U=String(m.i||'').split(/[\s,;]+/).filter(u=>/^https?
 async function mStrip(){
   const b=document.getElementById('mtp');if(!b)return;
   const key=MV.s,fid=SUCD[key];if(!fid){b.innerHTML='';return}
-  const img=src=>'<img src="'+esc(src)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()">';
-  MV.fi=MV.fi||{};let ids=MV.fi[fid];
-  if(!ids){b.innerHTML='<div class="mps"><div class="mpn">Cargando fotos\u2026</div></div>';
-    let r=null;try{r=await api('folder_imgs',{id:fid})}catch(e){r=null}
-    ids=(r&&r.ok&&Array.isArray(r.ids))?r.ids:[];if(r&&r.ok)MV.fi[fid]=ids;
-    if(!b.isConnected||MV.s!==key)return}
+  const sig=key+'|'+MV.u;
+  const img=(src,w)=>'<img src="'+esc(src)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()">';
   const nm=(MSUC.find(x=>x[0]===key)||[0,key])[1];
-  let t=ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,900))+'</button>').join('');
-  if(!ids.length)t=mList().filter(m=>mFirst(m)).slice(0,30).map(m=>'<button class="pt" data-mo="'+esc(m.n)+'">'+img(mFirst(m,900))+'<small>'+esc(m.n)+(m.p?' \u00b7 '+mxn(m.p):'')+'</small></button>').join('');
-  b.innerHTML='<div class="mps">'+t+'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+fid+'"><span>+</span><small>Abrir carpeta<br>'+esc(nm)+'</small></a></div>'}
+  const L=mList().filter(m=>mFirst(m)).slice(0,30);
+  const top=L.length?'<div class="mpn">Motos en '+esc(nm)+'</div><div class="mps">'+L.map(m=>'<button class="pt" data-mo="'+esc(m.n)+'">'+img(mFirst(m,900))+'<small>'+esc(m.n)+(m.p?' \u00b7 '+mxn(m.p):'')+'</small></button>').join('')+'</div>':'';
+  const uf=MV.u&&IMG.find(x=>x[0]===MFO[MV.u]);
+  const need=[fid].concat(uf?[uf[1]]:[]);
+  MV.fi=MV.fi||{};
+  if(need.some(f=>!MV.fi[f])){
+    b.innerHTML=top+'<div class="mpn">Cargando fotos reales\u2026</div>';
+    await Promise.all(need.filter(f=>!MV.fi[f]).map(async f=>{let r=null;try{r=await api('folder_imgs',{id:f})}catch(e){r=null}if(r&&r.ok&&Array.isArray(r.ids))MV.fi[f]=r.ids}));
+    if(!b.isConnected||MV.s+'|'+MV.u!==sig)return}
+  const ids=[];need.forEach(f=>(MV.fi[f]||[]).forEach(i=>{if(ids.indexOf(i)<0)ids.push(i)}));
+  const add=(id,t)=>'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+id+'"><span>+</span><small>Abrir carpeta<br>'+esc(t)+'</small></a>';
+  b.innerHTML=top+'<div class="mpn">Fotos reales</div><div class="mps">'+ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,900))+'</button>').join('')+add(fid,nm)+(uf?add(uf[1],uf[0]):'')+'</div>'}
 function mLb(id){const o=document.createElement('div');o.className='mlb';o.innerHTML='<img src="'+esc(mTh(id,1600))+'" alt="" referrerpolicy="no-referrer"><button aria-label="Cerrar">\u00d7</button>';o.onclick=()=>o.remove();document.body.appendChild(o)}
 function mFicha(f,n){const ln=u=>u&&u.indexOf('https:\x2F\x2Fnovamotos.com.mx')===0?`<a class="mtl" style="display:inline-block;margin-top:8px" target="_blank" rel="noopener" href="${esc(u)}">Ver en novamotos.com.mx</a>`:'';
   if(!f||!f.ok)return `<b>Ficha técnica</b><div class="note" style="margin-top:6px">No se pudo cargar la ficha.</div>`+ln('https:\x2F\x2Fnovamotos.com.mx/tienda/');
