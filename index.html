@@ -23,7 +23,6 @@ url:{getLocation:function(cb){cb({hash:location.hash.replace(/^#/,"")})}}
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>CRM Novamotos</title>
-<link rel="icon" href="data:,">
 <style>
 :root{color-scheme:light;
 --bg:#f6f7f9;--card:#fff;--tx:#1d2330;--mu:#677085;--ln:#e2e5ea;--soft:#eef0f3;
@@ -392,6 +391,39 @@ body.hasnav .sheet{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 #t3 .iarow{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;padding:8px 14px;font-size:14px;border-bottom:1px solid var(--line)}#t3 .iarow.hd{font-size:11px;color:var(--ink-3);text-transform:uppercase}
 #t3 .iaout .note{padding:6px 14px}
 #t3 .more{display:block;margin:10px auto}
+
+.tot.cats{grid-template-columns:repeat(3,1fr)}
+.tot.cats button{padding:14px 12px}
+.tot.cats button b{font-size:30px}
+.tot.cats button span{font-size:14px;font-weight:600}
+.ptb{display:flex;gap:8px;align-items:center;margin:14px 0 8px}
+.pq{flex:1;min-width:0;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:10px;padding:11px 12px;font:15px system-ui,sans-serif}
+.smb{border:1px solid var(--ln);background:none;color:var(--mu);border-radius:10px;padding:11px 10px;font-size:12px;cursor:pointer;white-space:nowrap}
+.pnote{color:var(--mu);font-size:12.5px;margin:2px 2px 8px}
+.pchips{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:4px 0 4px;padding-bottom:2px}
+.pchips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:999px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer}
+.chip em{font-style:normal;color:var(--mu);font-weight:500;margin-left:4px}
+.chip.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.chip.on em{color:var(--bg);opacity:.7}
+.dgl{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);margin:16px 2px 6px}
+.pcg{background:color-mix(in srgb,var(--k) 24%,transparent);color:var(--tx)}
+.pn{font-variant-numeric:tabular-nums;color:var(--tx);font-weight:500}
+.nw{background:#ef4444;color:#fff}
+.psn{color:var(--mu);font-size:12.5px;margin-top:3px;line-height:1.3}
+.qa{display:flex;gap:6px;padding:0 12px 10px;flex-wrap:wrap}
+.qb{border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:8px;padding:9px 11px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;min-height:38px;box-sizing:border-box}
+.qb.wa{background:var(--wa);border-color:var(--wa);color:#fff}
+.qb.st{border-color:#d97706;color:#d97706}
+.qb.bs{color:var(--mu)}
+body.ro .qb.act{display:none!important}
+.cm{display:flex;gap:6px;margin:10px 0 4px}
+.cm button{flex:1;border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:8px;padding:10px 6px;font-size:13px;font-weight:600;cursor:pointer}
+.cm button.on{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.cm button:disabled{opacity:.4}
+.vmb{display:block;margin:22px auto 8px;background:none;border:0;color:var(--mu);font-size:13px;text-decoration:underline;cursor:pointer}
+.qs2{text-align:center;margin:12px 0 2px}
+.qs2 button{background:none;border:1px solid var(--ln);border-radius:12px;padding:11px 20px;font:500 14px/1.1 -apple-system,'Helvetica Neue',Arial,sans-serif;letter-spacing:.04em;color:var(--mu);cursor:pointer}
 </style>
 </head>
 <body>
@@ -485,6 +517,9 @@ const gb=id=>id==='cartera'?CART:G.find(g=>g.id===id);
 
 let S={ag:AG[0],leads:[]},undo=null,open=null,only=null,sheet=null,AI=false,tt,TOK='',ME='',LU='',BASE=new Map(),pushing=false,again=false,ready=false,ADMIN=false,TAKEN=new Map(),delArm=null,NXM='w';
 const ANA_OK=false;
+let VM='cat',CATSEL=null,PQ='',PF='all',PLIM=60,SORTM='c';
+const CATS=[['imp','Importantes','#d97706'],['neu','Neutros','#4f46e5'],['bas','Basura','#475569']];
+const catOf=l=>l.cat==='imp'?'imp':l.cat==='bas'?'bas':'neu';
 if(!AG.includes(S.ag))S.ag=AG[0];
 const save=()=>{push()};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -604,17 +639,90 @@ function seenMap(){try{return JSON.parse(lget('crm-seen')||'{}')||{}}catch(e){re
 function newAuto(L,gid){if(gid==='cartera'||gid==='referidos')return [];const sm=seenMap(),lim=Date.now()-7*864e5;return L.filter(l=>l.auto&&!sm[l.tel]&&(l.c||0)>lim&&inA(l,gid))}
 function markSeen(L,gid){const a=newAuto(L,gid);if(!a.length)return;const sm=seenMap();a.forEach(l=>{sm[l.tel]=1});const ks=Object.keys(sm);if(ks.length>1500)ks.slice(0,ks.length-1000).forEach(k=>delete sm[k]);lset('crm-seen',JSON.stringify(sm))}
 function welcome(){const pn=phN();return '<div class="wel"><div class="wn">'+esc(pname(String(ME))[0])+'</div>'+(RO||ROLE==='admin'?'':'<div class="qs"><button id="qsb" data-qs="1"'+(QSBUSY?' disabled':'')+'>'+(QSBUSY?'Ubicando\u2026':'\u2316 Guardar ubicaci\u00f3n y llenar despu\u00e9s'+(pn?' \u00b7 '+pn:''))+'</button></div><div class="addl"><div class="ab"><button data-add="ia">IA</button><button data-add="man">Manual</button></div><div class="al">\u2196 Agregar leads \u2197</div></div>')+'</div>'}
+
+const gOf=l=>{if(l.done||l.lost)return CART;const g=G.find(x=>x.id!=='referidos'&&l.st&&l.st[x.id]!==undefined);return g||CART};
+const phName=l=>l.done?'Cerrado':l.lost?'Perdido':(gOf(l).id==='cartera'?'Sin fase':gOf(l).t);
+const actT=l=>{let m=l.c||0;Object.keys(l.st||{}).forEach(k=>{const v=Number(l.st[k]);if(v>m)m=v});(l.ctx||[]).forEach(e=>{if((e.t||0)>m)m=e.t});return m};
+function catSet(c){const pool=(c==='imp'&&ADMIN)?S.leads:mine();return pool.filter(l=>!l.ph&&!l.done&&catOf(l)===c)}
+function catNewList(){const sm=seenMap(),lim=Date.now()-7*864e5;return catSet('neu').filter(l=>l.auto&&!sm[l.tel]&&(l.c||0)>lim)}
+function seenOne(l){const sm=seenMap();if(sm[l.tel])return;sm[l.tel]=1;const ks=Object.keys(sm);if(ks.length>1500)ks.slice(0,ks.length-1000).forEach(k=>delete sm[k]);lset('crm-seen',JSON.stringify(sm))}
+function seenAll(){catNewList().forEach(seenOne)}
+function dgLabel(t){const a=new Date(),b=new Date(t);a.setHours(0,0,0,0);b.setHours(0,0,0,0);const d=Math.round((a-b)/864e5);return d<=0?'Hoy':d===1?'Ayer':d<=7?'Últimos 7 días':d<=30?'Últimos 30 días':'Más antiguos'}
+function copyTel(t){
+  const ok=()=>toast('Número copiado: '+fmt(t),1);
+  const fb=()=>{const x=document.createElement('textarea');x.value=t;x.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy')?ok():toast('No se pudo copiar',1)}catch(e){toast('No se pudo copiar',1)}x.remove()};
+  try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}
+}
+function pcard(l,c){
+  const g=gOf(l),key=g.id+':'+l.id,op=open===key,sm=seenMap();
+  const isNew=c==='neu'&&l.auto&&!sm[l.tel]&&(l.c||0)>Date.now()-7*864e5;
+  const lc=(l.ctx||[]).filter(e=>!e.auto).slice(-1)[0];
+  let sn=(l.ai&&l.ai.resumen)||(lc&&lc.x)||l.note||'';if(sn.length>130)sn=sn.slice(0,127)+'…';
+  const tg=`<span class="t pcg" style="--k:var(--${g.k})">${esc(phName(l))}</span>`+(isNew?'<span class="t nw">Nuevo</span>':'')+(l.sn&&l.sn>Date.now()?`<span class="t">Vuelve ${fd(l.sn)}</span>`:'')+(ADMIN&&c==='imp'?`<span class="t">${esc(l.own)}</span>`:'');
+  let qa=`<button class="qb" data-cp="${l.tel}">Copiar número</button><a class="qb wa" href="https:\x2F\x2Fwa.me/52${l.tel}" target="_blank" rel="noopener">WhatsApp</a>`;
+  if(c==='neu'){if(ADMIN)qa+='<button class="qb st act" data-a="catImp">★ Importante</button>';qa+='<button class="qb bs act" data-a="catBas">Basura</button>'}
+  else if(c==='imp'){if(ADMIN)qa+='<button class="qb act" data-a="catNeu">Quitar de importantes</button>'}
+  else qa+='<button class="qb act" data-a="catNeu">Recuperar</button>';
+  const cm=`<div class="cm"><button data-a="catImp" class="${c==='imp'?'on':''}"${ADMIN?'':' disabled'}>${ADMIN?'':'🔒 '}Importantes</button><button data-a="catNeu" class="${c==='neu'?'on':''}">Neutros</button><button data-a="catBas" class="${c==='bas'?'on':''}">Basura</button></div>`;
+  return `<div class="c${op?' open':''}" style="--k:var(--${g.k})" data-id="${l.id}" data-g="${g.id}">
+   <button class="row"><div class="top"><b>${esc(l.name)}</b><small>${ago(l.c||actT(l))}</small></div>
+   <div class="m"><span class="pn">${esc(fmt(l.tel))}</span>${l.moto&&l.moto!=='Sin moto'?' · '+esc(l.moto):''} ${tg}</div>${sn?`<div class="psn">${esc(sn)}</div>`:''}</button>
+   <div class="qa">${qa}</div>
+   <div class="more">${op?acts(l,g):''}</div></div>`;
+}
+function pListHTML(){
+  const c=CATSEL;let it=catSet(c);
+  const q=PQ.trim().toLowerCase(),qd=q.replace(/\D/g,'');
+  if(q)it=it.filter(l=>(String(l.name)+' '+(l.moto||'')+' '+l.tel).toLowerCase().indexOf(q)>=0||(qd.length>=3&&l.tel.indexOf(qd)>=0));
+  let chips='';
+  if(c!=='imp'){
+    const m={},ord=[];it.forEach(l=>{const k=gOf(l).id;if(!m[k]){m[k]=0;ord.push(k)}m[k]++});
+    const nn=c==='neu'?it.filter(l=>catNewList().indexOf(l)>=0).length:0;
+    const ids=G.map(x=>x.id).concat(['cartera']).filter(k=>m[k]);
+    if(PF!=='all'&&PF!=='new'&&!m[PF])PF='all';
+    if(PF==='new'&&!nn)PF='all';
+    chips='<div class="pchips"><button class="chip'+(PF==='all'?' on':'')+'" data-pf="all">Todos<em>'+it.length+'</em></button>'+(nn?'<button class="chip'+(PF==='new'?' on':'')+'" data-pf="new">Nuevos<em>'+nn+'</em></button>':'')+ids.map(k=>{const g=k==='cartera'?{t:'Sin fase'}:gb(k);return '<button class="chip'+(PF===k?' on':'')+'" data-pf="'+k+'">'+esc(g.t)+'<em>'+m[k]+'</em></button>'}).join('')+'</div>';
+    if(PF==='new'){const nl=catNewList();it=it.filter(l=>nl.indexOf(l)>=0)}
+    else if(PF!=='all')it=it.filter(l=>gOf(l).id===PF);
+  }
+  it.sort((a,b)=>SORTM==='c'?(b.c||0)-(a.c||0):actT(b)-actT(a));
+  if(!it.length){return chips+'<div class="empty" style="padding:18px 2px">'+(PQ.trim()?'Sin resultados':c==='imp'?(ADMIN?'Vacío. Marca con ★ los leads que quieras priorizar.':'Aquí aparecen los leads que Fer marque como importantes.'):c==='bas'?'Nada en la basura.':'No hay leads aquí.')+'</div>'}
+  let h=chips,last='',n=0;
+  for(const l of it){
+    if(n>=PLIM)break;
+    if(c!=='imp'){const lb=dgLabel(SORTM==='c'?(l.c||0):actT(l));if(lb!==last){last=lb;h+='<div class="dgl">'+lb+'</div>'}}
+    h+=pcard(l,c);n++;
+  }
+  if(it.length>n)h+='<button class="chip" style="display:block;margin:12px auto" data-pm="1">Ver más ('+(it.length-n)+')</button>';
+  return h;
+}
+function renderCat(){
+  const T=document.getElementById('tot');
+  const cnt={imp:catSet('imp').length,neu:catSet('neu').length,bas:catSet('bas').length};
+  if(!CATSEL)CATSEL=cnt.imp?'imp':'neu';
+  const nw=catNewList().length;
+  T.classList.add('cats');
+  T.innerHTML=CATS.map(([k,t,col])=>`<button style="--k:${col}" class="${CATSEL===k?'':'dim'}" data-cs="${k}"><b>${cnt[k]}</b><span>${t}</span>${k==='neu'&&nw?'<i class="nbg">'+nw+'</i>':''}</button>`).join('');
+  const pn=phN();
+  const qsb=(RO||ROLE==='admin')?'':'<div class="qs2"><button id="qsb" data-qs="1"'+(QSBUSY?' disabled':'')+'>'+(QSBUSY?'Ubicando…':'⌖ Guardar ubicación y llenar después'+(pn?' · '+pn:''))+'</button></div>';
+  const note=CATSEL==='imp'?'<div class="pnote">'+(ADMIN?'Solo tú metes y sacas leads de aquí'+(ADMIN?' · se ven los de todas las cuentas':''):'Leads que Fer marcó como prioridad')+'</div>':'';
+  document.getElementById('list').innerHTML=qsb+'<div class="ptb"><input id="pq" class="pq" type="search" placeholder="Buscar nombre, número o moto" value="'+esc(PQ)+'" autocomplete="off"><button class="smb" data-sm="1">'+(SORTM==='c'?'Más nuevos primero':'Última actividad')+'</button></div>'+note+'<div id="plist">'+pListHTML()+'</div><button class="vmb" data-vm="fases">Ver por fases (versión anterior)</button>';
+}
+const vmBack=()=>'<button class="vmb" style="margin:14px auto 0" data-vm="cat">← Volver a categorías</button>';
+
 function render(){
   wake();
   document.getElementById('brand').innerHTML=brand();
   if(!ADMIN&&AG.includes(ME))S.ag=ME;
   document.getElementById('ag').innerHTML=`${ADMIN?agBar():'<div class="tabs"></div>'}<button class="newb mapb" id="mapbtn">Mapa</button><button class="newb" id="newbtn">+ Lead</button>`;
+  if(VM==='cat'){renderCat();return}
+  document.getElementById('tot').classList.remove('cats');
   const L=mine();
   document.getElementById('tot').innerHTML=GRID.map(g=>{const n=g.id==='cartera'?L.length:L.filter(l=>inA(l,g.id)).length;
     return `<button style="--k:var(--${g.k})" class="${only&&only!==g.id?'dim':''}" data-f="${g.id}" data-n="${NX[g.id]||''}"><b>${n}</b><span>${g.t}</span>${newAuto(L,g.id).length?'<i class="nbg">'+newAuto(L,g.id).length+'</i>':''}</button>`}).join('');
-  if(!only){document.getElementById('list').innerHTML=welcome();return}
+  if(!only){document.getElementById('list').innerHTML=vmBack()+welcome();return}
   const gs=[gb(only)];
-  document.getElementById('list').innerHTML=gs.map(g=>{
+  document.getElementById('list').innerHTML=vmBack()+gs.map(g=>{
     if(g.id==='cartera')return carteraHTML(L,g);
     const it=(g.id==='cartera'?L.slice().sort((a,b)=>b.c-a.c):L.filter(l=>inA(l,g.id)).sort((a,b)=>a.st[g.id]-b.st[g.id]));
     const h=`<div class="grp" style="--k:var(--${g.k})"><i></i>${g.t}<small>${it.length}</small></div>`;
@@ -731,6 +839,9 @@ const A={
  apr(l){del(l,'aprobar');add(l,'visita');l.note=ST[l.s];l.f=0;ev(l,'Lo aprobaron con '+ST[l.s]+'. Falta que visite la sucursal.');done(l.name+' → Buscar visita')},
  vis(l){del(l,'visita');add(l,'vendidos');l.f=0;ev(l,'El cliente ya visitó la sucursal.');done(l.name+' → Caducidad promoción')},
  gift(l){del(l,'vendidos');add(l,'apartar');ev(l,'Ya se le presionó para cerrar: se le ofreció un regalo por cerrar esta semana o se le puso fecha de vencimiento a la promoción.');done(l.name+' → Apartar o firmar')},
+ catImp(l){if(!ADMIN)return toast('Solo Fer puede marcar importantes',1);l.cat='imp';(l.ctx=l.ctx||[]).push({t:Date.now(),x:'Marcado como importante.',auto:true,pend:false});done(l.name+' → Importantes')},
+ catNeu(l){if(catOf(l)==='imp'&&!ADMIN)return toast('Solo Fer puede quitar de importantes',1);delete l.cat;(l.ctx=l.ctx||[]).push({t:Date.now(),x:'Pasó a Neutros.',auto:true,pend:false});done(l.name+' → Neutros')},
+ catBas(l){if(catOf(l)==='imp'&&!ADMIN)return toast('Solo Fer puede quitar de importantes',1);l.cat='bas';(l.ctx=l.ctx||[]).push({t:Date.now(),x:'Pasó a Basura.',auto:true,pend:false});done(l.name+' → Basura')},
  fir(l){const k=l.st.referidos;l.st={};if(k!==undefined)l.st.referidos=k;l.done=true;ev(l,'El cliente ya apartó o firmó su moto.');done(l.name+' ✓')},
  na(l){if(l.f<4)l.f++;touch(l);ev(l,l.f>=4?'No contestó varios mensajes; toca llamarle.':'No contestó el seguimiento ('+l.f+'/3).');done(l.name+(l.f>=4?' → Llamar':' → Seg. '+l.f+'/3'))},
  ans(l){l.f=0;touch(l);ev(l,'El cliente ya contestó.');done(l.name+' contestó')},
@@ -762,6 +873,12 @@ const A={
 document.addEventListener('click',e=>{
   if(e.target.classList&&e.target.classList.contains('sheet'))return closeSheet();
   const b=e.target.closest('button,a');if(!b)return;
+  if(b.dataset.cp){copyTel(b.dataset.cp);return}
+  if(b.dataset.cs){CATSEL=b.dataset.cs;PF='all';PLIM=60;open=null;return render()}
+  if(b.dataset.pf){PF=b.dataset.pf;PLIM=60;open=null;return render()}
+  if(b.dataset.pm){PLIM+=60;return render()}
+  if(b.dataset.sm){SORTM=SORTM==='c'?'act':'c';PLIM=60;return render()}
+  if(b.dataset.vm){VM=b.dataset.vm;only=null;open=null;return render()}
   if(b.dataset.qs){quickSave();return}
    if(b.dataset.add){if(b.dataset.add==='ia'&&AI){pickPhoto(async f=>{openSheet(null,'foto');await onFile(f);if(sheet&&sheet.file)analyze()});return}openSheet(null,b.dataset.add==='ia'?'foto':'manual');return}
   if(b.dataset.r==='forget'){lset('crm-toks','');LR='';LU='';showLogin();return}
@@ -788,11 +905,12 @@ document.addEventListener('click',e=>{
   if(b.id==='undo'){const du=()=>{if(undo){S=JSON.parse(undo);undo=null;save();render()}document.getElementById('toast').classList.remove('show')};return du()}
   const c=b.closest('.c');if(!c)return;
   const key=c.dataset.g+':'+c.dataset.id;
-  if(b.classList.contains('row')){open=open===key?null:key;return render()}
+  if(b.classList.contains('row')){open=open===key?null:key;if(open){const l0=S.leads.find(x=>x.id===c.dataset.id);if(l0)seenOne(l0)}return render()}
   const l=S.leads.find(x=>x.id===c.dataset.id),a=b.dataset.a;
   if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000)))go();else needFull(go)}
 });
 document.addEventListener('input',e=>{
+  if(e.target&&e.target.id==='pq'){PQ=e.target.value;PLIM=60;const p=document.getElementById('plist');if(p)p.innerHTML=pListHTML();return}
   const t=e.target;if(!sheet)return;
   if(t.id==='sn')sheet.name=t.value;
   else if(t.id==='st')sheet.tel=t.value;
