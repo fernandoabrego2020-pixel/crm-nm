@@ -357,11 +357,11 @@ body.hasnav .sheet{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 .mtf{display:grid;grid-template-columns:44px 1fr 1fr;gap:8px;margin-bottom:8px}
 .mtf select.on{border:2px solid var(--tx);font-weight:700}
 .mtf select{height:44px;border:1px solid var(--ln);border-radius:12px;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23677085' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center/16px;padding:0 26px 0 10px;font-size:14px;font-weight:600;color:var(--tx);appearance:none;-webkit-appearance:none;font-family:inherit;min-width:0;width:100%}
-.mps{display:flex;gap:8px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mps{display:flex;gap:10px;overflow-x:auto;margin:0 0 10px;padding-bottom:2px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .mps::-webkit-scrollbar{display:none}
-.mps .pt{flex:none;width:132px;height:100px;border-radius:12px;overflow:hidden;background:var(--soft);scroll-snap-align:start;position:relative;cursor:pointer;border:0;padding:0;display:block}
+.mps .pt{flex:none;width:min(80vw,340px);height:230px;border-radius:16px;overflow:hidden;background:var(--soft);scroll-snap-align:start;position:relative;cursor:pointer;border:0;padding:0;display:block}
 .mps .pt img{width:100%;height:100%;object-fit:cover;display:block}
-.mps .pt small{text-transform:none;letter-spacing:0;position:absolute;left:0;right:0;bottom:0;padding:14px 8px 6px;color:#fff;font-size:12px;font-weight:700;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.65));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mps .pt small{text-transform:none;letter-spacing:0;position:absolute;left:0;right:0;bottom:0;padding:30px 12px 10px;color:#fff;font-size:16px;font-weight:700;text-align:left;background:linear-gradient(transparent,rgba(0,0,0,.65));white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mps .pt.add{display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px dashed var(--ln);background:var(--card);color:var(--mu);text-decoration:none;text-align:center}
 .mps .pt.add span{font-size:26px;line-height:1;font-weight:300}.mps .pt.add small{position:static;background:none;color:var(--mu);padding:4px 6px 0;font-weight:600;white-space:normal;text-align:center}
 .mps .mpn{color:var(--mu);font-size:13px;padding:6px 2px}
@@ -1790,12 +1790,16 @@ function mChips(){const u=document.getElementById('mtu'),s=document.getElementBy
   s.innerHTML=[['','Sucursal'],...MSUC].map(x=>`<option value="${x[0]}"${MV.s===x[0]?' selected':''}>${x[1]}</option>`).join('')}
 const MFO={'Motoneta':'Scooter','Traslado diario':'Traslado diario','Trabajo y reparto':'Trabajo y carga','Doble prop\u00f3sito':'Doble prop\u00f3sito','Deportiva':'Deportiva','Chopper':'Chopper y custom','Cuatrimoto':'Cuatrimoto','UTV':'Cuatrimoto','Carga':'Trabajo y carga'};
 const mTh=(id,w)=>'https:\x2F\x2Fdrive.google.com/thumbnail?id='+id+'&sz=w'+w;
-function mFirst(m){const U=String(m.i||'').split(/[\s,;]+/).filter(u=>/^https?:/i.test(u));for(const u of U){let x;
-    if((x=/drive\.google\.com\/file\/d\/([\w-]+)/.exec(u))||(x=/drive\.google\.com\/(?:open|uc)\?[^#]*id=([\w-]+)/.exec(u)))return mTh(x[1],500);
+function mFirst(m,w){const U=String(m.i||'').split(/[\s,;]+/).filter(u=>/^https?:/i.test(u));for(const u of U){let x;
+    if((x=/drive\.google\.com\/file\/d\/([\w-]+)/.exec(u))||(x=/drive\.google\.com\/(?:open|uc)\?[^#]*id=([\w-]+)/.exec(u)))return mTh(x[1],w||500);
     if(/\.(jpe?g|png|webp|gif)(\?|#|$)/i.test(u)||/i\.imgur\.com|lh3\.googleusercontent|drive\.google\.com\/thumbnail/i.test(u))return u}return ''}
 async function mStrip(){
   const b=document.getElementById('mtp');if(!b)return;
   const img=(src,x)=>'<img src="'+esc(src)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()">';
+  if(MV.s){
+    const L=mList().filter(m=>mFirst(m)).slice(0,30);
+    if(L.length){b.innerHTML='<div class="mps">'+L.map(m=>'<button class="pt" data-mo="'+esc(m.n)+'">'+img(mFirst(m,900))+'<small>'+esc(m.n)+(m.p?' \u00b7 '+mxn(m.p):'')+'</small></button>').join('')+'</div>';return}
+    if(!MV.u){b.innerHTML='';return}}
   if(MV.u){
     const fo=IMG.find(x=>x[0]===MFO[MV.u]);if(!fo){b.innerHTML='';return}
     const key=MV.u;MV.fi=MV.fi||{};
@@ -1804,11 +1808,7 @@ async function mStrip(){
       MV.fi[fo[1]]=(r&&r.ok&&Array.isArray(r.ids))?r.ids:[];if(!(r&&r.ok))delete MV.fi[fo[1]];
       if(MV.u!==key)return}
     const ids=MV.fi[fo[1]]||[];
-    b.innerHTML='<div class="mps">'+ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,500))+'</button>').join('')+'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+fo[1]+'"><span>+</span><small>Abrir carpeta<br>'+esc(fo[0])+'</small></a></div>';
-    return}
-  if(MV.s){
-    const L=mList().filter(m=>mFirst(m)).slice(0,30);
-    b.innerHTML=L.length?'<div class="mps">'+L.map(m=>'<button class="pt" data-mo="'+esc(m.n)+'">'+img(mFirst(m))+'<small>'+esc(m.n)+'</small></button>').join('')+'</div>':'';
+    b.innerHTML='<div class="mps">'+ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,900))+'</button>').join('')+'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+fo[1]+'"><span>+</span><small>Abrir carpeta<br>'+esc(fo[0])+'</small></a></div>';
     return}
   b.innerHTML=''}
 function mLb(id){const o=document.createElement('div');o.className='mlb';o.innerHTML='<img src="'+esc(mTh(id,1600))+'" alt="" referrerpolicy="no-referrer"><button aria-label="Cerrar">\u00d7</button>';o.onclick=()=>o.remove();document.body.appendChild(o)}
