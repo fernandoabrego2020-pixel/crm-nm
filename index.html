@@ -548,6 +548,10 @@ body.fermap #mdock .r2{grid-template-columns:1fr 1fr!important}
 .p2f .cn button{border:1px solid #d97706;background:#fff7ed;color:#9a3412;border-radius:10px;min-width:48px;min-height:44px;font-size:17px;font-weight:700;cursor:pointer;padding:0 12px}
 .lc .nm{display:flex;gap:8px;margin-top:10px}.lc .nm input{flex:1;min-width:0}
 .lc .ld.ph{color:#9a3412;font-weight:600;font-size:13.5px}
+.lkx button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:50px;border:0;border-radius:12px;font:inherit;font-weight:700;font-size:16px;color:#fff;cursor:pointer;text-align:center;line-height:1.2;padding:6px}
+.lkx button small{font-weight:500;font-size:12px;opacity:.92}
+.lkx+.lkx{margin-top:-6px}
+.lkx.lk2 button:first-child{background:var(--g1,#4f46e5)}.lkx.lk2 button:last-child{background:var(--g5,#d97706)}
 .lkx a:first-child{background:var(--g4,#e11d48)}.lkx a:last-child{background:var(--g3,#7c3aed)}
 .p2h .p2n{margin-left:auto;border:0;background:#1f9d55;color:#fff;border-radius:10px;padding:9px 13px;font-size:14px;font-weight:700;cursor:pointer}
 .p2a.vn{background:#2563eb;border-color:#2563eb;color:#fff}
@@ -1874,7 +1878,7 @@ const SUCD={lerma:'1ngWM2hFas_i7chSZHgPNnZojWEnaKVJd',atlacomulco:'1eDYSyoKkHXOq
 async function motosView(){
   MV.s=mSucKey(S.ag);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  const FLOW='<div class="flx"><div class="flh">Flujo de venta</div><ol><li><b>Inter\u00e9s</b><span>\u00bfCu\u00e1l moto le gust\u00f3?</span></li><li><b>INE</b><span>P\u00eddela y t\u00e1mitala</span></li><li><b>Visita</b><span>Dale un d\u00eda: \u201c\u00bfma\u00f1ana o s\u00e1bado?\u201d</span></li><li><b>Urgencia</b><span>Algo real que pueda perder</span></li></ol></div>',FD=FERDEV()&&ME==='Fer'&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div>':'';
+  const FLOW='<div class="flx"><div class="flh">Flujo de venta</div><ol><li><b>Inter\u00e9s</b><span>\u00bfCu\u00e1l moto le gust\u00f3?</span></li><li><b>INE</b><span>P\u00eddela y t\u00e1mitala</span></li><li><b>Visita</b><span>Dale un d\u00eda: \u201c\u00bfma\u00f1ana o s\u00e1bado?\u201d</span></li><li><b>Urgencia</b><span>Algo real que pueda perder</span></li></ol></div>',FD=FERDEV()&&ME==='Fer'&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div><div class="lkx lk2"><button data-nv="ana">Ana<small>Horario, bloqueados y precios</small></button><button data-nv="anacat">Actualizar cat\u00e1logo<small>Precios e inventario</small></button></div>':'';
   m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>`}${LK}<div id="mtb"></div>${FD?FLOW:''}</div>`;m.style.display='block';
   const b=document.getElementById('mtb');
   b.onchange=e=>{const t=e.target;if(t.id==='mtu'){MV.u=t.value;mChips();mDrawList();mStrip()}else if(t.id==='mts'){MV.s=t.value;mChips();mDrawList();mStrip()}};
@@ -1923,7 +1927,7 @@ function avCatDraw(){const b=document.getElementById('avb');if(!b)return;
   const qs=AV.q.toLowerCase().split(/\s+/).filter(Boolean).map(mnorm);
   const L=c.m.filter(m=>!qs.length||qs.every(w=>mnorm(m.n).indexOf(w)>=0));
   const nch=Object.keys(AV.ed).length,w=!c.ro;
-  b.innerHTML=`<button class="mback" data-av="back" style="margin-bottom:10px">← Ana</button>${w?'<button class="avb ft" data-av="foto">Actualizar catálogo con foto</button>':''}
+  b.innerHTML=`<button class="mback" data-av="back" style="margin-bottom:10px">← Ana</button>${w?'<button class="avb ft" data-av="foto">Actualizar catálogo con foto</button>':''}<div class="sg"><b>Inventario disponible</b><div class="note" style="margin:2px 0 8px">Qué motos hay en cada sucursal (hoja Motos en piso).</div><a class="avb sec" style="display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener" href="${pisoUrl()}">Abrir inventario</a></div>
   <div class="mtw"><svg viewBox="0 0 24 24">${IC.search}</svg><input id="avq" type="search" placeholder="Buscar moto" value="${esc(AV.q)}" autocomplete="off"></div>
   <div id="avs">${avSaveBtn()}</div>
   <div id="avl">${L.map(m=>{const e=AV.ed[m.r];return `<div class="avc${e!==undefined?' ch':''}"><span>${esc(m.n)}</span><input type="text" inputmode="numeric" data-r="${m.r}" value="${e!==undefined?e:m.p}"${w?'':' disabled'}></div>`}).join('')||'<div class="soonp">Sin resultados</div>'}</div><input type="file" id="avf" accept="image/\x2A" hidden>`}
@@ -1959,7 +1963,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   else if(a==='apply'){const items=AV.ft.ch.filter(x=>x.on).map(x=>({r:x.r,n:x.n,p:x.p}));if(items.length)avCatSave(items)}}
 async function anaView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in" id="avi"><div class="mh2"><b>Ana<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="avi">${FERDEV()&&ME==='Fer'?'<button class="mback" data-nv="moto" style="margin-bottom:10px">\u2190 Informaci\u00f3n</button>':''}<div class="mh2"><b>Ana<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
   const b=document.getElementById('avb');AV.sub='';AV.ft=null;AV.ed={};
   b.onclick=avClick;
   b.onchange=e=>{const t=e.target;
@@ -1969,12 +1973,14 @@ async function anaView(){
       if(!c)return;if(!(v>=0)||String(t.value).trim()===''){t.value=AV.ed[r]!==undefined?AV.ed[r]:c.p;return}
       if(v===c.p)delete AV.ed[r];else AV.ed[r]=v;t.value=v;const row=t.closest('.avc');if(row)row.classList.toggle('ch',v!==c.p);const sb=document.getElementById('avs');if(sb)sb.innerHTML=avSaveBtn()}};
   b.oninput=e=>{if(e.target.id==='avq'){AV.q=e.target.value;const p=e.target.selectionStart;avCatDraw();const q=document.getElementById('avq');if(q){q.focus();try{q.setSelectionRange(p,p)}catch(x){}}}};
-  try{const r=await api('ana_get');if(r&&r.ok&&r.ags.length){AV.d=r;const own=ACC[ME];AV.k=r.ags.some(x=>x.k===AV.k)?AV.k:(r.ags.some(x=>x.k===own)?own:r.ags[0].k)}else AV.d=null}catch(x){AV.d=null}
+  try{const r=await api('ana_get');if(r&&r.ok&&r.ags.length){AV.d=r;const own=ME==='Fer'&&FERDEV()?mSucKey(S.ag):ACC[ME];AV.k=r.ags.some(x=>x.k===AV.k)?AV.k:(r.ags.some(x=>x.k===own)?own:r.ags[0].k)}else AV.d=null}catch(x){AV.d=null}
   if(CUR!=='ana')return;
   if(!AV.d){b.innerHTML='<div class="soonp">No se pudo cargar el panel de Ana. Cierra y abre la página.</div>';return}
+  if(AV.go==='cat'){AV.go='';AV.q='';AV.ed={};return avCatLoad()}
   avDraw()}
 function navGo(id){navGo0(id);torreBg(id)}
 function navGo0(id){
+  if(id==='anacat'){AV.go='cat';id='ana'}
   MAPM.hide();navSet(id);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   m.classList.toggle('p2on',id==='p2'||id==='ia');m.classList.toggle('iaon',id==='ia');
