@@ -673,6 +673,11 @@ body.p2lock #toast{z-index:90}
 #mleg{position:absolute;left:10px;bottom:40px;display:flex;flex-direction:column;gap:3px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.9);font-size:12px;color:#3c4050;pointer-events:none}
 #mleg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
 #mpt.show~#mleg{display:none}
+
+.mxk{font-size:12px;font-weight:600;color:var(--mu);margin:18px 2px 8px;text-transform:uppercase;letter-spacing:.04em}
+.mxl{display:flex;flex-direction:column;gap:8px}
+.mxb{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;min-height:52px;padding:8px 16px;border-radius:12px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:600;text-align:left;text-decoration:none;cursor:pointer}
+.mxb svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--mu);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 </style>
 </head>
 <body>
@@ -686,7 +691,7 @@ body.p2lock #toast{z-index:90}
 <div class="toast" id="toast"><span id="tm"></span><button id="undo">Deshacer</button></div>
 <div id="sheet"></div>
 <div id="mapv">
-  <div id="mtop"><button id="mback">← Leads</button><b id="mtt">Mapa</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
+  <div id="mtop"><button id="mback">← Clientes</button><b id="mtt">Mapa</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
   <div id="mwrap"><canvas id="mc"></canvas><div id="mst"></div><div id="mpt"></div><div id="mleg"><span><i style="background:#4338ca"></i>Elegir moto</span><span><i style="background:#c0283a"></i>Aprobación</span><span><i style="background:#15803d"></i>Visita</span></div></div>
   <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="mph" style="display:none">Sin datos</button><button id="msave">Guardar ubicación del prospecto</button></div>
   <div class="mfs" id="mfs"><div class="mh"><b id="mft">Ubicar un lead que no tiene ubicación</b><button id="mfx" aria-label="Cerrar">×</button></div><input id="mfq" placeholder="Buscar por nombre o teléfono" autocomplete="off"><div class="note" id="mfn">Toca el lead y se guarda tu ubicación actual para él.</div><div class="res" id="mfr"></div></div>
@@ -886,7 +891,9 @@ function newAuto(L,gid){if(gid==='cartera'||gid==='referidos')return [];const sm
 function markSeen(L,gid){const a=newAuto(L,gid);if(!a.length)return;const sm=seenMap();a.forEach(l=>{sm[l.tel]=1});const ks=Object.keys(sm);if(ks.length>1500)ks.slice(0,ks.length-1000).forEach(k=>delete sm[k]);lset('crm-seen',JSON.stringify(sm))}
 function welcome(){const pn=phN();return '<div class="wel"><div class="wn">'+esc(pname(String(ME))[0])+'</div>'+(RO||ROLE==='admin'?'':'<div class="qs"><button id="qsb" data-qs="1"'+(QSBUSY?' disabled':'')+'>'+(QSBUSY?'Ubicando\u2026':'\u2316 Guardar ubicaci\u00f3n y llenar despu\u00e9s'+(pn?' \u00b7 '+pn:''))+'</button></div><div class="addl"><div class="ab"><button data-add="ia">IA</button><button data-add="man">Manual</button></div><div class="al">\u2196 Agregar leads \u2197</div></div>')+'</div>'}
 
-const P2FAB='<button class="p2fab" data-p2="fab" aria-label="Agregar lead"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Lead</button><div class="p2fm2" id="p2fm2" hidden><button data-p2="add">Con foto</button><button data-p2="addm">Escribir a mano</button></div>';
+const AGL=a=>a==='Fer'?'Lerma Fer':a;
+const DN=n=>n==='Fer'&&ROLE==='vendedor'?'Lerma Fer':n;
+const P2FAB='<button class="p2fab" data-p2="fab" aria-label="Agregar cliente"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Cliente</button><div class="p2fm2" id="p2fm2" hidden><button data-p2="add">Con foto</button><button data-p2="addm">Escribir a mano</button></div>';
 const P2={fm:0,q:'',sq:0,f:null,fp:0,cat:'neu',lim:50,act:{},at:{},ed:0,tp:null,eli:0,win:0,tmp:null,sending:0,open:null,tt:0};
 const P2PH={empezar:['Elegir moto','g1'],ofrecer:['Elegir moto','g1'],aprobar:['Buscar aprobaci\u00f3n','g4'],visita:['Buscar visita','g8'],vendidos:['Buscar visita','g8'],apartar:['Buscar visita','g8']};
 const P2OPT=[['empezar','Elegir moto','g1'],['aprobar','Buscar aprobaci\u00f3n','g4'],['visita','Buscar visita','g8']];
@@ -926,8 +933,8 @@ function p2Tiles(L){
   const n={};P2FT.forEach(f=>{n[f[0]]=0});
   L.forEach(l=>{const ph=p2Phase(l);const g=ph&&P2GRP[ph[2]];if(g&&n[g]!==undefined)n[g]++});
   return '<div class="p2g">'+P2FT.map(f=>'<button style="--k:var(--'+f[2]+')" class="'+(P2.f===f[0]?'on':'')+'" data-p2="tile" data-v="'+f[0]+'"><b>'+n[f[0]]+'</b><span>'+f[1]+'</span></button>').join('')+'</div>'}
-const P2E={imp:ADMIN_TXT(),neu:'No hay leads en neutros.',bas:'La basura está vacía.'};
-function ADMIN_TXT(){return ADMIN?'Vacío. Marca con ★ solo los que de verdad importan.':'Aquí salen los leads que Fer marque como importantes.'}
+const P2E={imp:ADMIN_TXT(),neu:'No hay clientes en neutros.',bas:'La basura está vacía.'};
+function ADMIN_TXT(){return ADMIN?'Vacío. Marca con ★ solo los que de verdad importan.':'Aquí salen los clientes que Fer marque como importantes.'}
 function copyTel(t){
   const ok=()=>toast('Número copiado: '+fmt(t),1);
   const fb=()=>{const x=document.createElement('textarea');x.value=t;x.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy')?ok():toast('No se pudo copiar',1)}catch(e){toast('No se pudo copiar',1)}x.remove()};
@@ -938,7 +945,7 @@ function p2View(){
   P2.cat='neu';P2.lim=50;P2.ed=0;P2.eli=0;
   if(ADMIN){const sv=lget('crm-p2ag');if(sv&&AG.includes(sv))S.ag=sv}
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in p2"><div class="p2h">'+(ADMIN?'<select id="p2ag" aria-label="Cuenta">'+AG.map(a=>'<option'+(a===S.ag?' selected':'')+'>'+esc(a)+'</option>').join('')+(FERDEV()?'<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join(''):'')+'</select>':'<b>Prospectos</b>')+'</div>'+(FERDEV()&&swCur()!=='@vendedor'?'<div class="p2r">Est\u00e1s en vista '+esc(SWL[swCur()])+(RO?' (solo lectura). Para agregar o editar cambia a Fer vendedor.':'.')+'</div>':'')+'<div id="p2b"></div>'+P2FAB+'</div>';
+  m.innerHTML='<div class="in p2"><div class="p2h">'+(ADMIN?'<select id="p2ag" aria-label="Cuenta">'+AG.map(a=>'<option value="'+esc(a)+'"'+(a===S.ag?' selected':'')+'>'+esc(AGL(a))+'</option>').join('')+(FERDEV()?'<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join(''):'')+'</select>':'<b>Clientes</b>')+'</div>'+(FERDEV()&&swCur()!=='@vendedor'?'<div class="p2r">Est\u00e1s en vista '+esc(SWL[swCur()])+(RO?' (solo lectura). Para agregar o editar cambia a Lerma Fer.':'.')+'</div>':'')+'<div id="p2b"></div>'+P2FAB+'</div>';
   m.style.display='block';p2Render();p2Act();
   const sel=document.getElementById('p2ag');if(sel)sel.onchange=()=>{if(sel.value.charAt(0)==='@'){const v=sel.value;sel.value=S.ag;return swTo(v)}S.ag=sel.value;lset('crm-p2ag',S.ag);P2.lim=50;P2.eli=0;p2Render();p2Act()};
 }
@@ -1179,8 +1186,8 @@ document.addEventListener('click',e=>{
   if(a==='cat'){P2.ed=0;P2.open=null;P2.ph=null;P2.fm=0;P2.cat=t.dataset.v;P2.lim=50;P2.eli=0;p2Render();return p2Act()}
   if(a==='elis'){P2.eli=P2.eli?0:1;return p2Render()}
   if(a==='fab'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=!fm.hidden;return}
-  if(a==='addm'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Fer vendedor para agregar.',1);return openSheet(null,'manual')}
-  if(a==='add'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Fer vendedor para agregar.',1);return p2Add()}
+  if(a==='addm'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Lerma Fer para agregar.',1);return openSheet(null,'manual')}
+  if(a==='add'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Lerma Fer para agregar.',1);return p2Add()}
   if(a==='tbs'){P2.sq=P2.sq||P2.q?0:1;if(!P2.sq)P2.q='';p2Render();const q=document.getElementById('p2q');if(q&&P2.sq)q.focus();return}
   if(a==='tile'){P2.f=P2.f===t.dataset.v?null:t.dataset.v;P2.lim=50;return p2Render()}
   if(a==='tbo'){const v=t.dataset.v;P2.fm=0;P2.fp=v==='pin'?1:0;P2.f=(v==='all'||v==='pin')?null:v;P2.lim=50;return p2Render()}
@@ -1267,16 +1274,16 @@ function renderSheet(){
   const s=sheet,ctxBox=`<textarea id="sc" rows="2" placeholder="Contexto para Ana (opcional)">${esc(s.ctx)}</textarea>`,err=`<div class="err">${esc(s.err)}</div>`;
   let body='';
   if(s.mode==='manual'||!AI||s.fill){
-    body=`<input id="sn" placeholder="Nombre" value="${esc(s.name)}" autocomplete="off"><input id="st" inputmode="tel" placeholder="WhatsApp (10 dígitos)" value="${esc(s.tel)}" autocomplete="off"><input id="si" placeholder="¿Cómo identificarlo? (ej. chico de la carnicería San Miguel)" value="${esc(s.idf)}" autocomplete="off" maxlength="80">${ctxBox}${err}<button class="b p" id="sman">${s.fill?'Guardar datos':'Guardar en '+esc(S.ag)}</button>`;
+    body=`<input id="sn" placeholder="Nombre" value="${esc(s.name)}" autocomplete="off"><input id="st" inputmode="tel" placeholder="WhatsApp (10 dígitos)" value="${esc(s.tel)}" autocomplete="off"><input id="si" placeholder="¿Cómo identificarlo? (ej. chico de la carnicería San Miguel)" value="${esc(s.idf)}" autocomplete="off" maxlength="80">${ctxBox}${err}<button class="b p" id="sman">${s.fill?'Guardar datos':'Guardar en '+esc(AGL(S.ag))}</button>`;
   }else if(!s.found){
     body=`<label class="pick"><b>${s.file?'Cambiar foto':'Subir o tomar foto'}</b><span>Captura de chats, contactos o una lista con nombres y teléfonos</span><input id="sf" type="file" accept="image/\x2A" hidden></label>${s.thumb?`<img class="prev" src="${s.thumb}" alt="">`:''}${err}${s.file?`<button class="b p" id="sread"${s.busy?' disabled':''}>${s.busy?'Leyendo…':'Leer leads con IA'}</button>`:''}`;
   }else{
     const n=s.found.filter(f=>f.on&&!f.dup).length;
     body=`<div class="note">Encontré ${s.found.length}. Corrige lo que haga falta, agrega contexto y revisa la fase que propuso la IA. Marca los que quieres agregar.</div>`+
       s.found.map((f,i)=>`<div class="fr${f.dup?' dup':''}"><input type="checkbox" data-i="${i}" data-k="on"${f.on?' checked':''}${f.dup?' disabled':''}><input data-i="${i}" data-k="name" value="${esc(f.name)}" placeholder="Nombre"><input data-i="${i}" data-k="tel" inputmode="tel" value="${esc(f.tel)}" placeholder="WhatsApp"><input class="fx" data-i="${i}" data-k="idf" value="${esc(f.idf||'')}" placeholder="¿Cómo identificarlo?" maxlength="80"><input class="fx" data-i="${i}" data-k="xc" value="${esc(f.xc||'')}" placeholder="Contexto (opcional)"><select class="fs" data-i="${i}" data-k="stg">${ETP.map(g=>`<option value="${g.id}"${f.stg===g.id?' selected':''}>${g.t}</option>`).join('')}</select>${f.msg?`<small>${esc(f.msg)}</small>`:''}</div>`).join('')+
-      ctxBox+err+`<div class="sub2"><button class="b" id="sagain">Otra foto</button><button class="b p" id="sfound">Agregar ${n} a ${esc(S.ag)}</button></div>`;
+      ctxBox+err+`<div class="sub2"><button class="b" id="sagain">Otra foto</button><button class="b p" id="sfound">Agregar ${n} a ${esc(AGL(S.ag))}</button></div>`;
   }
-  el.innerHTML=`<div class="sheet"><div class="sp"><div class="sh"><b>${s.fill?'Llenar datos':'Agregar a '+esc(S.ag)}</b><button id="sclose" aria-label="Cerrar">×</button></div>${s.loc?`<div class="note">Ubicación lista (±${s.loc[2]} m): se guarda junto con el lead.</div>`:''}${AI&&!s.fill&&ME!=='Fer'?`<div class="seg"><button data-m="foto" class="${s.mode==='foto'?'on':''}">Foto con IA</button><button data-m="manual" class="${s.mode==='manual'?'on':''}">Manual</button></div>`:''}${body}</div></div>`;
+  el.innerHTML=`<div class="sheet"><div class="sp"><div class="sh"><b>${s.fill?'Llenar datos':'Agregar a '+esc(AGL(S.ag))}</b><button id="sclose" aria-label="Cerrar">×</button></div>${s.loc?`<div class="note">Ubicación lista (±${s.loc[2]} m): se guarda junto con el lead.</div>`:''}${AI&&!s.fill&&ME!=='Fer'?`<div class="seg"><button data-m="foto" class="${s.mode==='foto'?'on':''}">Foto con IA</button><button data-m="manual" class="${s.mode==='manual'?'on':''}">Manual</button></div>`:''}${body}</div></div>`;
 }
 async function onFile(file){
   if(!file||!sheet)return;
@@ -1544,7 +1551,7 @@ const NDEF={vendedor:'pros',director:'pros',tecnico:'conv',admin:'tram'};
 const NTIT={uso:'Tiempo de uso',quien:'Escribieron',conv:'Chats',make:'Gasto de Make',onoff:'Prender y apagar Anas',venta:'Registrar venta',tram:'Trámites'};
 const FERDEV=()=>lget('crm-ferdev')==='1';
 function swCur(){return ME==='Fer'?(ROLE==='tecnico'?'@tecnico':'@vendedor'):'@'+ME}
-const SWL={'@vendedor':'Fer vendedor','@tecnico':'T\u00e9cnico','@Director':'Director','@Administrativo':'Administrativo'};
+const SWL={'@vendedor':'Lerma Fer','@tecnico':'T\u00e9cnico','@Director':'Director','@Administrativo':'Administrativo'};
 function swOpts(){const c=swCur();return Object.keys(SWL).filter(k=>k!==c)}
 function swSel(){return '<select class="swx"><option value="" selected disabled>'+esc(SWL[swCur()]||'Cambiar')+'</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join('')+'</select>'}
 function swGo(name,lr){LU=name;LR=lr||roleOf(name);const st=toks()[name];if(st){lset('crm-tok',st);lset('crm-user',name);lset('crm-role',LR);boot();return}if(!PROT(name)){lset('crm-user',name);lset('crm-role',LR);viewLogin(name);return}showLogin()}
@@ -1557,16 +1564,16 @@ function navInit(){
   const n=document.getElementById('nav'),role=ROLE||roleOf(ME);
   let NV=(NAVS[navKey(role)]||[]).slice();
   if(FERDEV()&&NV.length&&!NV.some(x=>x[0]==='p2')){
-    if(role==='vendedor'&&ME==='Fer')NV=[['p2','Leads','star'],['ia','Ana','ai'],['moto','Informaci\u00f3n','search'],['mapa','Mapa','pin']];
-    else if(role==='tecnico')NV=[['p2','Leads','star']].concat(NV.filter(x=>x[0]!=='quien'));
-    else if(role==='director')NV=[['p2','Leads','star'],['ia','Ana','ai']].concat(NV.filter(x=>x[0]==='conv'||x[0]==='quejas'||x[0]==='panel'));
+    if(role==='vendedor'&&ME==='Fer')NV=[['p2','Clientes','star'],['moto','Informaci\u00f3n','search'],['mapa','Mapa','pin'],['mas','M\u00e1s','grid']];
+    else if(role==='tecnico')NV=[['conv','Chats','chat'],['onoff','Anas','power'],['make','Gasto','coin'],['mas','M\u00e1s','grid']];
+    else if(role==='director')NV=[['p2','Clientes','star'],['conv','Chats','chat'],['quien','Escribieron','bell'],['mas','M\u00e1s','grid']];
   }
   n.innerHTML=NV.map(x=>NLINK[x[0]]?`<a class="nv" target="_blank" rel="noopener" href="${NLINK[x[0]]()}"><svg viewBox="0 0 24 24">${IC[x[2]]}</svg>${x[1]}</a>`:`<button class="nv" data-nv="${x[0]}"><svg viewBox="0 0 24 24">${IC[x[2]]}</svg>${x[1]}${x[0]==='quien'?'<i class="bdg" hidden></i>':''}</button>`).join('');
   document.body.classList.toggle('fermap',FERDEV());
   n.style.display='flex';n.style.justifyContent='space-around';document.body.classList.add('hasnav');window.__nbadge(window.__nb||0);
   navGo(NV.some(x=>x[0]==='p2')?'p2':(NDEF[role]||'pros'));
 }
-function navSet(id){CUR=id;document.querySelectorAll('#nav .nv').forEach(b=>b.classList.toggle('on',b.dataset.nv===id))}
+function navSet(id){CUR=id;const bs=document.querySelectorAll('#nav .nv');let hit=0;bs.forEach(b=>{if(b.dataset.nv===id)hit=1});bs.forEach(b=>b.classList.toggle('on',b.dataset.nv===id||(!hit&&b.dataset.nv==='mas')))}
 const IMG=[['Traslado diario','13DaPNJGQ8pwbCu0AI67puE6OhTKkkrBm',1],['Cuatrimoto','1ERQ5iCoFhkiYnnpXUvRd_REuSkKFqhLe',3],['Doble propósito','1fucT_n1HVF5bG7kDzNsj6qTQgGFJcXwK',4],['Deportiva','1zLSfk9ofF5EFZKZyA4TjqfLkzWOcPREj',6],['Scooter','1OQ_dsaspqImVZN6-bcmuxVS7NmO7Axj8',9],['Trabajo y carga','1AbFJPcvTrudYnClp5hnafaeZ51VPLpp0',2],['Chopper y custom','1OXa0XsgW6oQBeOk0qgNt9Mrn1Tc_9qb9',5]];
 const SEG=[["200/MH",46500,1852,5508,6916,2261,7745,9856],["250/MH 250CC",55000,1852,6176,7764,2261,8747,11128],["Acorazada 150cc",30500,1852,4250,5319,2261,5858,7462],["CCR200 (Plus)",39900,1852,4989,6257,2261,6966,8869],["Chopper Krathos 250",46500,1852,5508,6916,2261,7745,9856],["Jin 150cc",25000,1852,3818,4769,2261,5209,6637],["K29",69900,1852,7347,9252,2261,10504,13360],["KB300",35000,1852,4604,5768,2261,6389,8135],["KPM 250",69900,1852,7347,9252,2261,10504,13360],["KPR 250",69900,1852,7347,9252,2261,10504,13360],["KPT200",55000,1852,6176,7764,2261,8747,11128],["KPT400",139900,1852,12850,16238,2261,18758,23840],["LF110-2G",19900,1852,3417,4261,2261,4608,5874],["LF150-5",19900,1852,3417,4261,2261,4608,5874],["LF150T-12C",27900,1852,4046,5059,2261,5551,7072],["LF200-5",27800,1852,4038,5049,2261,5540,7056],["M12 150cc",27900,1852,4046,5059,2261,5551,7072],["Matt 150cc",27000,1852,3975,4970,2261,5445,6938],["Matt 250cc",33000,1852,4446,5568,2261,6153,7835],["MH150X",28700,1852,4108,5139,2261,5646,7192],["Motocarro Rampante 250cc (Plus)",65000,1852,6962,8762,2261,9926,12626],["MT 125cc",20000,1852,3424,4271,2261,4620,5889],["Pathcross 300",99000,1852,9635,12155,2261,13935,17716],["Pathcross 550 L (Lux / Defensa alta)",169000,1852,15138,19143,2261,22190,28197],["Pathcross 550 L (Pro)",165000,1852,14823,18742,2261,21718,27597],["Pathcross 550 L (Standard)",145000,1852,13251,16747,2261,19360,24603],["Pathcross 650 L",199000,1852,17496,22137,2261,25727,32688],["Pathcross L Mud Pro 1000",299000,1852,25357,32117,2261,37519,47659],["Raven 300cc",43500,1852,5272,6616,2261,7391,9407],["SS3",53000,1852,6019,7565,2261,8511,10830],["Starship 4",159900,1852,14422,18234,2261,21117,26834],["Starship 6",239000,1852,20641,26129,2261,30444,38677],["TigerCat 300cc",41700,1852,5130,6436,2261,7179,9137],["Titán 300cc",109000,1852,10421,13153,2261,15115,19213],["Trapper 150",18900,1852,3338,4161,2261,4490,5725],["V16S",89900,1852,8919,11247,2261,12862,16354],["V400",139900,1852,12850,16238,2261,18758,23840],["Worcross 650 (Sencillo)",299000,1852,25357,32117,2261,37519,47659],["Worcross 650 X3 (Puertas y winch)",329000,1852,27716,35111,2261,41057,52150],["Workcross 1000 X3 (HVAC)",409000,1852,34005,43096,2261,50490,64128],["Workcross 1000 X6 (HVAC)",529000,1852,43438,55074,2261,64640,82094],["X-Trail 150",29900,1852,4203,5259,2261,5787,7372]];
 const mxn=n=>'$'+Math.round(n).toLocaleString('es-MX');
@@ -1739,7 +1746,7 @@ function torreView(id){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const tt={conv:'Chats',quien:'Escribieron',make:'Gasto de Make',onoff:'Anas'}[id];
   const sec={conv:['tbl','msg'],quien:['msg'],make:['din','gas'],onoff:['bot']}[id];
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(ME)} \u00B7 ${ROLEN[role]||''}</small></b><button id="mlo">Salir</button></div>${id==='onoff'&&role==='tecnico'?'<div style="margin:-4px 0 10px"><button class="mtl" data-nv="ana" style="background:none;border:0;padding:0;cursor:pointer;font-family:inherit">Horario, catálogo y números bloqueados</button></div>':''}<div id="t3" class="pane"><div class="wrap">${T3HTML}</div></div></div>`;
+  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} \u00B7 ${ROLEN[role]||''}</small></b><button id="mlo">Salir</button></div>${id==='onoff'&&role==='tecnico'?'<div style="margin:-4px 0 10px"><button class="mtl" data-nv="ana" style="background:none;border:0;padding:0;cursor:pointer;font-family:inherit">Horario, catálogo y números bloqueados</button></div>':''}<div id="t3" class="pane"><div class="wrap">${T3HTML}</div></div></div>`;
   m.style.display='block';
   {const t3=document.getElementById('t3');if(t3){if(id==='quien')t3.classList.add('qm');if(role==='vendedor')t3.classList.add('vq')}}
   m.querySelectorAll('#t3 [data-sec]').forEach(s=>{s.hidden=sec.indexOf(s.dataset.sec)<0});
@@ -1782,7 +1789,7 @@ function vSum(rows){const p=rows.filter(v=>Number(v.precio)>0),s=rows.length-p.l
 function vRel(ms){const m=Math.round((Date.now()-ms)/60000);if(m<1)return 'hace un momento';if(m<60)return 'hace '+m+' min';const h=Math.round(m/60);return h<24?'hace '+h+' h':'el '+vDay(vYmd(new Date(ms)))}
 function ventaView(){
   const m=document.getElementById('menu');
-  m.innerHTML=`<div class="in"><div class="mh2"><b>Venta<small>${esc(ME)} · ${ROLEN[ROLE||roleOf(ME)]||''}</small></b><button id="mlo">Salir</button></div><div id="vt"><div id="vtReg"></div><div id="vtMain"><div class="note">Cargando ventas…</div></div></div></div>`;
+  m.innerHTML=`<div class="in"><div class="mh2"><b>Venta<small>${esc(DN(ME))} · ${ROLEN[ROLE||roleOf(ME)]||''}</small></b><button id="mlo">Salir</button></div><div id="vt"><div id="vtReg"></div><div id="vtMain"><div class="note">Cargando ventas…</div></div></div></div>`;
   m.style.display='block';
   if(ROLE==='tecnico')document.getElementById('vtReg').innerHTML=`<div class="vcard"><div class="vin"><textarea id="vtIn" rows="2" placeholder="Nueva venta: modelo, sucursal o número del cliente"></textarea><button id="vtGo" class="vbtn">Validar</button></div><div id="vtOut"></div></div>`;
   VT.fN=null;VT.fD=null;vtLoad();
@@ -1955,11 +1962,12 @@ function mDraw(){const b=document.getElementById('mtb');if(!b||!MV.d)return;{con
   mChips();mDrawList();mStrip()}
 const mSucKey=a=>{a=String(a||'');if(/aodes/i.test(a))return'aodes';const k=a.split(' ')[0].toLowerCase();return MSUC.some(x=>x[0]===k)?k:'lerma'};
 const SUCD={lerma:'1ngWM2hFas_i7chSZHgPNnZojWEnaKVJd',atlacomulco:'1eDYSyoKkHXOq3guBNIUvpUFLGSKhI4sq',santiago:'1jqyrs7wZ7sTpAj4lTM6vEhi9dernMb7K',tenancingo:'11viJBj0sjMD1RY504euhXOd9y30QVpZW',valle:'1jRUq053OCr7YIu1hdU6oiiyrlVAF4loH',aodes:'1vI6DtAeETFl8hRAWzZWIEd_iYaK5UmOD',almoloya:'1c5Mo2SIvuMJF7wk5V-rdXr9CaOtJxzYX'};
+const FLOWH='<div class="flx"><div class="flh">Flujo de venta</div><ol><li><b>Inter\u00e9s</b><span>\u00bfCu\u00e1l moto le gust\u00f3?</span></li><li><b>INE</b><span>P\u00eddela y t\u00e1mitala</span></li><li><b>Visita</b><span>Dale un d\u00eda: \u201c\u00bfma\u00f1ana o s\u00e1bado?\u201d</span></li><li><b>Urgencia</b><span>Algo real que pueda perder</span></li></ol></div>';
 async function motosView(){
   MV.s=mSucKey(S.ag);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  const FLOW='<div class="flx"><div class="flh">Flujo de venta</div><ol><li><b>Inter\u00e9s</b><span>\u00bfCu\u00e1l moto le gust\u00f3?</span></li><li><b>INE</b><span>P\u00eddela y t\u00e1mitala</span></li><li><b>Visita</b><span>Dale un d\u00eda: \u201c\u00bfma\u00f1ana o s\u00e1bado?\u201d</span></li><li><b>Urgencia</b><span>Algo real que pueda perder</span></li></ol></div>',FD=FERDEV()&&ME==='Fer'&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div><div class="lkx lk2"><button data-nv="ana">Ana<small>Horario, bloqueados y precios</small></button><button data-nv="anacat">Actualizar cat\u00e1logo<small>Precios e inventario</small></button></div>':'';
-  m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>`}${LK}<div id="mtb"></div>${FD?FLOW:''}</div>`;m.style.display='block';
+  const FD=FERDEV()&&ME==='Fer'&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div><div class="lkx lk2"><button data-nv="ana">Ana<small>Horario, bloqueados y precios</small></button><button data-nv="anacat">Actualizar cat\u00e1logo<small>Precios e inventario</small></button></div>':'';
+  m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>`}<div id="mtb"></div></div>`;m.style.display='block';
   const b=document.getElementById('mtb');
   b.onchange=e=>{const t=e.target;if(t.id==='mtu'){MV.u=t.value;mChips();mDrawList();mStrip()}else if(t.id==='mts'){MV.s=t.value;mChips();mDrawList();mStrip()}};
   b.onclick=e=>{const t=e.target,sb=t.closest&&t.closest('#mtsb');if(sb){const w=document.getElementById('mtwr'),q=document.getElementById('mtq');if(w.style.display==='none'){MV.sq=1;w.style.display='';sb.classList.add('on');q.focus()}else{MV.sq=0;MV.q='';q.value='';w.style.display='none';sb.classList.remove('on');mDrawList();mStrip()}return}const lb=t.closest&&t.closest('[data-lb]');if(lb){mLb(lb.dataset.lb);return}const mo=t.closest&&t.closest('[data-mo]');
@@ -2043,7 +2051,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   else if(a==='apply'){const items=AV.ft.ch.filter(x=>x.on).map(x=>({r:x.r,n:x.n,p:x.p}));if(items.length)avCatSave(items)}}
 async function anaView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in" id="avi">${FERDEV()&&ME==='Fer'?'<button class="mback" data-nv="moto" style="margin-bottom:10px">\u2190 Informaci\u00f3n</button>':''}<div class="mh2"><b>Ana<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="avi">${FERDEV()&&ME==='Fer'?'<button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button>':''}<div class="mh2"><b>Ana<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
   const b=document.getElementById('avb');AV.sub='';AV.ft=null;AV.ed={};
   b.onclick=avClick;
   b.onchange=e=>{const t=e.target;
@@ -2059,14 +2067,31 @@ async function anaView(){
   if(AV.go==='cat'){AV.go='';AV.q='';AV.ed={};return avCatLoad()}
   avDraw()}
 function navGo(id){navGo0(id);torreBg(id)}
+function masView(){
+  const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
+  const ch='<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',ex='<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>';
+  const L=(t,h)=>'<a class="mxb" target="_blank" rel="noopener" href="'+h+'"><span>'+t+'</span>'+ex+'</a>';
+  const N=(t,v)=>'<button class="mxb" data-nv="'+v+'"><span>'+t+'</span>'+ch+'</button>';
+  const G=(t,a)=>'<div class="mxk">'+t+'</div><div class="mxl">'+a.join('')+'</div>';
+  const ANA=G('Ana',[N('Horario y n\u00fameros bloqueados de Ana','ana'),N('Actualizar precios e inventario de Ana','anacat')]);
+  const QUIEN=N('Ver qui\u00e9n escribi\u00f3 y espera respuesta','quien');
+  let h='';
+  if(role==='vendedor')h=G('Tr\u00e1mite de INE',[L('Tramitar INE en Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Tramitar INE en Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE por WhatsApp con Ana','ine')])+G('Atender',[QUIEN])+ANA+FLOWH;
+  else if(role==='tecnico')h=G('Seguimiento',[QUIEN,N('Registrar una venta','venta'),N('Ver tiempo de uso del panel','uso')])+ANA+G('Reportes',[L('Abrir panel de control',NLINK.panel())]);
+  else if(role==='director')h=G('Reportes',[L('Ver quejas de clientes',NLINK.quejas()),L('Abrir panel de control',NLINK.panel())]);
+  else h=G('Tr\u00e1mites',[N('Tr\u00e1mites','tram'),L('Ver inventario disponible',NLINK.inv())]);
+  m.innerHTML='<div class="in p2"><div class="mh2"><b>M\u00e1s<small>'+esc(DN(ME))+' \u00b7 '+(ROLEN[role]||'')+(RO?' \u00b7 solo lectura':'')+'</small></b><button id="mlo">Salir</button></div>'+h+'</div>';
+  m.style.display='block';
+}
 function navGo0(id){
   if(id==='anacat'){AV.go='cat';id='ana'}
   MAPM.hide();navSet(id);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.classList.toggle('p2on',id==='p2'||id==='ia');m.classList.toggle('iaon',id==='ia');
+  m.classList.toggle('p2on',id==='p2'||id==='ia'||id==='mas');m.classList.toggle('iaon',id==='ia');
   if(id==='pros'){m.style.display='none';return}
   if(id==='p2'){p2View();return}
   if(id==='ia'){iaView();return}
+  if(id==='mas'){masView();return}
   if(id==='mapa'){m.style.display='none';MAPM.show();return}
   if(id==='lead'){m.style.display='none';navSet('pros');openSheet();return}
   let body='';
@@ -2080,7 +2105,7 @@ function navGo0(id){
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
   const tt=id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
+  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
   const R=6378137,C=2*Math.PI*R;
