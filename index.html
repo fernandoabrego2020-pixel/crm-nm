@@ -912,7 +912,7 @@ const p2When=t=>P2D.format(t).replace(/[.,]/g,'').replace(/ de /g,' ')+' · '+p2
 function p2T(t){if(!t)return '';const n=Date.now();if(P2Y.format(t)===P2Y.format(n))return p2Hr(t);if(P2Y.format(t)===P2Y.format(n-864e5))return 'Ayer';if(n-t<6*864e5)return P2W.format(t);return P2S.format(t).replace(/[.,]/g,'').replace(/ de /g,' ')}
 function p2Last(l){const a=P2.act[l.tel];if(a)return a;let m=Math.max(l.c||0,(l.ai&&l.ai.t)||0);(l.ctx||[]).forEach(e=>{if(e&&e.t>m)m=e.t});return m}
 function p2Pool(c){const pool=S.leads.filter(l=>l.own===S.ag);return pool.filter(l=>(!l.ph||l.fld)&&(c==='eli'||(!l.done&&!l.lost))&&p2cat(l)===c).sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||(b.pin&&a.pin?b.pin-a.pin:0)||p2Last(b)-p2Last(a))}
-function p2SumFull(l){let s=l.ctxu||(l.ai&&l.ai.resumen)||'';if(!s){const c=(l.ctx||[]).filter(e=>!e.auto&&e.x).slice(-1)[0];s=c?c.x:''}if(!s)s=l.note||'';return String(s).replace(/\s+/g,' ').trim()}
+function p2SumFull(l){let s=l.ctxu||(l.ai&&l.ai.resumen)||'';if(!s){const c=(l.ctx||[]).filter(e=>!e.auto&&e.x).slice(-1)[0];s=c?c.x:''}if(!s)s=l.note||'';s=String(s).replace(/\s+/g,' ').trim();const d=String(l.idf||'').replace(/\s+/g,' ').trim();if(d&&s.toLowerCase().indexOf(d.toLowerCase())<0)s=s?d+' \u00b7 '+s:d;return s}
 function p2Sum(l){const s=p2SumFull(l);return s.length>150?s.slice(0,147)+'…':s}
 const P2I={pin:'<path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/><path d="M12 14v7"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',moto:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="M6 16l4-7h5l3 7M9 9H6"/>',ok:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 12l2 2 4-4"/>',visit:'<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/>',flag:'<path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/>'};
 const P2FT=[['empezar','Elegir moto','g1','moto'],['aprobar','Aprobaci\u00f3n','g4','ok'],['visita','Visita','g8','visit']];
@@ -969,7 +969,7 @@ function p2Card(l,c){
   const gk=ph?P2GRP[ph[2]]:'';
   const chip=P2.ph===l.id?'<div class="lpw pk">'+P2OPT.map(o=>'<button class="lph pb'+(o[0]===gk?' on':'')+'" style="--k:var(--'+o[2]+')" data-p2="setph" data-v="'+o[0]+'" data-id="'+l.id+'">'+o[1]+'</button>').join('')+'</div>':'<div class="lpw"><button class="lph pb'+(ph?'':' no')+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+' data-p2="ph" data-id="'+l.id+'">'+(ph?esc(ph[0]):'Elegir etapa')+' <i class="cv">\u25be</i></button></div>';
   const more=op?'<div class="lx">'+D('ctx','ls'+(sm?'':' no'),sm?esc(p2SumFull(l)):'Sin contexto (doble toque para escribir)')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b'+(mt?'':' class="no"')+' data-p2="ed" data-fld="moto" data-id="'+l.id+'">'+(mt?esc(mt):'\u00bfQu\u00e9 moto le interesa?')+'</b>'+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+(op?D('name','ld lnm','<span class="lnl">Nombre</span>'+esc(p2real(l)||'Sin nombre')):'')+D('idf','ld'+(idf?'':' no'),idf?esc(idf):'\u00bfC\u00f3mo identificarlo?')+(op?chip:'')+'</div>'+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+more+(op?'<div class="la">'+ac+'</div>':'')+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b'+(mt?'':' class="no"')+' data-p2="ed" data-fld="moto" data-id="'+l.id+'">'+(mt?esc(mt):'\u00bfQu\u00e9 moto le interesa?')+'</b>'+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+(op?D('name','ld lnm','<span class="lnl">Nombre</span>'+esc(p2real(l)||'Sin nombre')):'')+(op?'':(sm?'<div class="ld">'+esc(sm)+'</div>':''))+(op?chip:'')+'</div>'+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+more+(op?'<div class="la">'+ac+'</div>':'')+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -1014,7 +1014,7 @@ function p2Edit(l,el,fld){
       if(fld==='name')l.name=v;
       else if(fld==='idf'){if(v)l.idf=v;else delete l.idf}
       else if(fld==='moto'){if(v)l.moto=v;else delete l.moto}
-      else{if(v)l.ctxu=v;else delete l.ctxu}
+      else{if(v)l.ctxu=v;else delete l.ctxu;delete l.idf}
       save();p2Render();toast('Guardado')};
     p2Render();
     if(l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000))go();else needFull(go)};
@@ -1046,7 +1046,7 @@ function iaFill(L){
     const l=S.leads.find(x=>x.ph&&!x.fld&&x.own===S.ag&&x.pn===f.n);
     if(!l){no.push(f.n);return}
     const t0=Date.now();
-    if(f.name)l.name=f.name;if(f.idf)l.idf=f.idf;if(f.ctx)l.ctxu=f.ctx;
+    if(f.name)l.name=f.name;{const u=[f.idf,f.ctx].filter(Boolean).join(' \u00b7 ');if(u)l.ctxu=u}
     const k=['empezar','ofrecer','aprobar','visita','vendidos'].includes(f.etapa)?f.etapa:'empezar';
     l.st={};l.st[k]=t0;l.st.referidos=t0;l.fld=1;
     ok.push(f.n);
@@ -1161,7 +1161,7 @@ function p2Send(l){
 function p2Chat(l){
   p2Close();P2.win=0;P2.sending=0;P2.cl=l;p2ToolsLoad();
   const w=document.createElement('div');w.id='p2chat';
-  const nm=p2Name(l),sub=String(l.idf||'').trim(),sm=p2Sum(l);
+  const nm=p2Name(l),sub='',sm=p2Sum(l);
   w.innerHTML='<div class="wh"><button class="wb" data-p2="back" aria-label="Volver">‹</button><div class="wav">'+esc(nm.charAt(0).toUpperCase())+'</div><div class="wt"><b>'+esc(nm)+'</b><small>'+esc(sub)+'</small></div></div><div class="wbd" id="p2cb">'+(sm?'<div class="wnote">Contexto: '+esc(sm)+'</div>':'')+'<div class="wnote" id="p2ld">Cargando conversación…</div></div><div class="wc"><button class="wpl" data-p2="tools" aria-label="Herramientas">+</button><textarea id="p2tx" rows="1" readonly placeholder="No disponible en este chat"></textarea><button id="p2send" class="off" data-p2="send" data-id="'+l.id+'">Enviar</button></div><div class="wwin" id="p2win">Revisando ventana de 24 h…</div><div class="wf"><button class="wcp" data-p2="copy" data-id="'+l.id+'">Copiar número</button><a class="wwa" href="https:\x2F\x2Fwa.me/52'+l.tel+'" target="_blank" rel="noopener">Abrir en WhatsApp</a></div>';
   document.body.appendChild(w);document.body.classList.add('p2lock');
   const tx=document.getElementById('p2tx');
@@ -1274,13 +1274,13 @@ function renderSheet(){
   const s=sheet,ctxBox=`<textarea id="sc" rows="2" placeholder="Contexto para Ana (opcional)">${esc(s.ctx)}</textarea>`,err=`<div class="err">${esc(s.err)}</div>`;
   let body='';
   if(s.mode==='manual'||!AI||s.fill){
-    body=`<input id="sn" placeholder="Nombre" value="${esc(s.name)}" autocomplete="off"><input id="st" inputmode="tel" placeholder="WhatsApp (10 dígitos)" value="${esc(s.tel)}" autocomplete="off"><input id="si" placeholder="¿Cómo identificarlo? (ej. chico de la carnicería San Miguel)" value="${esc(s.idf)}" autocomplete="off" maxlength="80">${ctxBox}${err}<button class="b p" id="sman">${s.fill?'Guardar datos':'Guardar en '+esc(AGL(S.ag))}</button>`;
+    body=`<input id="sn" placeholder="Nombre" value="${esc(s.name)}" autocomplete="off"><input id="st" inputmode="tel" placeholder="WhatsApp (10 dígitos)" value="${esc(s.tel)}" autocomplete="off">${ctxBox}${err}<button class="b p" id="sman">${s.fill?'Guardar datos':'Guardar en '+esc(AGL(S.ag))}</button>`;
   }else if(!s.found){
     body=`<label class="pick"><b>${s.file?'Cambiar foto':'Subir o tomar foto'}</b><span>Captura de chats, contactos o una lista con nombres y teléfonos</span><input id="sf" type="file" accept="image/\x2A" hidden></label>${s.thumb?`<img class="prev" src="${s.thumb}" alt="">`:''}${err}${s.file?`<button class="b p" id="sread"${s.busy?' disabled':''}>${s.busy?'Leyendo…':'Leer leads con IA'}</button>`:''}`;
   }else{
     const n=s.found.filter(f=>f.on&&!f.dup).length;
     body=`<div class="note">Encontré ${s.found.length}. Corrige lo que haga falta, agrega contexto y revisa la fase que propuso la IA. Marca los que quieres agregar.</div>`+
-      s.found.map((f,i)=>`<div class="fr${f.dup?' dup':''}"><input type="checkbox" data-i="${i}" data-k="on"${f.on?' checked':''}${f.dup?' disabled':''}><input data-i="${i}" data-k="name" value="${esc(f.name)}" placeholder="Nombre"><input data-i="${i}" data-k="tel" inputmode="tel" value="${esc(f.tel)}" placeholder="WhatsApp"><input class="fx" data-i="${i}" data-k="idf" value="${esc(f.idf||'')}" placeholder="¿Cómo identificarlo?" maxlength="80"><input class="fx" data-i="${i}" data-k="xc" value="${esc(f.xc||'')}" placeholder="Contexto (opcional)"><select class="fs" data-i="${i}" data-k="stg">${ETP.map(g=>`<option value="${g.id}"${f.stg===g.id?' selected':''}>${g.t}</option>`).join('')}</select>${f.msg?`<small>${esc(f.msg)}</small>`:''}</div>`).join('')+
+      s.found.map((f,i)=>`<div class="fr${f.dup?' dup':''}"><input type="checkbox" data-i="${i}" data-k="on"${f.on?' checked':''}${f.dup?' disabled':''}><input data-i="${i}" data-k="name" value="${esc(f.name)}" placeholder="Nombre"><input data-i="${i}" data-k="tel" inputmode="tel" value="${esc(f.tel)}" placeholder="WhatsApp"><input class="fx" data-i="${i}" data-k="xc" value="${esc(f.xc||'')}" placeholder="Contexto (opcional)"><select class="fs" data-i="${i}" data-k="stg">${ETP.map(g=>`<option value="${g.id}"${f.stg===g.id?' selected':''}>${g.t}</option>`).join('')}</select>${f.msg?`<small>${esc(f.msg)}</small>`:''}</div>`).join('')+
       ctxBox+err+`<div class="sub2"><button class="b" id="sagain">Otra foto</button><button class="b p" id="sfound">Agregar ${n} a ${esc(AGL(S.ag))}</button></div>`;
   }
   el.innerHTML=`<div class="sheet"><div class="sp"><div class="sh"><b>${s.fill?'Llenar datos':'Agregar a '+esc(AGL(S.ag))}</b><button id="sclose" aria-label="Cerrar">×</button></div>${s.loc?`<div class="note">Ubicación lista (±${s.loc[2]} m): se guarda junto con el lead.</div>`:''}${AI&&!s.fill&&ME!=='Fer'?`<div class="seg"><button data-m="foto" class="${s.mode==='foto'?'on':''}">Foto con IA</button><button data-m="manual" class="${s.mode==='manual'?'on':''}">Manual</button></div>`:''}${body}</div></div>`;
@@ -1313,10 +1313,10 @@ function saveManual(){
   if(d){s.err=dupMsg(d);return renderSheet()}
   if(s.fill){
     const fl=S.leads.find(x=>x.id===s.fill);
-    if(fl){const t0=Date.now();undo=JSON.stringify(S);fl.name=n;fl.tel=t;if(s.idf.trim())fl.idf=s.idf.trim();delete fl.ph;fl.c=t0;fl.st={empezar:t0,referidos:t0};if(s.ctx.trim())fl.ctx=[{t:t0,x:s.ctx.trim(),pend:true}];sheet=null;renderSheet();done(n+' ya est\u00e1 en tus prospectos');MAPM.filled(fl.id);return}
+    if(fl){const t0=Date.now();undo=JSON.stringify(S);fl.name=n;fl.tel=t;delete fl.ph;fl.c=t0;fl.st={empezar:t0,referidos:t0};if(s.ctx.trim())fl.ctx=[{t:t0,x:s.ctx.trim(),pend:true}];sheet=null;renderSheet();done(n+' ya est\u00e1 en tus prospectos');MAPM.filled(fl.id);return}
     sheet=null;return renderSheet();
   }
-  UNDO_ADD=true;undo=JSON.stringify(S);const nl=newLead(S.ag,n,'',t,s.ctx.trim(),s.idf.trim());if(s.loc)nl.loc=s.loc;S.leads.push(nl);sheet=null;renderSheet();if(s.loc)MAPM.saved();done(n+' agregado a '+S.ag);
+  UNDO_ADD=true;undo=JSON.stringify(S);const nl=newLead(S.ag,n,'',t,s.ctx.trim(),'');if(s.loc)nl.loc=s.loc;S.leads.push(nl);sheet=null;renderSheet();if(s.loc)MAPM.saved();done(n+' agregado a '+S.ag);
 }
 function saveFound(){
   const s=sheet;if(!s||!s.found)return;
@@ -1329,7 +1329,7 @@ function saveFound(){
     else{const d=findDup(t);if(d)bad.push(n+': '+dupMsg(d));else if(seen.has(t))bad.push(n+': repetido');seen.add(t)}});
   if(bad.length){s.err=bad.join(' · ');return renderSheet()}
   UNDO_ADD=true;undo=JSON.stringify(S);
-  sel.forEach(f=>{const nl=newLead(S.ag,f.name.trim(),f.mt||'',norm(f.tel),[s.ctx.trim(),f.xc||''].filter(Boolean).join(' · '),(f.idf||'').trim());setStage(nl,f.stg);if(s.loc)nl.loc=s.loc;S.leads.push(nl)});
+  sel.forEach(f=>{const nl=newLead(S.ag,f.name.trim(),f.mt||'',norm(f.tel),[s.ctx.trim(),(f.idf||'').trim(),f.xc||''].filter(Boolean).join(' · '),'');setStage(nl,f.stg);if(s.loc)nl.loc=s.loc;S.leads.push(nl)});
   sheet=null;renderSheet();if(s.loc)MAPM.saved();done(sel.length+(sel.length===1?' lead agregado a ':' leads agregados a ')+S.ag);
 }
 function snz(l,days){delete l.vz;const d=new Date();d.setDate(d.getDate()+days);d.setHours(8,0,0,0);l.sn=d.getTime();ev(l,'Se acordó escribirle de nuevo el '+fd(l.sn)+'.');done(l.name+' vuelve el '+fd(l.sn)+' · está en Cartera')}
