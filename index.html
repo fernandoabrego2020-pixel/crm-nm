@@ -796,9 +796,9 @@ function markSeen(L,gid){const a=newAuto(L,gid);if(!a.length)return;const sm=see
 function welcome(){const pn=phN();return '<div class="wel"><div class="wn">'+esc(pname(String(ME))[0])+'</div>'+(RO||ROLE==='admin'?'':'<div class="qs"><button id="qsb" data-qs="1"'+(QSBUSY?' disabled':'')+'>'+(QSBUSY?'Ubicando\u2026':'\u2316 Guardar ubicaci\u00f3n y llenar despu\u00e9s'+(pn?' \u00b7 '+pn:''))+'</button></div><div class="addl"><div class="ab"><button data-add="ia">IA</button><button data-add="man">Manual</button></div><div class="al">\u2196 Agregar leads \u2197</div></div>')+'</div>'}
 
 const P2={fm:0,q:'',sq:0,f:null,fp:0,cat:'neu',lim:50,act:{},at:{},ed:0,tp:null,eli:0,win:0,tmp:null,sending:0,open:null,tt:0};
-const P2PH={empezar:['Elegir moto','g1'],ofrecer:['Elegir moto','g1'],aprobar:['Buscar aprobaci\u00f3n','g4'],visita:['Buscar visita','g5'],vendidos:['Apartar o firmar','g8'],apartar:['Apartar o firmar','g8']};
-const P2OPT=[['empezar','Elegir moto','g1'],['aprobar','Buscar aprobaci\u00f3n','g4'],['visita','Buscar visita','g5'],['apartar','Apartar o firmar','g8']];
-const P2GRP={empezar:'empezar',ofrecer:'empezar',aprobar:'aprobar',visita:'visita',vendidos:'apartar',apartar:'apartar'};
+const P2PH={empezar:['Elegir moto','g1'],ofrecer:['Elegir moto','g1'],aprobar:['Buscar aprobaci\u00f3n','g4'],visita:['Buscar visita','g8'],vendidos:['Buscar visita','g8'],apartar:['Buscar visita','g8']};
+const P2OPT=[['empezar','Elegir moto','g1'],['aprobar','Buscar aprobaci\u00f3n','g4'],['visita','Buscar visita','g8']];
+const P2GRP={empezar:'empezar',ofrecer:'empezar',aprobar:'aprobar',visita:'visita',vendidos:'visita',apartar:'visita'};
 function p2Phase(l){let b=null,t=0;Object.keys(l.st||{}).forEach(k=>{if(P2PH[k]&&(l.st[k]||0)>=t){t=l.st[k]||0;b=k}});if(!b&&l.st&&l.st.referidos)b='empezar';return b?P2PH[b].concat([b]):null}
 const p2cat=l=>l.cat==='imp'?'imp':l.cat==='bas'?'bas':l.cat==='ven'?'ven':l.cat==='eli'?'eli':'neu';
 const p2real=l=>{const n=String(l.name||'').trim();return n&&!/^[\d\s+()-]{6,}$/.test(n)&&!/^sin nombre$/i.test(n)?n:''};
@@ -816,7 +816,7 @@ function p2Pool(c){const pool=(c==='imp'&&ADMIN)?S.leads:S.leads.filter(l=>l.own
 function p2SumFull(l){let s=l.ctxu||(l.ai&&l.ai.resumen)||'';if(!s){const c=(l.ctx||[]).filter(e=>!e.auto&&e.x).slice(-1)[0];s=c?c.x:''}if(!s)s=l.note||'';return String(s).replace(/\s+/g,' ').trim()}
 function p2Sum(l){const s=p2SumFull(l);return s.length>150?s.slice(0,147)+'…':s}
 const P2I={pin:'<path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/><path d="M12 14v7"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',moto:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="M6 16l4-7h5l3 7M9 9H6"/>',ok:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 12l2 2 4-4"/>',visit:'<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/>',flag:'<path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/>'};
-const P2FT=[['empezar','Elegir moto','g1','moto'],['aprobar','Buscar aprobaci\u00f3n','g4','ok'],['visita','Buscar visita','g5','visit'],['apartar','Apartar o firmar','g8','flag']];
+const P2FT=[['empezar','Elegir moto','g1','moto'],['aprobar','Buscar aprobaci\u00f3n','g4','ok'],['visita','Buscar visita','g8','visit']];
 const p2nz=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function p2Keep(l){
   if(P2.fp&&!l.pin)return false;
@@ -871,7 +871,7 @@ function p2Card(l,c){
   const gk=ph?P2GRP[ph[2]]:'';
   const chip=P2.ph===l.id?'<div class="lpw pk">'+P2OPT.map(o=>'<button class="lph pb'+(o[0]===gk?' on':'')+'" style="--k:var(--'+o[2]+')" data-p2="setph" data-v="'+o[0]+'" data-id="'+l.id+'">'+o[1]+'</button>').join('')+'</div>':'<div class="lpw"><button class="lph pb'+(ph?'':' no')+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+' data-p2="ph" data-id="'+l.id+'">'+(ph?esc(ph[0]):'Elegir etapa')+' <i class="cv">\u25be</i></button></div>';
   const more=op?'<div class="lx">'+D('ctx','ls'+(sm?'':' no'),sm?esc(p2SumFull(l)):'Sin contexto (doble toque para escribir)')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="name" data-id="'+l.id+'">'+esc(p2Name(l))+'</b>'+(c==='imp'&&ADMIN?'<span class="lo">'+esc(l.own)+'</span>':'')+'</span><small>'+(l.pin?'<i class="pn">Fijado</i>':'')+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+D('idf','ld'+(idf?'':' no'),idf?esc(idf):'\u00bfC\u00f3mo identificarlo?')+chip+'</div>'+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+more+(op?'<div class="la">'+ac+'</div>':'')+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="name" data-id="'+l.id+'">'+esc(p2Name(l))+'</b>'+(c==='imp'&&ADMIN&&op?'<span class="lo">'+esc(l.own)+'</span>':'')+'</span><small>'+(l.pin?'<i class="pn">Fijado</i>':'')+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+D('idf','ld'+(idf?'':' no'),idf?esc(idf):'\u00bfC\u00f3mo identificarlo?')+(op?chip:'')+'</div>'+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+more+(op?'<div class="la">'+ac+'</div>':'')+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -1068,7 +1068,7 @@ function p2Chat(l){
     show('',ms.map(x=>x.who==='nota'?'<div class="wnote">'+esc(x.text)+'</div>':'<div class="wm '+(x.who==='cliente'?'in':'out')+'">'+(x.who==='cliente'?'':'<small>'+esc(x.lab)+'</small>')+esc(x.text)+'</div>').join(''));
   }).catch(()=>{p2Win(null,l);show('No pude cargar la conversación ahora. Abre WhatsApp con el botón de abajo.')});
 }
-function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
+function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;if(P2.ph&&P2.ph!==P2.open)P2.ph=null;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='p2q'){P2.q=e.target.value;P2.lim=50;p2Render()}});
 document.addEventListener('click',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;const t=e.target.closest&&e.target.closest('[data-p2]');
