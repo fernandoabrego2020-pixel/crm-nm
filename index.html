@@ -1784,10 +1784,9 @@ function mRow(m){const w=m.e?MSUC.filter((x,i)=>m.e[i]).map(x=>x[1]):[];
   return `<button class="mtr" data-mo="${esc(m.n)}"><img src="${esc(m.i||'')}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'"><span style="flex:1;min-width:0"><b>${esc(m.n)}</b><small>${m.p?mxn(m.p):'Sin precio'}${esc(mInfo(m))}</small><small>${ex}</small></span></button>`}
 function mDrawList(){const b=document.getElementById('mtl');if(!b)return;const L=mList();
   b.innerHTML=(L.length?`<div class="note" style="margin-bottom:6px">${L.length} ${L.length===1?'moto':'motos'}</div>`+L.map(mRow).join(''):'<div class="soonp">No hay motos con ese filtro</div>')}
-function mChips(){const u=document.getElementById('mtu'),s=document.getElementById('mts');if(!u||!s)return;
-  u.classList.toggle('on',!!MV.u);s.classList.toggle('on',!!MV.s);
-  u.innerHTML=['',...MUSOS].map(x=>`<option value="${esc(x)}"${MV.u===x?' selected':''}>${x||'Uso'}</option>`).join('');
-  s.innerHTML=[['','Sucursal'],...MSUC].map(x=>`<option value="${x[0]}"${MV.s===x[0]?' selected':''}>${x[1]}</option>`).join('')}
+function mChips(){const u=document.getElementById('mtu');if(!u)return;
+  u.classList.toggle('on',!!MV.u);
+  u.innerHTML=['',...MUSOS].map(x=>`<option value="${esc(x)}"${MV.u===x?' selected':''}>${x||'Uso'}</option>`).join('');}
 const MFO={'Motoneta':'Scooter','Traslado diario':'Traslado diario','Trabajo y reparto':'Trabajo y carga','Doble prop\u00f3sito':'Doble prop\u00f3sito','Deportiva':'Deportiva','Chopper':'Chopper y custom','Cuatrimoto':'Cuatrimoto','UTV':'Cuatrimoto','Carga':'Trabajo y carga'};
 const mTh=(id,w)=>'https:\x2F\x2Fdrive.google.com/thumbnail?id='+id+'&sz=w'+w;
 function mFirst(m,w){const U=String(m.i||'').split(/[\s,;]+/).filter(u=>/^https?:/i.test(u));for(const u of U){let x;
@@ -1795,22 +1794,17 @@ function mFirst(m,w){const U=String(m.i||'').split(/[\s,;]+/).filter(u=>/^https?
     if(/\.(jpe?g|png|webp|gif)(\?|#|$)/i.test(u)||/i\.imgur\.com|lh3\.googleusercontent|drive\.google\.com\/thumbnail/i.test(u))return u}return ''}
 async function mStrip(){
   const b=document.getElementById('mtp');if(!b)return;
-  const img=(src,x)=>'<img src="'+esc(src)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()">';
-  if(MV.s){
-    const L=mList().filter(m=>mFirst(m)).slice(0,30);
-    if(L.length){b.innerHTML='<div class="mps">'+L.map(m=>'<button class="pt" data-mo="'+esc(m.n)+'">'+img(mFirst(m,900))+'<small>'+esc(m.n)+(m.p?' \u00b7 '+mxn(m.p):'')+'</small></button>').join('')+'</div>';return}
-    if(!MV.u){b.innerHTML='';return}}
-  if(MV.u){
-    const fo=IMG.find(x=>x[0]===MFO[MV.u]);if(!fo){b.innerHTML='';return}
-    const key=MV.u;MV.fi=MV.fi||{};
-    if(!MV.fi[fo[1]]){b.innerHTML='<div class="mps"><div class="mpn">Cargando fotos\u2026</div></div>';
-      let r=null;try{r=await api('folder_imgs',{id:fo[1]})}catch(e){r=null}
-      MV.fi[fo[1]]=(r&&r.ok&&Array.isArray(r.ids))?r.ids:[];if(!(r&&r.ok))delete MV.fi[fo[1]];
-      if(MV.u!==key)return}
-    const ids=MV.fi[fo[1]]||[];
-    b.innerHTML='<div class="mps">'+ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,900))+'</button>').join('')+'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+fo[1]+'"><span>+</span><small>Abrir carpeta<br>'+esc(fo[0])+'</small></a></div>';
-    return}
-  b.innerHTML=''}
+  const key=MV.s,fid=SUCD[key];if(!fid){b.innerHTML='';return}
+  const img=src=>'<img src="'+esc(src)+'" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.parentNode.remove()">';
+  MV.fi=MV.fi||{};let ids=MV.fi[fid];
+  if(!ids){b.innerHTML='<div class="mps"><div class="mpn">Cargando fotos\u2026</div></div>';
+    let r=null;try{r=await api('folder_imgs',{id:fid})}catch(e){r=null}
+    ids=(r&&r.ok&&Array.isArray(r.ids))?r.ids:[];if(r&&r.ok)MV.fi[fid]=ids;
+    if(!b.isConnected||MV.s!==key)return}
+  const nm=(MSUC.find(x=>x[0]===key)||[0,key])[1];
+  let t=ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,900))+'</button>').join('');
+  if(!ids.length)t=mList().filter(m=>mFirst(m)).slice(0,30).map(m=>'<button class="pt" data-mo="'+esc(m.n)+'">'+img(mFirst(m,900))+'<small>'+esc(m.n)+(m.p?' \u00b7 '+mxn(m.p):'')+'</small></button>').join('');
+  b.innerHTML='<div class="mps">'+t+'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+fid+'"><span>+</span><small>Abrir carpeta<br>'+esc(nm)+'</small></a></div>'}
 function mLb(id){const o=document.createElement('div');o.className='mlb';o.innerHTML='<img src="'+esc(mTh(id,1600))+'" alt="" referrerpolicy="no-referrer"><button aria-label="Cerrar">\u00d7</button>';o.onclick=()=>o.remove();document.body.appendChild(o)}
 function mFicha(f,n){const ln=u=>u&&u.indexOf('https:\x2F\x2Fnovamotos.com.mx')===0?`<a class="mtl" style="display:inline-block;margin-top:8px" target="_blank" rel="noopener" href="${esc(u)}">Ver en novamotos.com.mx</a>`:'';
   if(!f||!f.ok)return `<b>Ficha técnica</b><div class="note" style="margin-top:6px">No se pudo cargar la ficha.</div>`+ln('https:\x2F\x2Fnovamotos.com.mx/tienda/');
@@ -1847,9 +1841,12 @@ function mDetail(m){const sg=mSeg(m.n),own=ACC[ME],u=mUsos(m);
   <div class="sg"><b>Seguro</b>${seg}</div></div>`}
 function mDraw(){const b=document.getElementById('mtb');if(!b||!MV.d)return;{const t=document.getElementById('mti');if(t)t.classList.toggle('mdet',!!MV.sel)}
   if(MV.sel){const m=MV.d.m.find(x=>x.n===MV.sel);if(m){b.innerHTML=mDetail(m);return}MV.sel=null}
-  b.innerHTML=`<div class="mtf"><button class="tbq sm${MV.q||MV.sq?' on':''}" id="mtsb" aria-label="Buscar" title="Buscar"><svg viewBox="0 0 24 24">${IC.search}</svg></button><select id="mtu" aria-label="Uso"></select><select id="mts" aria-label="Sucursal"></select></div><div class="mtw" id="mtwr"${MV.q||MV.sq?'':' style="display:none"'}><input id="mtq" type="text" inputmode="search" enterkeyhint="search" placeholder="Buscar moto, marca o cilindrada" value="${esc(MV.q)}" autocomplete="off"></div><div id="mtp"></div><div id="mtl"></div><div style="margin:10px 0 4px"><a class="mtl" target="_blank" rel="noopener" href="${WA(PISO_TXT)}">Buscar moto ideal con Ana</a><button class="mtl" data-nv="img" style="border:0;background:none;padding:0;cursor:pointer;font:inherit;font-size:12px">Imágenes de motos</button></div>`;
+  b.innerHTML=`<div class="mtf"><button class="tbq sm${MV.q||MV.sq?' on':''}" id="mtsb" aria-label="Buscar" title="Buscar"><svg viewBox="0 0 24 24">${IC.search}</svg></button><select id="mtu" aria-label="Uso"></select></div><div class="mtw" id="mtwr"${MV.q||MV.sq?'':' style="display:none"'}><input id="mtq" type="text" inputmode="search" enterkeyhint="search" placeholder="Buscar moto, marca o cilindrada" value="${esc(MV.q)}" autocomplete="off"></div><div id="mtp"></div><div id="mtl"></div><div style="margin:10px 0 4px"><a class="mtl" target="_blank" rel="noopener" href="${WA(PISO_TXT)}">Buscar moto ideal con Ana</a><button class="mtl" data-nv="img" style="border:0;background:none;padding:0;cursor:pointer;font:inherit;font-size:12px">Imágenes de motos</button></div>`;
   mChips();mDrawList();mStrip()}
+const mSucKey=a=>{a=String(a||'');if(/aodes/i.test(a))return'aodes';const k=a.split(' ')[0].toLowerCase();return MSUC.some(x=>x[0]===k)?k:'lerma'};
+const SUCD={lerma:'1ngWM2hFas_i7chSZHgPNnZojWEnaKVJd',atlacomulco:'1eDYSyoKkHXOq3guBNIUvpUFLGSKhI4sq',santiago:'1jqyrs7wZ7sTpAj4lTM6vEhi9dernMb7K',tenancingo:'11viJBj0sjMD1RY504euhXOd9y30QVpZW',valle:'1jRUq053OCr7YIu1hdU6oiiyrlVAF4loH',aodes:'1vI6DtAeETFl8hRAWzZWIEd_iYaK5UmOD',almoloya:'1c5Mo2SIvuMJF7wk5V-rdXr9CaOtJxzYX'};
 async function motosView(){
+  MV.s=mSucKey(S.ag);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const FLOW='<div class="flx"><div class="flh">Flujo de venta</div><ol><li><b>Inter\u00e9s</b><span>\u00bfCu\u00e1l moto le gust\u00f3?</span></li><li><b>INE</b><span>P\u00eddela y t\u00e1mitala</span></li><li><b>Visita</b><span>Dale un d\u00eda: \u201c\u00bfma\u00f1ana o s\u00e1bado?\u201d</span></li><li><b>Urgencia</b><span>Algo real que pueda perder</span></li></ol></div>',FD=FERDEV()&&ME==='Fer'&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div>':'';
   m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(ME)} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>`}${LK}<div id="mtb"></div>${FD?FLOW:''}</div>`;m.style.display='block';
