@@ -710,6 +710,9 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 .lc .p2nm{font-size:16px;font-weight:700;color:var(--tx)}
 .lc .p2ub{font-size:15px;font-weight:500;color:var(--mu)}
 .lc .p2no{font-weight:400;font-style:italic;opacity:.6}
+.lc .p2nw{font-style:normal;font-size:11px;font-weight:700;line-height:1;color:#fff;background:var(--g1);border-radius:999px;padding:3px 8px;margin-left:8px;vertical-align:2px;letter-spacing:.02em}
+.p2t .p2c span.p2nb,.p2t .p2c.on span.p2nb{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--g1);border-radius:999px;padding:2px 7px;margin-left:5px;line-height:1.3}
+.p2lp{font-size:12px;color:var(--mu);margin:-4px 2px 10px}
 </style>
 </head>
 <body>
@@ -933,26 +936,34 @@ const P2GRP={empezar:'empezar',ofrecer:'empezar',aprobar:'aprobar',visita:'visit
 function p2Phase(l){let b=null,t=0;Object.keys(l.st||{}).forEach(k=>{if(P2PH[k]&&(l.st[k]||0)>=t){t=l.st[k]||0;b=k}});if(!b&&l.st&&l.st.referidos)b='empezar';return b?P2PH[b].concat([b]):null}
 const p2cat=l=>l.cat==='imp'?'imp':l.cat==='bas'?'bas':l.cat==='ven'?'ven':l.cat==='eli'?'eli':'neu';
 const p2real=l=>{const n=String(l.name||'').trim();return n&&!/^[\d\s+()-]{6,}$/.test(n)&&!/^sin nombre$/i.test(n)?n:''};
-const p2Title=l=>{const i=String(l.idf||'').trim();if(i)return i;const m=String(l.moto||'').trim().replace(/^sin moto$/i,'');if(m)return m;const n=p2real(l);if(n)return n;return fmt(l.tel||'')||'Sin datos'};
-function p2LabT(l){let t=(l.ai&&l.ai.t)||0;(l.ctx||[]).forEach(e=>{if(!e.auto&&e.t>t)t=e.t});return t}
-function p2LabNeed(l){if(l.ph||l.idfm)return false;const c=p2cat(l);if(c==='eli')return false;const has=p2real(l)||l.moto||l.note||l.ctxu||(l.ai&&l.ai.resumen)||(l.ctx||[]).some(e=>e.x);if(!has)return false;return !l.lab||p2LabT(l)>l.lab}
-const LAB={busy:0};
+const p2Title=l=>{const i=String(l.idf||'').trim();if(i)return i;const n=p2real(l);if(n)return n;const m=String(l.moto||'').trim().replace(/^sin moto$/i,'');if(m)return m;return fmt(l.tel||'')||'Sin datos'};
+const NEWBASE=1794426417435,LABV=2;
+const p2New=l=>!l.vis&&!l.ph&&(l.c||0)>NEWBASE&&p2cat(l)!=='eli';
+function p2Hash(x){let h=5381;x=String(x);for(let i=0;i<x.length;i++)h=((h<<5)+h+x.charCodeAt(i))|0;return (h>>>0).toString(36)}
+function p2Mias(l){const a=[];if(l.ctxu&&l.ctxu!==l.rs)a.push(l.ctxu);if(l.note)a.push(l.note);(l.ctx||[]).filter(e=>e.x&&!e.auto).slice(-5).forEach(e=>{if(e.x!==l.ctxu&&e.x!==l.rs)a.push(e.x)});return a.map(x=>String(x).replace(/\s+/g,' ').trim()).filter(Boolean).slice(-6)}
+function p2CS(l){return (l.ai&&l.ai.resumen)?String(l.ai.resumen):''}
+function p2Sig(l){return p2Hash(p2Mias(l).join('|'))+'/'+((l.ai&&(l.ai.ultimo||l.ai.t))||'')}
+function p2LabQ(l){if(l.ph)return null;const c=p2cat(l);if(c==='eli')return null;if(!(p2real(l)||l.moto||l.note||l.ctxu||l.rs||(l.ai&&l.ai.resumen)||(l.ctx||[]).some(e=>e.x)))return null;
+  const sg=p2Sig(l),qref=!l.idfm&&(!l.idf||l.labv!==LABV),qrs=sg!==l.rsg;if(!qref&&!qrs)return null;return {qref:qref,qrs:qrs,sg:sg}}
+const p2LabNeed=l=>!!p2LabQ(l);
+const LAB={busy:0,tries:{},tm:0};
+const p2LabPend=()=>S.leads.filter(l=>l.own===S.ag&&(LAB.tries[l.id]||0)<2&&p2LabQ(l)).length;
 async function p2LabRun(){
   if(LAB.busy||RO||!ready||document.hidden||!FERDEV()||!isFull()||P2.ed||sheet)return;
   const ord={imp:0,neu:1,bas:2};
-  const L=S.leads.filter(l=>l.own===S.ag&&p2LabNeed(l)).sort((a,b)=>(ord[p2cat(a)]||0)-(ord[p2cat(b)]||0)).slice(0,12);
+  const L=S.leads.filter(l=>l.own===S.ag&&(LAB.tries[l.id]||0)<2&&p2LabQ(l)).sort((a,b)=>((ord[p2cat(a)]||0)-(ord[p2cat(b)]||0))||(p2Last(b)-p2Last(a))).slice(0,10);
   if(!L.length)return;
+  const Q={};L.forEach(l=>{Q[l.id]=p2LabQ(l);LAB.tries[l.id]=(LAB.tries[l.id]||0)+1});
   LAB.busy=1;let more=0;
   try{
-    const r=await api('ia_label',{items:L.map(l=>({id:l.id,name:p2real(l),moto:l.moto||'',nota:l.note||'',ctx:[l.ctxu||'',(l.ai&&l.ai.resumen)||''].concat((l.ctx||[]).filter(e=>e.x&&!e.auto).map(e=>e.x).slice(-4)).filter(Boolean).slice(-5),auto:(l.ctx||[]).filter(e=>e.auto&&e.x).map(e=>e.x).slice(-2)}))});
+    const r=await api('ia_label',{items:L.map(l=>({id:l.id,name:p2real(l),ub:l.ub||'',moto:l.moto||'',idf:l.idf||'',qref:Q[l.id].qref,qrs:Q[l.id].qrs,mias:p2Mias(l),chat:p2CS(l),prev:l.rs||''}))});
     if(r&&r.ok&&Array.isArray(r.res)){
-      const t=Date.now();let ch=0;
-      L.forEach(l=>{l.lab=t});
-      r.res.forEach(x=>{const l=L.find(z=>z.id===x.id);if(!l)return;
-        if(x.ref&&!l.idfm){l.idf=x.ref;ch=1}
-        if(x.ubic&&!l.ubm){l.ub=x.ubic;ch=1}
-        if(x.nombre&&!p2real(l)){l.name=x.nombre;ch=1}
-        if(x.moto&&!String(l.moto||'').trim()){l.moto=x.moto;ch=1}});
+      r.res.forEach(x=>{const l=L.find(z=>z.id===x.id);if(!l)return;const q=Q[l.id];
+        if(q.qref&&!l.idfm){if(x.ref)l.idf=x.ref;else if(l.labv!==LABV)delete l.idf;l.labv=LABV}
+        if(q.qrs){const pv=String(l.rs||'');if(x.resumen&&!(pv&&x.resumen.length<pv.length*0.6))l.rs=x.resumen;l.rsg=q.sg}
+        if(x.ubic&&!l.ubm&&!l.ub)l.ub=x.ubic;
+        if(x.nombre&&!p2real(l))l.name=x.nombre;
+        if(x.moto&&!String(l.moto||'').trim())l.moto=x.moto});
       save();if(!P2.ed&&document.getElementById('p2b'))p2Render();more=1}
   }catch(e){}
   LAB.busy=0;if(more)setTimeout(p2LabRun,1500)}
@@ -967,7 +978,7 @@ const p2When=t=>P2D.format(t).replace(/[.,]/g,'').replace(/ de /g,' ')+' · '+p2
 function p2T(t){if(!t)return '';const n=Date.now();if(P2Y.format(t)===P2Y.format(n))return p2Hr(t);if(P2Y.format(t)===P2Y.format(n-864e5))return 'Ayer';if(n-t<6*864e5)return P2W.format(t);return P2S.format(t).replace(/[.,]/g,'').replace(/ de /g,' ')}
 function p2Last(l){const a=P2.act[l.tel];if(a)return a;let m=Math.max(l.c||0,(l.ai&&l.ai.t)||0);(l.ctx||[]).forEach(e=>{if(e&&e.t>m)m=e.t});return m}
 function p2Pool(c){const pool=S.leads.filter(l=>l.own===S.ag);return pool.filter(l=>(!l.ph||l.fld)&&(c==='eli'||(!l.done&&!l.lost))&&p2cat(l)===c).sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||(b.pin&&a.pin?b.pin-a.pin:0)||p2Last(b)-p2Last(a))}
-function p2SumFull(l){let s=l.ctxu||(l.ai&&l.ai.resumen)||'';if(!s){const c=(l.ctx||[]).filter(e=>!e.auto&&e.x).slice(-1)[0];s=c?c.x:''}if(!s)s=l.note||'';return String(s).replace(/\s+/g,' ').trim()}
+function p2SumFull(l){let s=l.rs||l.ctxu||'';if(!s){const c=(l.ctx||[]).filter(e=>!e.auto&&e.x).slice(-1)[0];s=c?c.x:''}if(!s)s=l.note||'';if(!s)s=(l.ai&&l.ai.resumen)||'';return String(s).replace(/\s+/g,' ').trim()}
 function p2Sum(l){const s=p2SumFull(l);return s.length>150?s.slice(0,147)+'…':s}
 const P2I={pin:'<path d="M9 3h6l-1 6 3 3v2H7v-2l3-3-1-6z"/><path d="M12 14v7"/>',search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/>',moto:'<circle cx="6" cy="16" r="3"/><circle cx="18" cy="16" r="3"/><path d="M6 16l4-7h5l3 7M9 9H6"/>',ok:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 12l2 2 4-4"/>',visit:'<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/>',flag:'<path d="M5 21V4"/><path d="M5 4h12l-2 4 2 4H5"/>'};
 const P2FT=[['empezar','Elegir moto','g1','moto'],['aprobar','Aprobaci\u00f3n','g4','ok'],['visita','Visita','g8','visit']];
@@ -1026,7 +1037,7 @@ function p2Card(l,c){
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls'+(sm?'':' no'),sm?esc(p2SumFull(l)):'Sin resumen (toca para escribir)')+'</div>':'';
   const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb"><button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA sobre este cliente</button></div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+(op?res+'<div class="p2id">'+D('name','p2nm'+(p2real(l)?'':' p2no'),esc(p2real(l)||'Sin nombre'))+D('ub','p2ub'+(ub?'':' p2no'),esc(ub||'Sin ubicaci\u00f3n'))+'</div>':'')+(op&&l.tel&&!l.ph?'<div class="p2tel">'+esc(fmt(l.tel))+'</div>':'')+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+chip+'</div>':'')+(op?'<div class="la">'+ac+'</div>':'')+more+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+(op?res+'<div class="p2id">'+D('name','p2nm'+(p2real(l)?'':' p2no'),esc(p2real(l)||'Sin nombre'))+D('ub','p2ub'+(ub?'':' p2no'),esc(ub||'Sin ubicaci\u00f3n'))+'</div>':'')+(op&&l.tel&&!l.ph?'<div class="p2tel">'+esc(fmt(l.tel))+'</div>':'')+(l.ph?'<div class="ld ph">Sin n\u00famero todav\u00eda \u00b7 guardado en el mapa'+(l.pn?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr'+(P2.ph===l.id?' pk':'')+'">'+chip+'</div>':'')+(op?'<div class="la">'+ac+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -1038,8 +1049,9 @@ function p2Render(){
   S.leads.filter(l=>l.ph&&l.own===S.ag&&!l.pn).forEach(l=>{l.pn=phNext()});
   const PH=S.leads.filter(l=>l.ph&&!l.fld&&l.own===S.ag).sort((x,y)=>(x.pn||0)-(y.pn||0));
   const BN=PH.length?'<div class="p2f"><b>Ubicaciones por llenar ('+PH.length+')</b><span>Toca el n\u00famero y dicta a la IA qui\u00e9n es. Ej: 1- Juan, carnicer\u00eda San Miguel, cotizar INE</span><div class="cn">'+PH.map(l=>'<button data-p2="fill" data-n="'+(l.pn||'')+'">'+(l.pn||'?')+'</button>').join('')+'</div></div>':'';
-  b.innerHTML='<div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span><span class="n">'+L[k].length+'</span></button>').join('')+p2Btns()+'</div>'+p2Tb()+(P2.cat==='neu'?p2Tiles(L.neu):'')+(show.length?show.map(l=>p2Card(l,P2.cat)).join(''):'<div class="p2e">'+(flt?'Nada con ese filtro.':P2E[P2.cat])+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
+  b.innerHTML='<div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span><span class="n">'+L[k].length+'</span>'+(L[k].filter(p2New).length?'<span class="p2nb">+'+L[k].filter(p2New).length+'</span>':'')+'</button>').join('')+p2Btns()+'</div>'+(FERDEV()&&isFull()&&!RO&&p2LabPend()?'<div class="p2lp">Ordenando con IA: faltan '+p2LabPend()+'</div>':'')+p2Tb()+(P2.cat==='neu'?p2Tiles(L.neu):'')+(show.length?show.map(l=>p2Card(l,P2.cat)).join(''):'<div class="p2e">'+(flt?'Nada con ese filtro.':P2E[P2.cat])+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
   if(fo>=0){const q=document.getElementById('p2q');if(q){q.focus();try{q.setSelectionRange(fo,fo)}catch(e){}}}
+  clearTimeout(LAB.tm);LAB.tm=setTimeout(p2LabRun,2500);
 }
 function p2Re(id){const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render()}
 function p2SetPh(l,k){
@@ -1060,7 +1072,7 @@ function p2Edit(l,el,fld){
   const ta=fld==='ctx';
   const inp=document.createElement(ta?'textarea':'input');inp.className='p2i';
   const cur=fld==='name'?(p2real(l)?String(l.name):''):fld==='idf'?p2Title(l):fld==='ub'?String(l.ub||''):fld==='moto'?String(l.moto||'').replace(/^sin moto$/i,''):p2SumFull(l);
-  inp.maxLength=fld==='ctx'?300:(fld==='name'||fld==='moto')?60:80;inp.value=cur;
+  inp.maxLength=fld==='ctx'?420:(fld==='name'||fld==='moto')?60:80;inp.value=cur;
   inp.placeholder=fld==='name'?'Nombre':fld==='idf'?'¿Cómo identificarlo?':fld==='ub'?'Colonia, pueblo o calle':fld==='moto'?'Ej: KPR250 verde, motoneta':'Resumen del cliente';
   if(ta){inp.rows=3;el.classList.add('ed')}
   el.classList.remove('no');el.textContent='';el.appendChild(inp);inp.focus();
@@ -1069,10 +1081,10 @@ function p2Edit(l,el,fld){
     if(!ok||v===cur.trim()||(fld==='name'&&!v)){p2Render();return}
     const go=()=>{undo=JSON.stringify(S);
       if(fld==='name')l.name=v;
-      else if(fld==='idf'){if(v){l.idf=v;l.idfm=1}else{delete l.idf;delete l.idfm;delete l.lab}}
+      else if(fld==='idf'){if(v){l.idf=v;l.idfm=1}else{delete l.idf;delete l.idfm;delete l.labv}}
       else if(fld==='ub'){if(v){l.ub=v;l.ubm=1}else{delete l.ub;delete l.ubm}}
       else if(fld==='moto'){if(v)l.moto=v;else delete l.moto}
-      else{if(v)l.ctxu=v;else delete l.ctxu}
+      else{if(v){l.rs=v;l.ctxu=v;l.rsg=p2Sig(l)}else{delete l.rs;delete l.ctxu;delete l.rsg}}
       save();p2Render();toast('Guardado')};
     p2Render();
     if(l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000))go();else needFull(go)};
@@ -1118,7 +1130,7 @@ function p2Move(l,to){
   const cur=p2cat(l);
   if((to==='imp'||to==='ven')&&!ADMIN)return toast('Solo Fer puede hacer eso',1);
   if(cur==='imp'&&!ADMIN)return toast('Solo Fer puede sacar de importantes',1);
-  const go=()=>{undo=JSON.stringify(S);
+  const go=()=>{undo=JSON.stringify(S);if(!l.vis)l.vis=Date.now();
     if(to==='ven'){const k=l.st&&l.st.referidos;l.st={};if(k!==undefined)l.st.referidos=k;l.done=true;l.cat='ven';ev(l,'Marcado como venta desde Leads.')}
     else{l.cat=to;if(cur==='ven'||cur==='eli')l.done=false}
     save();p2Render();toast(p2Name(l)+' \u2192 '+({imp:'Importantes',neu:'Neutros',bas:'Basura',ven:'Venta',eli:'Eliminados'})[to])};
@@ -1283,7 +1295,7 @@ function p2Chat(l){
     show('',ms.map(x=>x.who==='nota'?'<div class="wnote">'+esc(x.text)+'</div>':'<div class="wm '+(x.who==='cliente'?'in':'out')+'">'+(x.who==='cliente'?'':'<small>'+esc(x.lab)+'</small>')+esc(x.text)+'</div>').join(''));
   }).catch(()=>{p2Win(null,l);show('No pude cargar la conversación ahora. Abre WhatsApp con el botón de abajo.')});
 }
-function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;if(P2.mo&&P2.mo!==P2.open)P2.mo=0;if(P2.ph&&P2.ph!==P2.open)P2.ph=null;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
+function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;if(P2.open){const l0=S.leads.find(x=>x.id===id);if(l0&&!l0.vis&&!RO){l0.vis=Date.now();save()}}if(P2.mo&&P2.mo!==P2.open)P2.mo=0;if(P2.ph&&P2.ph!==P2.open)P2.ph=null;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='p2q'){P2.q=e.target.value;P2.lim=50;p2Render()}});
 document.addEventListener('click',e=>{
   {const fm=document.getElementById('p2fm2');if(fm&&!fm.hidden&&!(e.target.closest&&e.target.closest('[data-p2="fab"],#p2fm2')))fm.hidden=true}
