@@ -764,8 +764,10 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 #p2reg .rgf.info{background:var(--soft);color:var(--mu)}
 #p2reg .rgs{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));display:flex}
 #p2reg .rgs .p2a{flex:1;min-height:50px;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+#rgf{position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0}
+#p2reg .rgb .p2a{min-height:46px;font-size:15px}
 
-/* v101 */
+/* v102 */
 #menu.p2on{overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y pinch-zoom}
 #p2b{overflow-x:clip}
 .p2t{position:sticky;top:-8px;z-index:4;background:var(--bg)}
@@ -1006,7 +1008,7 @@ function welcome(){const pn=phN();return '<div class="wel"><div class="wn">'+esc
 
 const AGL=a=>a==='Fer'?'Lerma Fer':a;
 const DN=n=>n==='Fer'&&ROLE==='vendedor'?'Lerma Fer':n;
-const P2FAB='<button class="p2fab" data-p2="fab" aria-label="Agregar cliente"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Cliente</button><div class="p2fm2" id="p2fm2" hidden><button data-p2="add">Con foto</button><button data-p2="addm">Escribir a mano</button></div>';
+const P2FAB='<button class="p2fab" data-p2="fab" aria-label="Agregar cliente"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Cliente</button>';
 const P2={fm:0,q:'',sq:0,f:null,fp:0,cat:'neu',lim:50,act:{},at:{},ed:0,tp:null,eli:0,win:0,tmp:null,sending:0,open:null,tt:0};
 const P2PH={empezar:['Enviar cat\u00e1logo','g1'],ofrecer:['Enviar cat\u00e1logo','g1'],aprobar:['Buscar aprobaci\u00f3n','g4'],visita:['Buscar visita','g8'],vendidos:['Buscar visita','g8'],apartar:['Buscar visita','g8']};
 const P2OPT=[['empezar','Enviar cat\u00e1logo','g1'],['aprobar','Buscar aprobaci\u00f3n','g4'],['visita','Buscar visita','g8']];
@@ -1302,12 +1304,16 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const REG={on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0};
+const REG={on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
-function regOpen(){
+function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
+function regPick(){if(RO||!REG.on)return;const f=regFile();f.value='';f.click()}
+function regOpen(mode){
   if(RO)return toast('Estás en vista de solo lectura.',1);
-  REG.on=1;REG.photos=[];REG.rows=[];REG.busy=0;REG.prog='';REG.err='';REG.conf=0;REG.nota='';REG.lugar=lget('crm-lugar')||'';
-  document.body.classList.add('p2lock');regDraw();
+  REG.on=1;REG.sid=(REG.sid||0)+1;REG.photos=[];REG.rows=[];REG.busy=0;REG.prep=0;REG.prog='';REG.err='';REG.conf=0;REG.nota='';REG.lugar=lget('crm-lugar')||'';
+  document.body.classList.add('p2lock');
+  const m=mode||lget('crm-regmode')||'foto';
+  if(m==='mano'||!AI)regAddRow();else{regDraw();regPick()}
 }
 function regClose(){REG.on=0;REG.photos=[];REG.rows=[];const e=document.getElementById('p2reg');if(e)e.remove();document.body.classList.remove('p2lock');p2DFlush();if(document.getElementById('p2b'))p2Render()}
 function regPlaces(){const m={};S.leads.filter(l=>l.own===S.ag&&l.ub).forEach(l=>{m[l.ub]=(m[l.ub]||0)+1});return Object.keys(m).sort((a,b)=>m[b]-m[a]).slice(0,10)}
@@ -1317,9 +1323,25 @@ function regRow(x,lugar){
 }
 function regDup(r,i){const t=norm(r.tel);if(t.length!==10)return '';const d=findDup(t);if(d)return dupMsg(d);if(REG.rows.some((o,j)=>j<i&&norm(o.tel)===t))return 'Repetido en esta lista';return ''}
 function regDoubt(r){const t=norm(r.tel);return r.du.length>0||(t.length>0&&t.length!==10)}
+const regEmpty=r=>!String(r.name||'').trim()&&!norm(r.tel)&&!String(r.tx||'').trim()&&!String(r.idf||'').trim()&&!String(r.mt||'').trim();
+const regOk=(r,i)=>r.on&&!regDup(r,i)&&!regEmpty(r);
+function regFocusKey(){const a=document.activeElement;if(!a||!a.closest||!a.closest('#p2reg'))return null;let k='';if(a.id)k='#'+a.id;else if(a.dataset&&a.dataset.k!==undefined&&a.dataset.i!==undefined)k='[data-i="'+a.dataset.i+'"][data-k="'+a.dataset.k+'"]';if(!k)return null;let p=0;try{p=a.selectionStart}catch(e){}return {k:k,p:p}}
+function regStat(t){REG.prog=t;const x=document.getElementById('rgst');if(x)x.textContent=t}
+function regBtn(){
+  const b=document.querySelector('#p2reg [data-rg="save"]');if(!b)return;
+  const n=REG.rows.filter(regOk).length;
+  b.textContent=REG.conf?'Guardar así de todos modos':'Guardar '+n+(n===1?' lead':' leads');
+  b.disabled=!!REG.busy||!n;
+}
+function regAddRow(){
+  const lr=REG.rows[REG.rows.length-1];
+  if(!(lr&&regEmpty(lr))){REG.rows.push({on:1,name:'',tel:'',tx:'',mt:'',ub:REG.lugar,idf:'',stg:'empezar',du:[],hand:0});REG.conf=0;regDraw()}
+  const q=document.querySelectorAll('#p2reg .rgr');
+  if(q.length){const f=q[q.length-1].querySelector('[data-k="name"]');if(f)f.focus()}
+}
 function regDraw(){
-  if(!REG.on)return;const e=regEl(),b=REG.busy;
-  const th=REG.photos.map((p,i)=>'<div class="rgt"><img src="'+p.thumb+'" alt=""><button data-r="rmp" data-i="'+i+'" aria-label="Quitar foto">×</button></div>').join('');
+  if(!REG.on)return;const e=regEl(),b=REG.busy,fk=regFocusKey(),sc=e.scrollTop;
+  const th=REG.photos.map((p,i)=>'<div class="rgt"><img src="'+p.thumb+'" alt=""><button data-rg="rmp" data-i="'+i+'" aria-label="Quitar foto">×</button></div>').join('');
   const pl=regPlaces().map(x=>'<option value="'+esc(x)+'">').join('');
   const rows=REG.rows.map((r,i)=>{
     const dp=regDup(r,i),t=norm(r.tel),fl=[];
@@ -1330,47 +1352,55 @@ function regDraw(){
       r.du.forEach(d=>fl.push(['warn',d]));
     }
     const cls=dp?' dup':(regDoubt(r)?' dbt':'');
-    return '<div class="rgr'+cls+'"><div class="rgrh"><label><input type="checkbox" data-i="'+i+'" data-k="on"'+(r.on&&!dp?' checked':'')+(dp?' disabled':'')+'> <b>'+(i+1)+'</b></label><button data-r="rmr" data-i="'+i+'" aria-label="Quitar">×</button></div>'+
+    return '<div class="rgr'+cls+'"><div class="rgrh"><label><input type="checkbox" data-i="'+i+'" data-k="on"'+(r.on&&!dp?' checked':'')+(dp?' disabled':'')+'> <b>'+(i+1)+'</b></label><button data-rg="rmr" data-i="'+i+'" aria-label="Quitar">×</button></div>'+
       '<textarea rows="2" data-i="'+i+'" data-k="tx" placeholder="Texto tal cual (opcional)">'+esc(r.tx)+'</textarea>'+
-      '<div class="rgg"><input data-i="'+i+'" data-k="name" value="'+esc(r.name)+'" placeholder="Nombre (opcional)" autocomplete="off"><input class="'+((t&&t.length!==10)||r.du.length?'warn':'')+'" data-i="'+i+'" data-k="tel" inputmode="tel" value="'+esc(r.tel)+'" placeholder="WhatsApp (opcional)" autocomplete="off"></div>'+
-      '<div class="rgg"><input data-i="'+i+'" data-k="idf" value="'+esc(r.idf)+'" placeholder="Cómo identificarlo (opcional)" autocomplete="off"><input data-i="'+i+'" data-k="ub" value="'+esc(r.ub)+'" placeholder="Lugar (opcional)" autocomplete="off"></div>'+
+      '<div class="rgg"><input data-i="'+i+'" data-k="name" enterkeyhint="next" value="'+esc(r.name)+'" placeholder="Nombre (opcional)" autocomplete="off"><input class="'+((t&&t.length!==10)||r.du.length?'warn':'')+'" data-i="'+i+'" data-k="tel" enterkeyhint="next" inputmode="tel" value="'+esc(r.tel)+'" placeholder="WhatsApp (opcional)" autocomplete="off"></div>'+
+      '<div class="rgg"><input data-i="'+i+'" data-k="idf" enterkeyhint="next" value="'+esc(r.idf)+'" placeholder="Cómo identificarlo (opcional)" autocomplete="off"><input data-i="'+i+'" data-k="ub" enterkeyhint="done" value="'+esc(r.ub)+'" placeholder="Lugar (opcional)" autocomplete="off"></div>'+
       fl.map(f=>'<div class="rgf '+f[0]+'">'+esc(f[1])+'</div>').join('')+'</div>'}).join('');
-  const sel=REG.rows.filter((r,i)=>r.on&&!regDup(r,i)).length,nd=REG.rows.filter((r,i)=>r.on&&!regDup(r,i)&&regDoubt(r)).length;
-  e.innerHTML='<div class="rg"><div class="rgh"><b>Nuevos prospectos</b><button data-r="x">Cerrar</button></div>'+
-    '<div class="rgp">'+th+'<label class="rga"><span>+ Fotos</span><input id="rgf" type="file" accept="image/\x2A" multiple hidden></label></div>'+
+  const nd=REG.rows.filter((r,i)=>regOk(r,i)&&regDoubt(r)).length;
+  e.innerHTML='<div class="rg"><div class="rgh"><b>Nuevos prospectos</b><button data-rg="x">Cerrar</button></div>'+
+    '<div class="rgb">'+(AI?'<button class="p2a st" data-rg="pick">Subir fotos</button>':'')+'<button class="p2a" data-rg="add">Escribir a mano</button></div>'+
+    (th?'<div class="rgp">'+th+'</div>':'')+
+    (b||REG.prep?'<div id="rgst" class="rgf info">'+esc(REG.prog||'Leyendo…')+'</div>':'')+
     '<input id="rgl" list="rgpl" class="rgi" placeholder="¿De qué lugar son estos prospectos? (opcional)" value="'+esc(REG.lugar)+'" autocomplete="off"><datalist id="rgpl">'+pl+'</datalist>'+
     '<textarea id="rgn" class="rgi" rows="2" placeholder="Indicaciones para la IA (opcional). Ej: el número va antes del nombre">'+esc(REG.nota)+'</textarea>'+
-    '<div class="rgb">'+(AI?'<button class="p2a st" data-r="read"'+(b||!REG.photos.length?' disabled':'')+'>'+(b?esc(REG.prog||'Leyendo…'):'Leer con IA'+(REG.photos.length>1?' ('+REG.photos.length+' fotos)':''))+'</button>':'')+'<button class="p2a" data-r="add"'+(b?' disabled':'')+'>Agregar a mano</button></div>'+
+    (AI&&REG.photos.length&&!b&&!REG.prep?'<div class="rgb"><button class="p2a st" data-rg="read">Leer '+(REG.photos.length>1?REG.photos.length+' fotos':'la foto')+' con IA</button></div>':'')+
     (REG.err?'<div class="rgf bad">'+esc(REG.err)+'</div>':'')+
     (REG.rows.length&&nd?'<div class="rgf warn">La IA dudó en '+nd+(nd===1?' lead':' leads')+': revísalos (marcados en ámbar) antes de guardar.</div>':'')+
     rows+
-    (REG.rows.length?'<div class="rgs"><button class="p2a wa" data-r="save"'+(b?' disabled':'')+'>'+(REG.conf?'Guardar así de todos modos':'Guardar '+sel+(sel===1?' lead':' leads'))+'</button></div>':'')+'</div>';
+    (REG.rows.length?'<div class="rgs"><button class="p2a wa" data-rg="save"></button></div>':'')+'</div>';
+  regBtn();
+  if(fk){const n=e.querySelector(fk.k);if(n){n.focus();try{n.setSelectionRange(fk.p,fk.p)}catch(x){}}}
+  e.scrollTop=sc;
 }
 async function regRead(){
-  if(REG.busy||!REG.photos.length)return;
-  REG.busy=1;REG.err='';REG.conf=0;const fail=[],n=REG.photos.length;let add=0;
+  if(REG.busy||REG.prep||!REG.photos.length)return;
+  const sid=REG.sid,batch=REG.photos.slice(),n=batch.length,fail=[];
+  REG.busy=1;REG.err='';REG.conf=0;REG.prog='Leyendo foto 1 de '+n+'…';let add=0;regDraw();
   for(let i=0;i<n;i++){
-    REG.prog='Leyendo foto '+(i+1)+' de '+n+'…';regDraw();
+    regStat('Leyendo foto '+(i+1)+' de '+n+'…');
     try{
-      const img=await shrink(REG.photos[i].file);
+      const img=await shrink(batch[i].file);
       const r=await api('ai',{img:img,mime:'image/jpeg',nota:REG.nota,lugar:REG.lugar});
-      if(!REG.on)return;
+      if(!REG.on||REG.sid!==sid)return;
       if(r.err)throw {code:r.err};
       (Array.isArray(r.leads)?r.leads:[]).forEach(x=>{const row=regRow(x,REG.lugar);if(!row.name&&!row.tel&&!row.tx)return;
         const t=norm(row.tel),o=t.length===10?REG.rows.find(z=>norm(z.tel)===t):null;
         if(o){if(row.tx&&o.tx.indexOf(row.tx)<0)o.tx=(o.tx?o.tx+' ':'')+row.tx;row.du.forEach(d=>{if(o.du.indexOf(d)<0)o.du.push(d)});if(!o.name)o.name=row.name;if(!o.idf)o.idf=row.idf;return}
         REG.rows.push(row);add++});
-    }catch(e){fail.push(i);REG.err+=(REG.err?' ':'')+'Foto '+(i+1)+': '+aiErr(e&&e.code)}
+    }catch(e){if(!REG.on||REG.sid!==sid)return;fail.push(batch[i]);REG.err+=(REG.err?' ':'')+'Foto '+(i+1)+': '+aiErr(e&&e.code)}
   }
-  if(!REG.on)return;
-  REG.photos=REG.photos.filter((p,i)=>fail.indexOf(i)>=0);
+  if(!REG.on||REG.sid!==sid)return;
+  REG.photos=REG.photos.filter(p=>fail.indexOf(p)>=0||batch.indexOf(p)<0);
+  if(add)REG.rows=REG.rows.filter(r=>!regEmpty(r));
   if(!add&&!fail.length)REG.err='No encontré prospectos en las fotos. Prueba con una más clara o agrégalo a mano.';
   REG.busy=0;REG.prog='';regDraw();
+  if(REG.photos.some(p=>batch.indexOf(p)<0))regRead();
 }
 function regSave(){
-  const sel=REG.rows.filter((r,i)=>r.on&&!regDup(r,i));
-  if(!sel.length){REG.err='No hay nada que guardar.';return regDraw()}
-  const nd=sel.filter(regDoubt).length;
+  const sel=REG.rows.filter(regOk);
+  if(!sel.length){REG.err='Escribe al menos un dato: nombre, número o texto.';return regDraw()}
+  const nd=sel.filter(r=>regDoubt(r)).length;
   if(nd&&!REG.conf){REG.conf=1;REG.err='';regDraw();const q=document.querySelector('#p2reg .rgf.warn');if(q)q.scrollIntoView({block:'center'});return}
   const t0=Date.now();let np=0;
   undo=JSON.stringify(S);UNDO_ADD=true;
@@ -1385,8 +1415,9 @@ function regSave(){
     S.leads.push(nl);
   });
   if(REG.lugar.trim())lset('crm-lugar',REG.lugar.trim());
-  const nn=sel.length;P2.cat='neu';P2.open=null;
+  const nn=sel.length;P2.cat='neu';P2.open=null;P2.f=null;P2.q='';P2.sq=0;P2.fp=0;
   regClose();
+  const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
   done(nn+(nn===1?' lead agregado':' leads agregados')+(np?' ('+np+' sin número)':''));
 }
 document.addEventListener('input',e=>{
@@ -1398,21 +1429,32 @@ document.addEventListener('input',e=>{
   if(k==='on'){r.on=t.checked?1:0;REG.conf=0;return regDraw()}
   r[k]=t.value;if(k==='idf')r.hand=1;
   if(k==='tel'){r.du=[]}
-  if(REG.conf){REG.conf=0;const b=document.querySelector('#p2reg [data-r="save"]');if(b)b.textContent='Guardar'}
+  REG.conf=0;regBtn();
 });
 document.addEventListener('change',async e=>{
   const t=e.target;if(!REG.on||!t||t.id!=='rgf')return;
-  const fs=Array.from(t.files||[]);t.value='';
-  for(const f of fs){try{const th=await thumb(f);REG.photos.push({file:f,thumb:th})}catch(x){}}
-  regDraw();
+  const fs=Array.from(t.files||[]);t.value='';if(!fs.length)return;
+  lset('crm-regmode','foto');
+  const sid=REG.sid;REG.prep=1;REG.prog='Preparando fotos…';regDraw();
+  for(const f of fs){try{const th=await thumb(f);if(!REG.on||REG.sid!==sid)return;REG.photos.push({file:f,thumb:th})}catch(x){}}
+  REG.prep=0;regDraw();
+  if(AI)regRead();
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter'||!REG.on)return;const t=e.target;
+  if(!t||t.tagName!=='INPUT'||t.type==='checkbox'||!t.closest||!t.closest('#p2reg'))return;
+  const all=Array.from(document.querySelectorAll('#p2reg input:not([type=checkbox]),#p2reg textarea'));
+  const i=all.indexOf(t);e.preventDefault();
+  if(i>=0&&i<all.length-1)all[i+1].focus();else t.blur();
 });
 document.addEventListener('click',e=>{
-  if(!REG.on)return;const b=e.target.closest&&e.target.closest('#p2reg [data-r]');if(!b)return;
-  const a=b.dataset.r,i=+b.dataset.i;
+  if(!REG.on)return;const b=e.target.closest&&e.target.closest('#p2reg [data-rg]');if(!b)return;
+  const a=b.dataset.rg,i=+b.dataset.i;
   if(a==='x')return regClose();
   if(a==='rmp'){REG.photos.splice(i,1);return regDraw()}
   if(a==='rmr'){REG.rows.splice(i,1);REG.conf=0;return regDraw()}
-  if(a==='add'){REG.rows.push({on:1,name:'',tel:'',tx:'',mt:'',ub:REG.lugar,idf:'',stg:'empezar',du:[],hand:0});REG.conf=0;regDraw();const q=document.querySelectorAll('#p2reg .rgr');if(q.length)q[q.length-1].scrollIntoView({block:'center'});return}
+  if(a==='pick')return regPick();
+  if(a==='add'){lset('crm-regmode','mano');return regAddRow()}
   if(a==='read')return regRead();
   if(a==='save')return regSave();
 });
@@ -1535,7 +1577,7 @@ document.addEventListener('click',e=>{
   const a=t.dataset.p2,id=t.dataset.id,l=id?(S.leads.find(x=>x.id===id)||(P2.tmp&&P2.tmp.id===id?P2.tmp:null)):null;
   if(a==='cat'){P2.ed=0;P2.open=null;P2.ph=null;P2.fm=0;P2.cat=t.dataset.v;P2.lim=50;P2.eli=0;p2Render();return p2Act()}
   if(a==='elis'){P2.eli=P2.eli?0:1;return p2Render()}
-  if(a==='fab'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=!fm.hidden;return}
+  if(a==='fab')return p2Add();
   if(a==='addm'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Lerma Fer para agregar.',1);return openSheet(null,'manual')}
   if(a==='add'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Lerma Fer para agregar.',1);return p2Add()}
   if(a==='tbs'){P2.sq=P2.sq||P2.q?0:1;if(!P2.sq)P2.q='';p2Render();const q=document.getElementById('p2q');if(q&&P2.sq)q.focus();return}
