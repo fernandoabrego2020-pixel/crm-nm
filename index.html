@@ -2962,11 +2962,11 @@ function masView(){
   const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
   const ANAT=[N('Ana','anam')];
   try{pfTi()}catch(e){}
-  const QUIEN=N('Quién escribió','quien');
+  const QUIEN=N('Quién escribió','quien'),USOT=ME==='Fer'?[N('Tiempo de uso del panel','uso')]:[];
   let h='';
-  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),N('Tramitar venta','tvent'),N('Tramitar seguro','seg')]));
-  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),L('Panel de control',NLINK.panel())]));
-  else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
+  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),N('Tramitar venta','tvent'),N('Tramitar seguro','seg')],USOT));
+  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
+  else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas())].concat(USOT,[L('Panel de control',NLINK.panel())]));
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
   m.innerHTML='<div class="in p2">'+h+'</div>';
   m.style.display='block';
