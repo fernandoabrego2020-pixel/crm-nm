@@ -797,6 +797,10 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 .lc .p2cs{flex:1;min-width:0;font-size:13px;line-height:1.35;color:var(--mu);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
 .lc .p2wq{flex:none;width:40px;height:40px;border-radius:50%;border:0;background:#e3f3ea;color:var(--g8);display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
 .lc .p2wq svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+
+.lc .lt{align-items:center}
+.lc .lt small,.lc .lt small.d8,.lc .lt small.d14{color:var(--g8);font-weight:700}
+.lc .lt .p2wq{margin-left:2px}
 </style>
 </head>
 <body>
@@ -1060,6 +1064,7 @@ const P2S=new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',timeZone:
 const p2Hr=t=>P2H.format(t).replace(/[\s ]+/g,' ').replace(/\./g,'').toLowerCase();
 const p2When=t=>P2D.format(t).replace(/[.,]/g,'').replace(/ de /g,' ')+' · '+p2Hr(t);
 function p2T(t){if(!t)return '';const n=Date.now();if(P2Y.format(t)===P2Y.format(n))return p2Hr(t);if(P2Y.format(t)===P2Y.format(n-864e5))return 'Ayer';if(n-t<6*864e5)return P2W.format(t);return P2S.format(t).replace(/[.,]/g,'').replace(/ de /g,' ')}
+const p2Dt=t=>t?P2S.format(t).replace(/[.,]/g,'').replace(/ de /g,' '):'';
 function p2Last(l){const a=P2.act[l.tel];if(a)return a;let m=Math.max(l.c||0,(l.ai&&l.ai.t)||0);(l.ctx||[]).forEach(e=>{if(e&&e.t>m)m=e.t});return m}
 function p2Pool(c){const pool=S.leads.filter(l=>l.own===S.ag);return pool.filter(l=>(!l.ph||l.fld)&&(c==='eli'||(!l.done&&!l.lost))&&p2cat(l)===c).sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||(b.pin&&a.pin?b.pin-a.pin:0)||p2Last(b)-p2Last(a))}
 function p2SumFull(l){let s=l.rs||l.ctxu||'';if(!s){const c=(l.ctx||[]).filter(e=>!e.auto&&e.x).slice(-1)[0];s=c?c.x:''}if(!s)s=l.note||'';if(!s)s=(l.ai&&l.ai.resumen)||'';return String(s).replace(/\s+/g,' ').trim()}
@@ -1102,9 +1107,8 @@ function p2View(){
 function p2Refresh(){try{if(CUR==='p2'&&!P2.ed&&document.getElementById('p2b'))p2Render()}catch(e){}}
 function p2Age(l){const t=p2Last(l);if(!t)return '';const d=(Date.now()-t)/864e5;return d>=14?'d14':d>=8?'d8':''}
 function p2Quick(l){
-  const s=p2Sum(l),t=p2Title(l),sm=s&&p2nz(s)!==p2nz(t)?s:'',wa=!l.ph&&l.tel;
-  if(!sm&&!wa)return '';
-  return '<div class="p2cr"><span class="p2cs">'+esc(sm)+'</span>'+(wa?'<button class="p2wq" data-p2="chat" data-id="'+l.id+'" aria-label="Abrir chat de WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.9A8 8 0 1 1 21 12z"/></svg></button>':'')+'</div>'
+  if(l.ph||!l.tel)return '';
+  return '<button class="p2wq" data-p2="chat" data-id="'+l.id+'" aria-label="Abrir chat de WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.9A8 8 0 1 1 21 12z"/></svg></button>'
 }
 function p2Card(l,c){
   const sm=p2Sum(l),idf=String(l.idf||'').trim();
@@ -1126,7 +1130,7 @@ function p2Card(l,c){
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
   const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+chip+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA sobre este cliente</button></div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2T(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small></div>'+(op?'':p2Quick(l))+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small>'+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
