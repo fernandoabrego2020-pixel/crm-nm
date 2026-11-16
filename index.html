@@ -681,6 +681,8 @@ body.p2lock #toast{z-index:90}
 .mxg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .mxt{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;width:100%;height:96px;padding:10px 22px;border-radius:14px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:600;line-height:1.25;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .mxt:active{background:var(--ln)}
+.mxs{overflow:hidden}
+.mxs .swx{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;opacity:0;border:0;border-radius:14px;font-size:16px}
 .mxt svg{position:absolute;top:9px;right:9px;width:14px;height:14px;fill:none;stroke:var(--mu);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 .p2mo{display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;min-height:40px;padding:0 4px;background:none;border:0;color:var(--mu);font:inherit;font-size:13px;font-weight:600;text-align:left;cursor:pointer}
@@ -930,7 +932,8 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .pfva{display:flex;gap:8px;margin-top:10px}
 .pfva button,.pfva a,.pfvo{flex:1;text-align:center;text-decoration:none;border:0;border-radius:12px;padding:13px 8px;font:800 15px/1 system-ui,-apple-system,sans-serif;cursor:pointer}
 .pfva button{background:#eef1f5;color:#18202b}
-.pfva a{background:#25d366;color:#fff}
+.pfva a,.pfva .pfwa{background:#25d366;color:#fff}
+.pfls{display:inline-flex;box-shadow:none;border:1.5px solid #dfe3e9}
 .pfvo{display:block;background:#e8481c;color:#fff}
 .pfvn{text-align:center;padding:18px 8px;color:#5b6676;font:600 14px/1.4 system-ui,-apple-system,sans-serif}
 .pfvn b{display:block}
@@ -2042,7 +2045,7 @@ document.addEventListener('click',e=>{
   if(b.dataset.nv)return navGo(b.dataset.nv);
   if(b.id==='mback')navSet('pros');
   if(b.id==='mapbtn')navSet('mapa');
-  if(b.id==='mlo'){lset('crm-tok','');lset('crm-role','');lset('crm-user','');LR='';LU='';showLogin('Sesión cerrada');return}
+  if(b.id==='mlo'||b.id==='mlo2'){lset('crm-tok','');lset('crm-role','');lset('crm-user','');LR='';LU='';showLogin('Sesión cerrada');return}
   if(b.id==='lgo')return doLogin();
   if(b.id==='logout'){lset('crm-tok','');showLogin('Sesión cerrada');return}
   if(sheet&&b.dataset.m){sheet.mode=b.dataset.m;sheet.err='';return renderSheet()}
@@ -2665,8 +2668,8 @@ function pfView(){
   const m=document.getElementById('menu');m.classList.add('pfon');PFS.v=1;PFS.k='';PFS.m='';PFS.s=mSucKey(S.ag);
   m.innerHTML='<div class="pf" id="pf"></div>';m.style.display='block';m.scrollTop=0;
   const p=document.getElementById('pf');
-  p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay();return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
-  p.onchange=e=>{if(e.target.id==='pfs'){PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}};
+  p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay(pl.dataset.pfplay);return}const lc=e.target.closest&&e.target.closest('[data-pfloc]');if(lc){pfLoc(lc.dataset.pfloc);return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
+  p.onchange=e=>{if(e.target.id==='pfs'){PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s}};
   pfDraw1();
   pfJs('pf1.js').then(()=>{if(CUR==='moto'&&PFS.v===1&&document.getElementById('pf'))pfDraw1()});
   if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
@@ -2677,7 +2680,7 @@ function pfCsv(t){const R=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){c
 function pfVids(){
   if(PFV.d&&Date.now()-PFV.t<6e4)return Promise.resolve(PFV.d);
   if(PFV.p)return PFV.p;
-  PFV.p=fetch('https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/gviz/tq?tqx=out:csv&_='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(t=>{const M={};pfCsv(t).slice(1).forEach(x=>{const u=String(x[1]||'').trim();if(x[0]&&/^https?:/i.test(u))M[mnorm(x[0])]=u});PFV.d=M;PFV.t=Date.now();PFV.p=null;return M}).catch(()=>{PFV.p=null;return PFV.d||{}});
+  PFV.p=fetch('https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/gviz/tq?tqx=out:csv&_='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(t=>{const M={};pfCsv(t).slice(1).forEach(x=>{if(!x[0])return;const k=mnorm(x[0]),u=String(x[1]||'').trim(),w=String(x[2]||'').trim();if(/^https?:/i.test(u))M[k]=u;if(/^https?:/i.test(w))M[k+'#2']=w});PFV.d=M;PFV.t=Date.now();PFV.p=null;return M}).catch(()=>{PFV.p=null;return PFV.d||{}});
   return PFV.p
 }
 function pfVid(u){
@@ -2697,14 +2700,29 @@ function pfSeg(m){
   if(sg)return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(sg[2])+'</td><td>'+mxn(sg[5])+'</td></tr><tr><td>Recomendado</td><td><b>'+mxn(sg[3])+'</b></td><td><b>'+mxn(sg[6])+'</b></td></tr><tr><td>Mayor protección</td><td>'+mxn(sg[4])+'</td><td>'+mxn(sg[7])+'</td></tr></table><div class="note" style="margin-top:6px">Prima anual de contado, IVA incluido. Recomendado = Seguros Azteca (robo y pérdida total).</div>';
   return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(1852)+'</td><td>'+mxn(2261)+'</td></tr></table><div class="note" style="margin-top:6px">El seguro mínimo es el mismo para todas las motos (anual de contado, IVA incluido).</div>'
 }
-function pfVidBox(m,u){
-  if(!u)return '<div class="pfvn"><b>Todavía no hay video de esta moto</b>'+(FERDEV()?'<a target="_blank" rel="noopener" href="https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/edit">Agregar el link en el Sheet videos-motos</a>':'')+'</div>';
+function pfVidBox(m,u,k){
+  k=k||'';
+  if(!u)return '<div class="pfvn"><b>'+(k?'Todavía no hay video de la tienda':'Todavía no hay video de esta moto')+'</b>'+(FERDEV()?'<a target="_blank" rel="noopener" href="https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/edit">Agregar el link en el Sheet videos-motos'+(k?' (columna C)':'')+'</a>':'')+'</div>';
   const v=pfVid(u);
-  const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-pfplay="1" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
-  return '<div class="pfvb" id="pfvb" data-u="'+esc(u)+'">'+play+'</div><div class="pfva"><button data-pfcp="'+esc(u)+'">Copiar link</button><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/?text='+encodeURIComponent(m.n+': '+u)+'">Mandar por WhatsApp</a></div>'
+  const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-pfplay="'+(k?'2':'1')+'" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
+  return '<div class="pfvb" id="pfvb'+k+'" data-u="'+esc(u)+'">'+play+'</div><div class="pfva"><button data-pfcp="'+esc(u)+'">Copiar link</button><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/?text='+encodeURIComponent((k?'Video de la tienda · ':'')+m.n+': '+u)+'">Mandar por WhatsApp</a></div>'
 }
-function pfPlay(){
-  const b=document.getElementById('pfvb');if(!b)return;const v=pfVid(b.dataset.u);
+const PFLOC={
+lerma:['https:\x2F\x2Fmaps.app.goo.gl/MkyHAj7k4sTySNk7A','Av. de Las Partidas 602 esq. P.º del Cedro, Fracc. Cedros, C.P. 52004','722 155 6623','Lunes a sábado, 10:00 a 19:00'],
+atlacomulco:['https:\x2F\x2Fmaps.app.goo.gl/h1PwNfcdpStdHdQw8','Plaza Las Cuatro Fuentes, local 4, Blvd. Jorge Jiménez Cantú esq. Mario Colín Sánchez, Col. Cuatro Milpas, C.P. 50455','722 460 6291','Lunes a sábado, 10:00 a 19:00'],
+santiago:['https:\x2F\x2Fmaps.app.goo.gl/Kqm8Pwpf1S7uKxkVA','Av. Hermenegildo Galeana esq. Antonio Barbabosa, C.P. 52600','722 307 5292','Lunes a domingo, 10:00 a 19:00'],
+tenancingo:['https:\x2F\x2Fmaps.app.goo.gl/Ay5GfQJdNdrkgGVt5','Paseo de los Insurgentes S/N lote 11, Col. San Diego, C.P. 52400','722 564 5918','Lunes a sábado, 10:00 a 19:00'],
+valle:['https:\x2F\x2Fmaps.app.goo.gl/w5NQnYoLCvjvPEmb7','Calle Salitre 103, Col. Centro, C.P. 51200','722 497 8237','Lunes a sábado, 10:00 a 19:00'],
+aodes:['https:\x2F\x2Fmaps.app.goo.gl/Cv3pwaTTGbxwSeXH9','De Manuel 125, Sta. María Ahuacatlán, C.P. 51200','722 395 5007','Lunes a domingo, 10:00 a 19:00'],
+almoloya:['https:\x2F\x2Fmaps.app.goo.gl/2qBjNsA72iQhL4c47','Carretera Almoloya de Juárez No. 1,600, Col. Nueva Serratón, C.P. 51355','722 140 1360','Lunes a sábado, 10:00 a 19:00']};
+function pfLocTxt(k){const o=PFLOC[k]||PFLOC.lerma;return o[0]+'\n\nDirección:\n'+o[1]+'\n\nWhatsApp:\n'+o[2]+'\n\nHorario:\n'+o[3]}
+function pfLoc(a){
+  const sel=document.getElementById('pfls'),k=(sel&&sel.value)||PFS.s||'lerma',t=pfLocTxt(k);
+  if(a==='w'){window.open('https:\x2F\x2Fwa.me/?text='+encodeURIComponent(t),'_blank','noopener');return}
+  pfCopy(t,'Ubicación copiada')
+}
+function pfPlay(k){
+  const b=document.getElementById('pfvb'+(k==='2'?'2':''));if(!b)return;const v=pfVid(b.dataset.u);
   b.innerHTML=v.k==='mp'?'<video src="'+esc(v.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(v.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
 }
 function pfDraw3(){
@@ -2713,15 +2731,18 @@ function pfDraw3(){
   const I=window.PFI||{},k=pfSlug(m.n),ph=pfPhoto(m),hero=I[k]?'<img src="'+I[k]+'" alt="">':(ph?'<img class="pfp" src="'+esc(ph)+'" alt="" referrerpolicy="no-referrer">':''),L=pfLab(m);
   const tr=String(m.t||'').split('·').map(x=>x.trim()).filter(Boolean).slice(0,9),g=pfGrp(m);
   const si=PFS.s?MSUC.findIndex(x=>x[0]===PFS.s):-1;
+  const sk=PFS.s||mSucKey(S.ag)||'lerma';
   const ex=m.e?MSUC.map((x,i)=>'<span class="pfx'+(m.e[i]?' on':'')+(i===si?' me':'')+'">'+(m.e[i]?'✓ ':'')+x[1]+'</span>').join(''):'<span class="pfxn">Sin dato de existencia</span>';
   p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="2">← Similares</button></div><div class="pfr">'+esc(PFG[g]||g)+'</div>'
   +'<div class="pfhero">'+hero+'</div><div class="pft3"><b>'+esc(L[0])+'</b>'+(L[1]?'<small>'+esc(L[1])+'</small>':'')+'</div>'
-  +'<div class="pfc"><div class="pfpr">'+(m.p?mxn(m.p):'Sin precio')+'</div>'+(tr.length?'<div class="pftr">'+tr.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+'</div>'
-  +'<div class="pfc"><h4>Video</h4><div id="pfvw"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
+  +'<div class="pfc"><div class="pfpr">'+(m.p?mxn(m.p):'Sin precio')+'</div>'+'</div>'
+  +'<div class="pfc"><h4>Video de la moto</h4><div id="pfvw"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
+  +'<div class="pfc"><h4>Video de la tienda</h4><div id="pfvw2"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
   +'<div class="pfc"><h4>Dónde hay</h4><div class="pfxs">'+ex+'</div></div>'
+  +'<div class="pfc"><h4>Ubicación de la tienda</h4><label class="pfss pfls"><select id="pfls">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===sk?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>\u25bc</i></label><div class="pfva"><button data-pfloc="c">Copiar ubicación</button><button data-pfloc="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Maps, dirección, WhatsApp y horario, como los manda Ana.</div></div>'
   +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">Cargando ficha…</div></div></div>'
   +'<div class="pfc mtd"><div class="sg"><b>Seguro</b>'+pfSeg(m)+'</div></div>';
-  pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw');if(w)w.innerHTML=pfVidBox(m,M[mnorm(m.n)]||'')});
+  pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw');if(w)w.innerHTML=pfVidBox(m,M[mnorm(m.n)]||'');const w2=document.getElementById('pfvw2');if(w2)w2.innerHTML=pfVidBox(m,M[mnorm(m.n)+'#2']||'','2')});
   api('ficha',{n:m.n}).then(f=>f,()=>null).then(f=>{if(PFS.v!==3||PFS.m!==m.n)return;const b=document.getElementById('pff');if(b)b.innerHTML=mFicha(f,m.n)})
 }
 const PFS={k:'',s:'',v:1,m:''};
@@ -2864,15 +2885,16 @@ function masView(){
   const ch='<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',ex='<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>';
   const L=(t,h)=>'<a class="mxt" target="_blank" rel="noopener" href="'+h+'"><span>'+t+'</span>'+ex+'</a>';
   const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
-  const G=a=>'<div class="mxg">'+a.join('')+'</div>';
-  const ANA=[N('Tablero de Ana','ana'),N('Precios e inventario de Ana','anacat')];
+  const TAIL=(FERDEV()?['<label class="mxt mxs"><span>Cambiar de perfil</span>'+swSel()+'</label>']:[]).concat(['<button class="mxt" id="mlo2"><span>Cerrar sesi\u00f3n</span></button>']);
+  const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
+  const ANAT=[N('Tablero de Ana','ana'),N('Precios e inventario de Ana','anacat')];
   const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('INE por WhatsApp con Ana','ine'),QUIEN].concat(ANA,[N('Flujo de venta','flujo')]));
-  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANA,[L('Panel de control',NLINK.panel())]));
+  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),L('WhatsApp de Ana general','https:\x2F\x2Fwa.me/'+ANA)].concat(ANAT,[N('Flujo de venta','flujo')]));
+  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
-  m.innerHTML='<div class="in p2"><div class="mh2"><b>M\u00e1s<small>'+esc(DN(ME))+' \u00b7 '+(ROLEN[role]||'')+(RO?' \u00b7 solo lectura':'')+'</small></b><button id="mlo">Salir</button></div>'+h+'</div>';
+  m.innerHTML='<div class="in p2">'+h+'</div>';
   m.style.display='block';
 }
 function navGo0(id){
