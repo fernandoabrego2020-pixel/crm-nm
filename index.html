@@ -2322,10 +2322,10 @@ function segView(){
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><h4>1 · Cotiza</h4><div class="sgg"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><h4>1 · Sube tu cotización</h4><label class="sgfile" id="sgfC"><span>Cotización de Seguros Azteca (Excel)</span><input type="file" accept=".xlsm,.xlsx" id="sgC"><i id="sgCs">Subir archivo</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="margin-top:10px"><summary>No tengo el Excel: elegir la moto a mano</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
-  document.getElementById('sgVal').oninput=sgChg;
+  document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>sgCot(e.target.files[0]);
 }
 function sgSel(){
   const c=SG.cat.cat,q=SG.q;
@@ -2357,13 +2357,101 @@ function sgQuote(){
   api('seg_quote',{anio:q.anio,marca:q.marca,tipo:q.tipo,version:q.version,uso:q.uso,valorCap:q.valorCap}).then(r=>{
     if(n!==SG.seq)return;
     if(!r||!r.ok||r.valor==null){SG.quote=null;box.innerHTML='<div class="sgerr">Esa moto no está en el catálogo de Seguros Azteca.</div>';f.style.display='none';return}
-    SG.quote=r;sgQDraw();sgForm();
+    SG.quote=r;sgQDraw();sgForm();sgCotApply();
   }).catch(()=>{if(n===SG.seq)box.innerHTML='<div class="sgerr">No pude cotizar. Intenta de nuevo.</div>'});
 }
 function sgQDraw(){
   const r=SG.quote,box=document.getElementById('sgQ'),t=[r.total.min,r.total.rec,r.total.may];
   box.innerHTML=`<div class="note" style="margin:8px 0">Valor ${Number(SG.q.anio)>=2026?'factura':'convenido'}: <b>${sgMx(r.valor)}</b> · Prima anual de contado con IVA</div><div class="sgp">`+SGP.map((p,i)=>`<button type="button" class="sgpk${SG.pk===i?' on':''}" data-pk="${i}"><span>${p[1]}</span><b>${sgMx(t[i])}</b><small>${p[2]}</small></button>`).join('')+`</div>`;
   box.querySelectorAll('.sgpk').forEach(bt=>{bt.onclick=()=>{SG.pk=Number(bt.dataset.pk);sgQDraw();sgSum()}});
+}
+function sgRd(f,a,b){return f.slice(a,b).arrayBuffer()}
+async function sgInf(u8){const ds=new DecompressionStream('deflate-raw'),w=ds.writable.getWriter();w.write(u8);w.close();return new Uint8Array(await new Response(ds.readable).arrayBuffer())}
+async function sgZip(file){
+  const n=file.size,tail=new Uint8Array(await sgRd(file,Math.max(0,n-70000),n)),dv=new DataView(tail.buffer);
+  let e=-1;
+  for(let i=tail.length-22;i>=0;i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}
+  if(e<0)throw new Error('zip');
+  const cnt=dv.getUint16(e+10,true),cs=dv.getUint32(e+12,true),co=dv.getUint32(e+16,true);
+  const cd=new Uint8Array(await sgRd(file,co,co+cs)),cv=new DataView(cd.buffer),map={},td=new TextDecoder();
+  let p=0;
+  for(let i=0;i<cnt;i++){
+    if(cv.getUint32(p,true)!==0x02014b50)break;
+    const meth=cv.getUint16(p+10,true),csz=cv.getUint32(p+20,true),nl=cv.getUint16(p+28,true),el=cv.getUint16(p+30,true),cl=cv.getUint16(p+32,true),off=cv.getUint32(p+42,true);
+    map[td.decode(cd.subarray(p+46,p+46+nl))]={meth:meth,csz:csz,off:off};
+    p+=46+nl+el+cl;
+  }
+  return {file:file,map:map};
+}
+async function sgEnt(z,name){
+  const m=z.map[name];if(!m)return null;
+  const h=new DataView(await sgRd(z.file,m.off,m.off+30)),nl=h.getUint16(26,true),el=h.getUint16(28,true),s=m.off+30+nl+el;
+  const raw=new Uint8Array(await sgRd(z.file,s,s+m.csz));
+  return new TextDecoder().decode(m.meth===0?raw:await sgInf(raw));
+}
+async function sgCells(file){
+  const z=await sgZip(file),px=t=>new DOMParser().parseFromString(t,'application/xml');
+  const wb=px(await sgEnt(z,'xl/workbook.xml'));
+  let rid='';
+  [...wb.getElementsByTagName('sheet')].forEach(s=>{if(s.getAttribute('name')==='Cotizador')rid=s.getAttribute('r:id')||s.getAttributeNS('http:\x2F\x2Fschemas.openxmlformats.org\x2FofficeDocument\x2F2006\x2Frelationships','id')});
+  if(!rid)throw new Error('hoja');
+  const rl=px(await sgEnt(z,'xl/_rels/workbook.xml.rels'));
+  let tg='';
+  [...rl.getElementsByTagName('Relationship')].forEach(r=>{if(r.getAttribute('Id')===rid)tg=r.getAttribute('Target')});
+  const path=tg.charAt(0)==='\x2F'?tg.slice(1):'xl\x2F'+tg;
+  const sx=await sgEnt(z,'xl\x2FsharedStrings.xml'),ss=sx?[...px(sx).getElementsByTagName('si')].map(s=>s.textContent):[];
+  const sh=px(await sgEnt(z,path)),out={};
+  [...sh.getElementsByTagName('c')].forEach(c=>{
+    const t=c.getAttribute('t'),ve=c.getElementsByTagName('v')[0],v=ve?ve.textContent:null;
+    let x=null;
+    if(t==='inlineStr')x=c.textContent;
+    else if(v===null)x=null;
+    else if(t==='s')x=ss[Number(v)];
+    else if(t==='b')x=v==='1';
+    else if(t==='str'||t==='e')x=v;
+    else x=Number(v);
+    if(x!==null&&x!==''&&t!=='e')out[c.getAttribute('r')]=x;
+  });
+  return out;
+}
+const sgNm=s=>String(s==null?'':s).trim().toUpperCase().replace(/\s+/g,' ');
+function sgYmd(x){
+  if(typeof x==='number'&&x>1)return new Date(Date.UTC(1899,11,30)+Math.round(x)*864e5).toISOString().slice(0,10);
+  const m=/^(\d{1,2})[\x2F-](\d{1,2})[\x2F-](\d{4})$/.exec(String(x||'').trim());
+  if(m)return m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2);
+  return /^\d{4}-\d{2}-\d{2}/.test(String(x||''))?String(x).slice(0,10):'';
+}
+async function sgCot(file){
+  if(!file)return;
+  const st=document.getElementById('sgCs'),ld=document.getElementById('sgCl');
+  st.textContent='Leyendo…';ld.innerHTML='';
+  let c=null;
+  try{c=await sgCells(file)}catch(e){c=null}
+  if(!c||!c.C27||!c.H27||!c.P27||!c.X27){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML='<div class="sgerr">No encontré la moto en ese archivo. Sube el cotizador de Seguros Azteca ya guardado con año, marca, tipo y versión capturados.</div>';return}
+  const e=SG.cat.cat.find(x=>Number(x[0])===Number(c.C27)&&sgNm(x[1])===sgNm(c.H27)&&sgNm(x[2])===sgNm(c.P27)&&sgNm(x[3])===sgNm(c.X27));
+  if(!e){st.textContent='Listo, pero la moto no está';ld.innerHTML='<div class="sgerr">Esa moto ('+esc(c.C27+' '+c.H27+' '+c.P27+' '+c.X27)+') no está en el catálogo de Seguros Azteca.</div>';return}
+  const q=SG.q;
+  q.anio=String(e[0]);q.marca=e[1];q.tipo=e[2];q.version=e[3];
+  q.uso=SG.cat.usos.find(u=>sgNm(u)===sgNm(c.C31))||'Particular';
+  q.valorCap=Number(q.anio)>=2026&&typeof c.X29==='number'?String(Math.round(c.X29)):'';
+  const g=k=>c[k]==null?'':String(c[k]).trim();
+  SG.cot={tot:[c.B61,c.J61,c.U61].map(x=>typeof x==='number'?x:null),serv:g('J31'),cl:{rfc:g('C9').toUpperCase(),sexo:g('J9'),nombre:g('Q9'),apP:g('F11'),apM:g('P11'),nacimiento:sgYmd(c.AA11),cp:g('C13'),calle:g('G13'),colonia:g('X13'),numExt:g('D15'),numInt:g('H15'),estado:g('Q15'),correo:g('Q22'),serie:g('S31').toUpperCase(),motor:g('G33'),placas:g('Q33'),color:g('Y33')}};
+  st.textContent='Listo ✓ (toca para cambiarla)';
+  const vi=document.getElementById('sgVal');if(vi)vi.value=q.valorCap;
+  sgSel();sgQuote();
+}
+function sgCotApply(){
+  const o=SG.cot;if(!o||o.done===SG.seq)return;
+  o.done=SG.seq;
+  Object.keys(o.cl).forEach(k=>{if(o.cl[k])sgSet(k,o.cl[k])});
+  if(o.serv)sgSet('servicio',o.serv);
+  sgRegs();sgDefs();
+  const t=SG.quote&&SG.quote.total?[SG.quote.total.min,SG.quote.total.rec,SG.quote.total.may]:null,ld=document.getElementById('sgCl'),bad=[];
+  if(t)o.tot.forEach((x,i)=>{if(x!=null&&Math.abs(x-t[i])>0.05)bad.push(SGP[i][1]+': tu Excel '+sgMx(x)+' y el sistema '+sgMx(t[i]))});
+  const has=o.tot.some(x=>x!=null);
+  ld.innerHTML=bad.length?'<div class="sgdu"><b>Ojo, los precios no coinciden:</b><br>'+bad.map(x=>'• '+esc(x)).join('<br>')+'<br>Revisa la moto y el valor factura antes de emitir.</div>':has?'<div class="note" style="margin-top:8px">Precios iguales a tu cotización de Excel ✓</div>':'';
+  const miss=['nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','colonia','serie'].filter(k=>!sgV('sg_'+k)).length;
+  if(!miss&&o.cl.rfc)document.getElementById('sgRh').innerHTML='';
 }
 function sgField(id,lab,type,ph){return `<label>${lab}<input id="sg_${id}" type="${type||'text'}"${ph?` placeholder="${ph}"`:''} autocomplete="off"><em id="sge_${id}"></em></label>`}
 function sgSelF(id,lab,html,w){return `<label${w?' style="grid-column:1/-1"':''}>${lab}<select id="sg_${id}">${html}</select><em id="sge_${id}"></em></label>`}
@@ -2372,7 +2460,7 @@ function sgForm(){
   if(f.dataset.built){sgSum();f.style.display='';return}
   f.dataset.built='1';f.style.display='';
   const C=SG.cat;
-  f.innerHTML=`<div class="sgc"><h4>2 · Sube las fotos</h4><div class="note" style="margin-bottom:8px">Se leen solas y tú solo confirmas.</div><div class="sgg"><label class="sgfile" id="sgfI"><span>INE (frente)</span><input type="file" accept="image/\x2A" id="sgI"><i id="sgIs">Subir foto</i></label><label class="sgfile" id="sgfF"><span>Factura de la moto</span><input type="file" accept="image/\x2A" id="sgFa"><i id="sgFs">Subir foto</i></label></div><div id="sgLd"></div></div><div class="sgc"><h4>3 · Confirma</h4><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet"><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div><div class="sgc"><h4>4 · Emitir</h4><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> El cliente autoriza que se le envíe la póliza a su correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  f.innerHTML=`<div class="sgc"><h4>2 · Sube INE y factura</h4><div class="note" style="margin-bottom:8px">Se leen solas y tú solo confirmas.</div><div class="sgg"><label class="sgfile" id="sgfI"><span>INE (frente)</span><input type="file" accept="image/\x2A" id="sgI"><i id="sgIs">Subir foto</i></label><label class="sgfile" id="sgfF"><span>Factura de la moto</span><input type="file" accept="image/\x2A" id="sgFa"><i id="sgFs">Subir foto</i></label></div><div id="sgLd"></div></div><div class="sgc"><h4>3 · Confirma</h4><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet"><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div><div class="sgc"><h4>4 · Emitir</h4><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> El cliente autoriza que se le envíe la póliza a su correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
   sgRegs();
   document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
   document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
