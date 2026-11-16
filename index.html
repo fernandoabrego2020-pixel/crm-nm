@@ -824,6 +824,16 @@ html.fdv .nv{color:#98a2b5}
 html.fdv .nv.on{color:#fff}
 html.fdv .nv.on svg{background:rgba(255,255,255,.14)}
 html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
+
+.p2h{gap:8px}
+.p2sw{position:relative;display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 10px;border-radius:10px;background:var(--dk2);border:1px solid var(--dkl);color:#fff;font-size:14px;font-weight:700;max-width:70%}
+.p2sw .cv{font-style:normal;font-size:10px;opacity:.7}
+.p2h .p2sw select{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;opacity:0;border:0;padding:0;font-size:16px!important}
+.p2h .tbq.sm{margin-left:auto;width:34px;height:34px;border:0;background:none;color:#dfe4ee}
+.p2h .tbq.sm svg{width:18px;height:18px}
+.p2h .tbq.sm.on{background:#fff;color:var(--dk)}
+.p2h{min-height:44px}
+.lc .p2ct{font-style:normal;font-size:11px;font-weight:700;color:var(--mu);background:var(--soft);border-radius:999px;padding:2px 8px;margin-left:8px;vertical-align:2px}
 </style>
 </head>
 <body>
@@ -1039,6 +1049,7 @@ function markSeen(L,gid){const a=newAuto(L,gid);if(!a.length)return;const sm=see
 function welcome(){const pn=phN();return '<div class="wel"><div class="wn">'+esc(pname(String(ME))[0])+'</div>'+(RO||ROLE==='admin'?'':'<div class="qs"><button id="qsb" data-qs="1"'+(QSBUSY?' disabled':'')+'>'+(QSBUSY?'Ubicando\u2026':'\u2316 Guardar ubicaci\u00f3n y llenar despu\u00e9s'+(pn?' \u00b7 '+pn:''))+'</button></div><div class="addl"><div class="ab"><button data-add="ia">IA</button><button data-add="man">Manual</button></div><div class="al">\u2196 Agregar leads \u2197</div></div>')+'</div>'}
 
 const AGL=a=>a==='Fer'?'Lerma Fer':a;
+const p2Sh=a=>{const w=String(AGL(a)).split(' ');return w[w.length-1]};
 const DN=n=>n==='Fer'&&ROLE==='vendedor'?'Lerma Fer':n;
 const P2FAB='<button class="p2fab" data-p2="fab" aria-label="Agregar cliente"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Cliente</button>';
 const P2={fm:0,q:'',sq:0,f:null,fp:0,cat:'neu',lim:50,act:{},at:{},ed:0,tp:null,eli:0,win:0,tmp:null,sending:0,open:null,tt:0};
@@ -1098,7 +1109,7 @@ const P2FT=[['empezar','Enviar m\u00e1s fotos','g1','moto'],['aprobar','Buscar a
 const p2nz=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 function p2Keep(l){
   if(P2.fp&&!l.pin)return false;
-  if(P2.f&&P2.cat==='neu'){const ph=p2Phase(l);if(!ph||P2GRP[ph[2]]!==P2.f)return false}
+  if(P2.f&&P2.cat==='neu'&&!String(P2.q||'').trim()){const ph=p2Phase(l);if(!ph||P2GRP[ph[2]]!==P2.f)return false}
   const q=p2nz(P2.q).trim();if(q){const h=p2nz([l.name,l.idf,l.ub,l.tel,p2SumFull(l),l.moto].join(' '));if(!q.split(/\s+/).every(w=>h.indexOf(w)>=0))return false}
   return true}
 function p2Btns(){
@@ -1124,9 +1135,9 @@ function p2View(){
   P2.cat='neu';P2.lim=50;P2.ed=0;P2.eli=0;
   if(ADMIN){const sv=lget('crm-p2ag');if(sv&&AG.includes(sv))S.ag=sv}
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in p2"><div class="p2h">'+(ADMIN?'<select id="p2ag" aria-label="Cuenta">'+AG.map(a=>'<option value="'+esc(a)+'"'+(a===S.ag?' selected':'')+'>'+esc(AGL(a))+'</option>').join('')+(FERDEV()?'<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join(''):'')+'</select>':'<b>Clientes</b>')+'</div>'+(FERDEV()&&swCur()!=='@vendedor'?'<div class="p2r">Est\u00e1s en vista '+esc(SWL[swCur()])+(RO?' (solo lectura). Para agregar o editar cambia a Lerma Fer.':'.')+'</div>':'')+'<div id="p2b"></div>'+P2FAB+'</div>';
+  m.innerHTML='<div class="in p2"><div class="p2h">'+(ADMIN?'<div class="p2sw"><span class="p2sv" id="p2sv">'+esc(p2Sh(S.ag))+'</span><i class="cv">\u25be</i><select id="p2ag" aria-label="Cuenta">'+AG.map(a=>'<option value="'+esc(a)+'"'+(a===S.ag?' selected':'')+'>'+esc(AGL(a))+'</option>').join('')+(FERDEV()?'<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join(''):'')+'</select></div>':'<b>Clientes</b>')+p2Btns()+'</div>'+(FERDEV()&&swCur()!=='@vendedor'?'<div class="p2r">Est\u00e1s en vista '+esc(SWL[swCur()])+(RO?' (solo lectura). Para agregar o editar cambia a Lerma Fer.':'.')+'</div>':'')+'<div id="p2b"></div>'+P2FAB+'</div>';
   m.style.display='block';p2Render();p2Act();
-  const sel=document.getElementById('p2ag');if(sel)sel.onchange=()=>{if(sel.value.charAt(0)==='@'){const v=sel.value;sel.value=S.ag;return swTo(v)}S.ag=sel.value;lset('crm-p2ag',S.ag);P2.lim=50;P2.eli=0;p2Render();p2Act()};
+  const sel=document.getElementById('p2ag');if(sel)sel.onchange=()=>{if(sel.value.charAt(0)==='@'){const v=sel.value;sel.value=S.ag;return swTo(v)}S.ag=sel.value;lset('crm-p2ag',S.ag);const sv=document.getElementById('p2sv');if(sv)sv.textContent=p2Sh(S.ag);P2.lim=50;P2.eli=0;p2Render();p2Act()};
 }
 function p2Refresh(){try{if(CUR==='p2'&&!P2.ed&&document.getElementById('p2b'))p2Render()}catch(e){}}
 function p2Age(l){const t=p2Last(l);if(!t)return '';const d=(Date.now()-t)/864e5;return d>=14?'d14':d>=8?'d8':''}
@@ -1154,20 +1165,20 @@ function p2Card(l,c){
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
   const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+chip+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA sobre este cliente</button></div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small>'+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(P2.q&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small>'+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
   if(p2DBusy()){P2G.rr=1;return}
   const L={},T=[['bas','Basura'],['neu','Neutros'],['imp','Importantes']];
   T.forEach(([k])=>{L[k]=p2Pool(k)});const EL=p2Pool('eli');
-  const flt=!!((P2.f&&P2.cat==='neu')||P2.q);const list=L[P2.cat].filter(p2Keep),show=list.slice(0,P2.lim);
+  const flt=!!((P2.f&&P2.cat==='neu')||P2.q);const srch=!!String(P2.q||'').trim();const list=(srch?L.bas.concat(L.neu,L.imp).sort((a,b)=>p2Last(b)-p2Last(a)):L[P2.cat]).filter(p2Keep),show=list.slice(0,P2.lim);
   const fo=document.activeElement&&document.activeElement.id==='p2q'?document.activeElement.selectionStart:-1;
   P2E.imp=ADMIN_TXT();
   S.leads.filter(l=>l.ph&&l.own===S.ag&&!l.pn).forEach(l=>{l.pn=phNext()});
   const PH=S.leads.filter(l=>l.ph&&!l.fld&&l.own===S.ag).sort((x,y)=>(x.pn||0)-(y.pn||0));
   const BN=PH.length?'<div class="p2f"><b>Ubicaciones por llenar ('+PH.length+')</b><span>Toca el n\u00famero y dicta a la IA qui\u00e9n es. Ej: 1- Juan, carnicer\u00eda San Miguel, cotizar INE</span><div class="cn">'+PH.map(l=>'<button data-p2="fill" data-n="'+(l.pn||'')+'">'+(l.pn||'?')+'</button>').join('')+'</div></div>':'';
-  b.innerHTML='<div id="p2sn"></div><div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span><span class="n">'+L[k].length+'</span>'+'</button>').join('')+p2Btns()+'</div>'+(FERDEV()&&isFull()&&!RO&&p2LabPend()?'<div class="p2lp">Ordenando con IA: faltan '+p2LabPend()+'</div>':'')+p2Tb()+(P2.cat==='neu'?p2Tiles(L.neu):'')+(show.length?show.map(l=>p2Card(l,P2.cat)).join(''):'<div class="p2e">'+(flt?'Nada con ese filtro.':P2E[P2.cat])+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
+  b.innerHTML='<div id="p2sn"></div><div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k&&!srch?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span></button>').join('')+'</div>'+(FERDEV()&&isFull()&&!RO&&p2LabPend()?'<div class="p2lp">Ordenando con IA: faltan '+p2LabPend()+'</div>':'')+p2Tb()+(P2.cat==='neu'&&!srch?p2Tiles(L.neu):'')+(show.length?show.map(l=>p2Card(l,srch?p2cat(l):P2.cat)).join(''):'<div class="p2e">'+(flt?'Nada con ese filtro.':P2E[P2.cat])+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
   if(fo>=0){const q=document.getElementById('p2q');if(q){q.focus();try{q.setSelectionRange(fo,fo)}catch(e){}}}
   clearTimeout(LAB.tm);LAB.tm=setTimeout(p2LabRun,2500);
 }
@@ -1612,7 +1623,7 @@ document.addEventListener('click',e=>{
   if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;const t=e.target.closest&&e.target.closest('[data-p2]');
   if(!t){const cd=e.target.closest&&e.target.closest('.lc');if(cd&&!e.target.closest('button,a,.nm'))p2Tog(cd.dataset.id);return}
   const a=t.dataset.p2,id=t.dataset.id,l=id?(S.leads.find(x=>x.id===id)||(P2.tmp&&P2.tmp.id===id?P2.tmp:null)):null;
-  if(a==='cat'){P2.ed=0;P2.open=null;P2.ph=null;P2.fm=0;P2.cat=t.dataset.v;P2.lim=50;P2.eli=0;p2Render();return p2Act()}
+  if(a==='cat'){P2.ed=0;P2.open=null;P2.ph=null;P2.fm=0;P2.q='';P2.sq=0;P2.cat=t.dataset.v;P2.lim=50;P2.eli=0;p2Render();return p2Act()}
   if(a==='elis'){P2.eli=P2.eli?0:1;return p2Render()}
   if(a==='fab')return p2Add();
   if(a==='addm'){const fm=document.getElementById('p2fm2');if(fm)fm.hidden=true;if(RO)return toast('Est\u00e1s en vista de solo lectura. Cambia a Lerma Fer para agregar.',1);return openSheet(null,'manual')}
