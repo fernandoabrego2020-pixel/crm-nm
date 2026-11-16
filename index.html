@@ -678,6 +678,10 @@ body.p2lock #toast{z-index:90}
 .mxl{display:flex;flex-direction:column;gap:8px}
 .mxb{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;box-sizing:border-box;min-height:52px;padding:8px 16px;border-radius:12px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:600;text-align:left;text-decoration:none;cursor:pointer}
 .mxb svg{width:18px;height:18px;flex:none;fill:none;stroke:var(--mu);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mxg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.mxt{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;width:100%;height:96px;padding:10px 22px;border-radius:14px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:600;line-height:1.25;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.mxt:active{background:var(--ln)}
+.mxt svg{position:absolute;top:9px;right:9px;width:14px;height:14px;fill:none;stroke:var(--mu);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 .p2mo{display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;min-height:40px;padding:0 4px;background:none;border:0;color:var(--mu);font:inherit;font-size:13px;font-weight:600;text-align:left;cursor:pointer}
 .p2mb{display:flex;flex-direction:column;gap:6px;padding-bottom:4px}
@@ -2842,16 +2846,16 @@ function navGo(id){navGo0(id);torreBg(id)}
 function masView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const ch='<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',ex='<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>';
-  const L=(t,h)=>'<a class="mxb" target="_blank" rel="noopener" href="'+h+'"><span>'+t+'</span>'+ex+'</a>';
-  const N=(t,v)=>'<button class="mxb" data-nv="'+v+'"><span>'+t+'</span>'+ch+'</button>';
-  const G=(t,a)=>'<div class="mxk">'+t+'</div><div class="mxl">'+a.join('')+'</div>';
-  const ANA=G('Ana',[N('Horario y n\u00fameros bloqueados de Ana','ana'),N('Actualizar precios e inventario de Ana','anacat')]);
-  const QUIEN=N('Ver qui\u00e9n escribi\u00f3 y espera respuesta','quien');
+  const L=(t,h)=>'<a class="mxt" target="_blank" rel="noopener" href="'+h+'"><span>'+t+'</span>'+ex+'</a>';
+  const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
+  const G=a=>'<div class="mxg">'+a.join('')+'</div>';
+  const ANA=[N('Tablero de Ana','ana'),N('Precios e inventario de Ana','anacat')];
+  const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G('Tr\u00e1mite de INE',[L('Tramitar INE en Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Tramitar INE en Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE por WhatsApp con Ana','ine')])+G('Atender',[QUIEN])+ANA+FLOWH;
-  else if(role==='tecnico')h=G('Seguimiento',[QUIEN,N('Registrar una venta','venta'),N('Ver tiempo de uso del panel','uso')])+ANA+G('Reportes',[L('Abrir panel de control',NLINK.panel())]);
-  else if(role==='director')h=G('Reportes',[L('Ver quejas de clientes',NLINK.quejas()),L('Abrir panel de control',NLINK.panel())]);
-  else h=G('Tr\u00e1mites',[N('Tr\u00e1mites','tram'),L('Ver inventario disponible',NLINK.inv())]);
+  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('INE por WhatsApp con Ana','ine'),QUIEN].concat(ANA,[N('Flujo de venta','flujo')]));
+  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANA,[L('Panel de control',NLINK.panel())]));
+  else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
+  else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
   m.innerHTML='<div class="in p2"><div class="mh2"><b>M\u00e1s<small>'+esc(DN(ME))+' \u00b7 '+(ROLEN[role]||'')+(RO?' \u00b7 solo lectura':'')+'</small></b><button id="mlo">Salir</button></div>'+h+'</div>';
   m.style.display='block';
 }
@@ -2873,11 +2877,12 @@ function navGo0(id){
   else if(id==='ana'){anaView();return}
   else if(id==='seg'){segView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
+  else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
-  const tt=id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
+  const tt=id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
   m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
