@@ -882,6 +882,39 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .pfm .pfn{display:block;margin-top:1px;color:#fff;background:#18202b;border-radius:6px;font:700 9px/1 system-ui,-apple-system,sans-serif;padding:2px 5px;text-transform:uppercase}
 .pf2 .pfg{flex:none;grid-auto-rows:150px;min-height:0}
 .pfem{padding:40px 20px;text-align:center;font:700 16px/1.3 system-ui,-apple-system,sans-serif;color:#5b6676}
+
+.pf{--card:#fff;--tx:#18202b;--mu:#5b6676;--ln:#dfe3e9;--soft:#eef1f5}
+.pfhero{position:relative;height:210px;margin:4px 0 0}
+.pfhero img{position:absolute;left:4%;top:0;width:92%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 6px rgba(0,0,0,.28))}
+.pfhero img.pfp{border-radius:14px;object-fit:cover;filter:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.pft3{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:2px 0 8px}
+.pft3 b{color:#e8481c;font:900 italic 26px/1 system-ui,-apple-system,sans-serif;text-transform:uppercase;text-shadow:0 0 4px #fff,0 0 4px #fff}
+.pft3 small{color:#e8481c;font:800 italic 17px/1 system-ui,-apple-system,sans-serif;text-shadow:0 0 4px #fff}
+.pfc{background:#fff;border-radius:16px;padding:14px;margin:0 4px 10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.pfc h4{margin:0 0 10px;font:800 13px/1 system-ui,-apple-system,sans-serif;color:#5b6676;text-transform:uppercase;letter-spacing:.04em}
+.pfpr{font:900 34px/1 system-ui,-apple-system,sans-serif;color:#18202b}
+.pftr{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.pftr span{background:#eef1f5;color:#18202b;border-radius:999px;padding:6px 11px;font:700 13px/1 system-ui,-apple-system,sans-serif}
+.pfvb{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#18202b}
+.pfvb iframe,.pfvb video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.pfvp{position:absolute;inset:0;width:100%;height:100%;border:0;background:#18202b center/cover no-repeat;cursor:pointer;padding:0}
+.pfpl{position:absolute;left:50%;top:50%;width:68px;height:68px;margin:-34px 0 0 -34px;border-radius:50%;background:rgba(232,72,28,.95);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+.pfpl svg{width:34px;height:34px;fill:#fff;margin-left:4px}
+.pfva{display:flex;gap:8px;margin-top:10px}
+.pfva button,.pfva a,.pfvo{flex:1;text-align:center;text-decoration:none;border:0;border-radius:12px;padding:13px 8px;font:800 15px/1 system-ui,-apple-system,sans-serif;cursor:pointer}
+.pfva button{background:#eef1f5;color:#18202b}
+.pfva a{background:#25d366;color:#fff}
+.pfvo{display:block;background:#e8481c;color:#fff}
+.pfvn{text-align:center;padding:18px 8px;color:#5b6676;font:600 14px/1.4 system-ui,-apple-system,sans-serif}
+.pfvn b{display:block}
+.pfvn a{display:inline-block;margin-top:8px;color:#e8481c;font-weight:800}
+.pfxs{display:flex;flex-wrap:wrap;gap:6px}
+.pfx{border-radius:999px;padding:6px 11px;font:700 13px/1 system-ui,-apple-system,sans-serif;background:#eef1f5;color:#8a93a1}
+.pfx.on{background:#dcfce7;color:#157a41}
+.pfx.me{outline:2px solid #e8481c}
+.pfxn{color:#5b6676;font:600 13px/1.3 system-ui,-apple-system,sans-serif}
+.pf3{padding-bottom:20px}
+.pfc .sg{background:none;border:0;padding:0;margin:0;box-shadow:none}
 </style>
 </head>
 <body>
@@ -2510,16 +2543,69 @@ function pfDraw1(){
   p.innerHTML=PF1.map(([t,L])=>'<div class="pfr">'+esc(t)+'</div><div class="pfg" style="--n:'+Math.ceil(L.length/3)+'">'+L.map(x=>'<button class="pfm" data-pf="'+x[0]+'"><span class="pfi">'+(I[x[0]]?'<img src="'+I[x[0]]+'" alt="">':'<span class="pfh"></span>')+'</span><b>'+esc(x[1])+'</b>'+(x[2]?'<small>'+esc(x[2])+'</small>':'')+'</button>').join('')+'</div>').join('')
 }
 function pfView(){
-  const m=document.getElementById('menu');m.classList.add('pfon');PFS.v=1;PFS.k='';PFS.s=mSucKey(S.ag);
+  const m=document.getElementById('menu');m.classList.add('pfon');PFS.v=1;PFS.k='';PFS.m='';PFS.s=mSucKey(S.ag);
   m.innerHTML='<div class="pf" id="pf"></div>';m.style.display='block';m.scrollTop=0;
   const p=document.getElementById('pf');
-  p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(1);return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
+  p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay();return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
   p.onchange=e=>{if(e.target.id==='pfs'){PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}};
   pfDraw1();
   pfJs('pf1.js').then(()=>{if(CUR==='moto'&&PFS.v===1&&document.getElementById('pf'))pfDraw1()});
   if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
 }
-const PFS={k:'',s:'',v:1};
+const PFV={d:null,t:0,p:null};
+const PFVID='1j5nH0yoG4Sq1EvK07bt8nS4Ux4XLVeCGlkzzdvREpBw';
+function pfCsv(t){const R=[];let r=[],c='',q=false;for(let i=0;i<t.length;i++){const ch=t[i];if(q){if(ch==='"'){if(t[i+1]==='"'){c+='"';i++}else q=false}else c+=ch}else if(ch==='"')q=true;else if(ch===','){r.push(c);c=''}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&t[i+1]==='\n')i++;r.push(c);c='';R.push(r);r=[]}else c+=ch}if(c!==''||r.length){r.push(c);R.push(r)}return R}
+function pfVids(){
+  if(PFV.d&&Date.now()-PFV.t<6e4)return Promise.resolve(PFV.d);
+  if(PFV.p)return PFV.p;
+  PFV.p=fetch('https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/gviz/tq?tqx=out:csv&_='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(t=>{const M={};pfCsv(t).slice(1).forEach(x=>{const u=String(x[1]||'').trim();if(x[0]&&/^https?:/i.test(u))M[mnorm(x[0])]=u});PFV.d=M;PFV.t=Date.now();PFV.p=null;return M}).catch(()=>{PFV.p=null;return PFV.d||{}});
+  return PFV.p
+}
+function pfVid(u){
+  let x;
+  if(x=/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|embed\/|live\/))([\w-]{6,})/i.exec(u))return {k:'yt',id:x[1],th:'https:\x2F\x2Fimg.youtube.com/vi/'+x[1]+'/hqdefault.jpg',em:'https:\x2F\x2Fwww.youtube.com/embed/'+x[1]+'?autoplay=1&playsinline=1&rel=0'};
+  if(x=/drive\.google\.com\/file\/d\/([\w-]+)/i.exec(u)||/drive\.google\.com\/(?:open|uc)\?[^#]*id=([\w-]+)/i.exec(u))return {k:'dr',id:x[1],th:'https:\x2F\x2Fdrive.google.com/thumbnail?id='+x[1]+'&sz=w800',em:'https:\x2F\x2Fdrive.google.com/file/d/'+x[1]+'/preview'};
+  if(/\.(mp4|mov|webm|m4v)(\?|#|$)/i.test(u))return {k:'mp',th:'',em:u};
+  return {k:'ot',th:'',em:u}
+}
+function pfCopy(t,msg){
+  const ok=()=>toast(msg||'Link copiado',1);
+  const fb=()=>{const x=document.createElement('textarea');x.value=t;x.style.cssText='position:fixed;top:0;opacity:0';document.body.appendChild(x);x.focus();x.select();try{document.execCommand('copy')?ok():toast('No se pudo copiar',1)}catch(e){toast('No se pudo copiar',1)}x.remove()};
+  try{navigator.clipboard.writeText(t).then(ok,fb)}catch(e){fb()}
+}
+function pfSeg(m){
+  const sg=mSeg(m.n);
+  if(sg)return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(sg[2])+'</td><td>'+mxn(sg[5])+'</td></tr><tr><td>Recomendado</td><td><b>'+mxn(sg[3])+'</b></td><td><b>'+mxn(sg[6])+'</b></td></tr><tr><td>Mayor protección</td><td>'+mxn(sg[4])+'</td><td>'+mxn(sg[7])+'</td></tr></table><div class="note" style="margin-top:6px">Prima anual de contado, IVA incluido. Recomendado = Seguros Azteca (robo y pérdida total).</div>';
+  return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(1852)+'</td><td>'+mxn(2261)+'</td></tr></table><div class="note" style="margin-top:6px">El seguro mínimo es el mismo para todas las motos (anual de contado, IVA incluido).</div>'
+}
+function pfVidBox(m,u){
+  if(!u)return '<div class="pfvn"><b>Todavía no hay video de esta moto</b>'+(FERDEV()?'<a target="_blank" rel="noopener" href="https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/edit">Agregar el link en el Sheet videos-motos</a>':'')+'</div>';
+  const v=pfVid(u);
+  const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-pfplay="1" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
+  return '<div class="pfvb" id="pfvb" data-u="'+esc(u)+'">'+play+'</div><div class="pfva"><button data-pfcp="'+esc(u)+'">Copiar link</button><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/?text='+encodeURIComponent(m.n+': '+u)+'">Mandar por WhatsApp</a></div>'
+}
+function pfPlay(){
+  const b=document.getElementById('pfvb');if(!b)return;const v=pfVid(b.dataset.u);
+  b.innerHTML=v.k==='mp'?'<video src="'+esc(v.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(v.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
+}
+function pfDraw3(){
+  const p=document.getElementById('pf');if(!p)return;p.className='pf pf3';
+  const d=MV.d,m=d&&d.m.find(x=>x.n===PFS.m);if(!m){pfShow(PFS.k?2:1);return}
+  const I=window.PFI||{},k=pfSlug(m.n),ph=pfPhoto(m),hero=I[k]?'<img src="'+I[k]+'" alt="">':(ph?'<img class="pfp" src="'+esc(ph)+'" alt="" referrerpolicy="no-referrer">':''),L=pfLab(m);
+  const tr=String(m.t||'').split('·').map(x=>x.trim()).filter(Boolean).slice(0,9),g=pfGrp(m);
+  const si=PFS.s?MSUC.findIndex(x=>x[0]===PFS.s):-1;
+  const ex=m.e?MSUC.map((x,i)=>'<span class="pfx'+(m.e[i]?' on':'')+(i===si?' me':'')+'">'+(m.e[i]?'✓ ':'')+x[1]+'</span>').join(''):'<span class="pfxn">Sin dato de existencia</span>';
+  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="2">← Similares</button></div><div class="pfr">'+esc(PFG[g]||g)+'</div>'
+  +'<div class="pfhero">'+hero+'</div><div class="pft3"><b>'+esc(L[0])+'</b>'+(L[1]?'<small>'+esc(L[1])+'</small>':'')+'</div>'
+  +'<div class="pfc"><div class="pfpr">'+(m.p?mxn(m.p):'Sin precio')+'</div>'+(tr.length?'<div class="pftr">'+tr.map(x=>'<span>'+esc(x)+'</span>').join('')+'</div>':'')+'</div>'
+  +'<div class="pfc"><h4>Video</h4><div id="pfvw"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
+  +'<div class="pfc"><h4>Dónde hay</h4><div class="pfxs">'+ex+'</div></div>'
+  +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">Cargando ficha…</div></div></div>'
+  +'<div class="pfc mtd"><div class="sg"><b>Seguro</b>'+pfSeg(m)+'</div></div>';
+  pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw');if(w)w.innerHTML=pfVidBox(m,M[mnorm(m.n)]||'')});
+  api('ficha',{n:m.n}).then(f=>f,()=>null).then(f=>{if(PFS.v!==3||PFS.m!==m.n)return;const b=document.getElementById('pff');if(b)b.innerHTML=mFicha(f,m.n)})
+}
+const PFS={k:'',s:'',v:1,m:''};
 const PFG={'Cuatrimoto':'Cuatrimotos','UTV':'UTV y side by side','Carga':'Veh\u00edculos de carga','Motoneta':'Motonetas','Chopper':'Choppers y custom','Deportiva':'Deportivas','Doble prop\u00f3sito':'Doble prop\u00f3sito','Trabajo y reparto':'Trabajo y reparto','Traslado diario':'Urbanas'};
 const PFGO=['Cuatrimoto','UTV','Carga','Motoneta','Chopper','Deportiva','Doble prop\u00f3sito','Trabajo y reparto','Traslado diario'];
 function pfGrp(m){const u=mUsos(m);for(const g of PFGO)if(u.indexOf(g)>=0)return g;return m.c||'Otras'}
@@ -2540,12 +2626,12 @@ function pfDraw2(){
   const bar='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===PFS.s?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>\u25bc</i></label></div>';
   p.innerHTML=bar+'<div class="pfr">'+esc(PFG[g]||g)+'</div>'+(L.length||hasSel?'<div class="pfg" style="--n:'+Math.max(1,Math.ceil(all.length/3))+'">'+all.map((m,i)=>pfCell(m,I,i===0,i===0&&!hasSel?sn:'')).join('')+'</div>':'')+(L.length?'':'<div class="pfem">No hay m\u00e1s motos de este tipo en '+esc(sn)+'</div>')
 }
-function pfShow(v){PFS.v=v;const m=document.getElementById('menu');if(m)m.scrollTop=0;if(v===1)pfDraw1();else pfDraw2()}
+function pfShow(v){PFS.v=v;const m=document.getElementById('menu');if(m)m.scrollTop=0;if(v===1)pfDraw1();else if(v===2)pfDraw2();else pfDraw3()}
 async function pfOpen(k){
   if(!MV.d||!MV.d.m){const p=document.getElementById('pf');if(p)toast('Cargando cat\u00e1logo\u2026',1);try{const r=await api('motos');if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}catch(e){}}
   if(!MV.d){toast('No se pudo cargar el cat\u00e1logo',1);return}
   const m=MV.d.m.find(x=>pfSlug(x.n)===k);if(!m){toast('No encontr\u00e9 esa moto en el cat\u00e1logo',1);return}
-  if(PFS.v===2){toast(m.n+(m.p?' \u00b7 '+mxn(m.p):'')+' \u2014 la ficha con video viene en la fase 3',1);return}
+  if(PFS.v===2||PFS.v===3){PFS.m=m.n;pfShow(3);return}
   PFS.k=k;if(!PFS.s)PFS.s=mSucKey(S.ag);
   pfShow(2);
   pfJs('pf2.js').then(()=>{if(CUR==='moto'&&PFS.v===2&&document.getElementById('pf'))pfDraw2()})
