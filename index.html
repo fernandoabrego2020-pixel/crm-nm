@@ -2322,10 +2322,10 @@ function segView(){
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><h4>1 · Sube tus archivos</h4><label class="sgfile" id="sgfC"><span>Cotización (Excel), INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Súbelos aquí, suéltalos o pégalos con Ctrl+V</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="margin-top:10px"><summary>No tengo el Excel: elegir la moto a mano</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><h4>1 · Sube tus archivos</h4><label class="sgfile" id="sgfC"><span>Cotización (Excel), INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca aquí y elige los 3 archivos (o suéltalos / Ctrl+V)</i></label><button type="button" class="sgbtn sec" id="sgPg" style="margin-top:8px;width:100%">Pegar desde el portapapeles</button><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>.</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
-  document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{sgRoute(e.target.files);e.target.value=''};SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
+  document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{const fl=[...e.target.files];e.target.value='';sgRoute(fl)};document.getElementById('sgPg').onclick=sgPaste;SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
   if(!SG.pasteOn){SG.pasteOn=1;document.addEventListener('paste',e=>{if(!document.getElementById('sgw'))return;const fs=e.clipboardData&&e.clipboardData.files;if(fs&&fs.length){e.preventDefault();sgRoute(fs)}})}
 }
 function sgSel(){
@@ -2484,7 +2484,20 @@ function sgFill(k,v,notes,src){
   if(o&&e.value&&sgDa(e.value)!==sgDa(v)){notes.push('En el Excel el '+SGL[k]+' es «'+e.value+'» y '+src+' dice «'+v+'». Dejé el del Excel, confirma cuál es el correcto.');return}
   sgSet(k,v);
 }
+async function sgPaste(){
+  const ld=document.getElementById('sgCl');
+  try{
+    if(!navigator.clipboard||!navigator.clipboard.read)throw 0;
+    const its=await navigator.clipboard.read(),fs=[];
+    for(const it of its)for(const t of it.types){if(t.indexOf('image\x2F')===0||t==='application\x2Fpdf'){const b=await it.getType(t);fs.push(new File([b],'pegado'+fs.length+(t==='application\x2Fpdf'?'.pdf':'.jpg'),{type:t}));break}}
+    if(!fs.length)throw 1;
+    await sgRoute(fs);
+  }catch(e){if(ld)ld.innerHTML='<div class="sgerr">No encontré imagen ni PDF copiados. Mejor toca el recuadro de arriba y elige los archivos (Fototeca o Archivos). El Excel solo se puede subir desde Archivos.</div>'}
+}
 async function sgRoute(files){
+  try{await sgRoute0(files)}catch(e){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Algo falló al leer los archivos ('+esc(String(e&&e.message||e))+'). Intenta de nuevo.</div>'}
+}
+async function sgRoute0(files){
   const L=[...files],ex=L.filter(f=>/\.xls[mx]$/i.test(f.name||'')),rest=L.filter(f=>ex.indexOf(f)<0);
   for(const f of ex)await sgCot(f);
   if(rest.length&&!document.getElementById('sgI')){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Primero sube la cotización en Excel (o elige la moto a mano) y luego la INE y la factura.</div>';return}
@@ -2598,7 +2611,7 @@ async function sgHist(){
   if(!document.getElementById('sgH'))return;
   if(!r||!r.ok){h.textContent='No pude cargar el historial.';return}
   const adm=ME==='Fer';
-  const cfg=adm?`<div class="sgcfg"><small>Último consecutivo real usado (la siguiente póliza será el número siguiente)</small><div style="display:flex;gap:8px"><input id="sgLast" inputmode="numeric" placeholder="Ej. 245"><button class="sgbtn sec" id="sgSave" type="button">Guardar</button></div><div id="sgCfgM" class="note"></div></div>`:'';
+  const cfg=adm&&false?`<div class="sgcfg"><small>Último consecutivo real usado (la siguiente póliza será el número siguiente)</small><div style="display:flex;gap:8px"><input id="sgLast" inputmode="numeric" placeholder="Ej. 245"><button class="sgbtn sec" id="sgSave" type="button">Guardar</button></div><div id="sgCfgM" class="note"></div></div>`:'';
   h.className='';
   h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b><small>${esc(x.poliza.slice(-11,-4))} · ${new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Mexico_City'})} · ${esc(x.paquete.replace(/\.$/,''))}${adm?' · '+esc(x.cuenta):''}</small></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-p="${esc(x.poliza)}" type="button">PDF</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
   h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.p})}catch(e){g=null}bt.disabled=false;bt.textContent='PDF';if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
