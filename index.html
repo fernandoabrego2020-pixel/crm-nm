@@ -856,6 +856,7 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #p2reg #rgn{min-height:40px;resize:none}
 
 .p2lp{display:none!important}
+#mdock #msave{order:-1}
 .lc .lt b{font-size:16px;line-height:21px}
 .lc .p2nw{font-size:10px;padding:2px 7px}
 
@@ -928,7 +929,7 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 <div class="toast" id="toast"><span id="tm"></span><button id="undo">Deshacer</button></div>
 <div id="sheet"></div>
 <div id="mapv">
-  <div id="mtop"><button id="mback">← Clientes</button><b id="mtt">Mapa</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
+  <div id="mtop"><button id="mback">← Clientes</button><b id="mtt">Cambaceo</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
   <div id="mwrap"><canvas id="mc"></canvas><div id="mst"></div><div id="mpt"></div><div id="mleg"><span><i style="background:#4338ca"></i>Enviar más fotos</span><span><i style="background:#c0283a"></i>Buscar aprobación</span><span><i style="background:#15803d"></i>Buscar visita</span></div></div>
   <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="mph" style="display:none">Sin datos</button><button id="msave">Guardar ubicación del prospecto</button></div>
   <div class="mfs" id="mfs"><div class="mh"><b id="mft">Ubicar un lead que no tiene ubicación</b><button id="mfx" aria-label="Cerrar">×</button></div><input id="mfq" placeholder="Buscar por nombre o teléfono" autocomplete="off"><div class="note" id="mfn">Toca el lead y se guarda tu ubicación actual para él.</div><div class="res" id="mfr"></div></div>
@@ -1261,7 +1262,7 @@ function p2Render(){
   S.leads.filter(l=>l.ph&&l.own===S.ag&&!l.pn).forEach(l=>{l.pn=phNext()});
   const PH=S.leads.filter(l=>l.ph&&!l.fld&&l.own===S.ag).sort((x,y)=>(x.pn||0)-(y.pn||0));
   const BN=PH.length?'<div class="p2f"><b>Ubicaciones por llenar ('+PH.length+')</b><span>Toca el n\u00famero y dicta a la IA qui\u00e9n es. Ej: 1- Juan, carnicer\u00eda San Miguel, cotizar INE</span><div class="cn">'+PH.map(l=>'<button data-p2="fill" data-n="'+(l.pn||'')+'">'+(l.pn||'?')+'</button>').join('')+'</div></div>':'';
-  b.innerHTML='<div id="p2sn"></div><div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k&&!srch?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span></button>').join('')+'</div>'+(FERDEV()&&isFull()&&!RO&&p2LabPend()?'<div class="p2lp">Ordenando con IA: faltan '+p2LabPend()+'</div>':'')+p2Tb()+(P2.cat==='neu'&&!srch?p2Tiles(L.neu):'')+(show.length?show.map(l=>p2Card(l,srch?p2cat(l):P2.cat)).join(''):'<div class="p2e">'+(flt?'Nada con ese filtro.':P2E[P2.cat])+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
+  b.innerHTML='<div id="p2sn"></div><div class="p2t">'+T.map(([k,t])=>'<button class="p2c '+k+(P2.cat===k&&!srch?' on':'')+'" data-p2="cat" data-v="'+k+'"><span>'+t+'</span></button>').join('')+'</div>'+p2Tb()+(P2.cat==='neu'&&!srch?p2Tiles(L.neu):'')+(show.length?show.map(l=>p2Card(l,srch?p2cat(l):P2.cat)).join(''):'<div class="p2e">'+(flt?'Nada con ese filtro.':P2E[P2.cat])+'</div>')+(list.length>show.length?'<button class="p2m" data-p2="more">Ver más ('+(list.length-show.length)+')</button>':'')+(P2.cat==='bas'&&EL.length?(P2.eli?'<div class="p2k">Eliminados ('+EL.length+')</div>'+EL.slice(0,P2.lim).map(l=>p2Card(l,'eli')).join('')+'<button class="p2x" data-p2="elis">Ocultar eliminados</button>':'<button class="p2x" data-p2="elis">Ver '+EL.length+(EL.length===1?' eliminado':' eliminados')+'</button>'):'');
   if(fo>=0){const q=document.getElementById('p2q');if(q){q.focus();try{q.setSelectionRange(fo,fo)}catch(e){}}}
   clearTimeout(LAB.tm);LAB.tm=setTimeout(p2LabRun,2500);
 }
@@ -1299,7 +1300,7 @@ function p2Edit(l,el,fld){
       else{if(v){l.rs=v;l.ctxu=v;l.rsg=p2Sig(l)}else{delete l.rs;delete l.ctxu;delete l.rsg}}
       save();p2Render();toast('Guardado')};
     p2Render();
-    if(l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000))go();else needFull(go)};
+    needFull(go)};
   inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();end(1)}else if(e.key==='Escape')end(0)};
   let bt=0;
   if(fld==='moto'){
@@ -1346,7 +1347,7 @@ function p2Move(l,to){
     if(to==='ven'){const k=l.st&&l.st.referidos;l.st={};if(k!==undefined)l.st.referidos=k;l.done=true;l.cat='ven';ev(l,'Marcado como venta desde Leads.')}
     else{l.cat=to;if(cur==='ven'||cur==='eli')l.done=false}
     save();p2Render();toast(p2Name(l)+' \u2192 '+({imp:'Importantes',neu:'Neutros',bas:'Basura',ven:'Venta',eli:'Eliminados'})[to])};
-  if(l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000))go();else needFull(go);
+  needFull(go);
 }
 
 const P2G={t:0,on:0,card:null,sx:0,sy:0,over:'',id:null,sup:0,rr:0,raf:0,px:0,py:0,tg:[],el:null,ts:0};
@@ -1529,7 +1530,7 @@ function regDraw(){
       fl.map(f=>'<div class="rgf '+f[0]+'">'+esc(f[1])+'</div>').join('')+'</div>'}).join('');
   const nd=REG.rows.filter((r,i)=>regOk(r,i)&&regDoubt(r)).length;
   e.innerHTML='<div class="rg"><div class="rgh"><b>Nuevos prospectos</b><button data-rg="x">Cerrar</button></div>'+
-    '<div class="rgb">'+(AI?'<button class="p2a st" data-rg="pick">Registrar</button>':'')+'<button class="p2a" data-rg="add">Escribir a mano</button></div>'+
+    '<div class="rgb">'+(AI?'<button class="p2a st" data-rg="pick">Leer fotos con IA</button>':'')+'<button class="p2a" data-rg="add">Escribir a mano</button></div>'+
     (th?'<div class="rgp">'+th+'</div>':'')+
     (b||REG.prep?'<div id="rgst" class="rgf info">'+esc(REG.prog||'Leyendo…')+'</div>':'')+
     '<input id="rgl" list="rgpl" class="rgi" placeholder="Lugar (opcional)" value="'+esc(REG.lugar)+'" autocomplete="off"><datalist id="rgpl">'+pl+'</datalist>'+
@@ -1720,6 +1721,12 @@ function p2Send(l){
     const e=r&&r.err;toast(e==='nosend'?'El envío todavía no está conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
   }).catch(()=>{back();toast('No se pudo enviar, intenta otra vez',1)});
 }
+const DEFRX=new Set(['Fer','Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Almoloya','Valle Andrea','Valle Carlos']);
+function p2Wa(l){
+  copyTel(l.tel);
+  if(DEFRX.has(ME))return p2Chat(l);
+  const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+}
 function p2Chat(l){
   p2Close();P2.win=0;P2.sending=0;P2.cl=l;p2ToolsLoad();
   const w=document.createElement('div');w.id='p2chat';
@@ -1774,7 +1781,7 @@ document.addEventListener('click',e=>{
   if(!l)return;
   if(a==='ed'){if(P2.open===id&&!P2.ed)return p2Edit(l,t,t.dataset.fld);return p2Tog(id)}
   if(a==='num'){const card=t.closest('.lc');if(card){P2.ed=1;const la=card.querySelector('.la');la.innerHTML='<div class="nm"><input class="p2i" inputmode="tel" placeholder="WhatsApp, 10 d\u00edgitos" maxlength="16"><button class="p2a st" data-p2="numok">Guardar</button></div>';la.querySelector('input').focus()}return}
-  if(a==='chat')return p2Chat(l);
+  if(a==='chat')return p2Wa(l);
   if(a==='copy')return copyTel(l.tel);
   if(a==='send')return p2Send(l);
   if(a==='imp'||a==='neu'||a==='bas'||a==='ven'||a==='eli')return p2Move(l,a);
@@ -1785,7 +1792,7 @@ function render(){
   wake();
   document.getElementById('brand').innerHTML=brand();
   if(!ADMIN&&AG.includes(ME))S.ag=ME;
-  document.getElementById('ag').innerHTML=`${ADMIN?agBar():'<div class="tabs"></div>'}<button class="newb mapb" id="mapbtn">Mapa</button><button class="newb" id="newbtn">+ Lead</button>`;
+  document.getElementById('ag').innerHTML=`${ADMIN?agBar():'<div class="tabs"></div>'}<button class="newb mapb" id="mapbtn">Cambaceo</button><button class="newb" id="newbtn">+ Lead</button>`;
   const L=mine();
   document.getElementById('tot').innerHTML=GRID.map(g=>{const n=g.id==='cartera'?L.length:L.filter(l=>inA(l,g.id)).length;
     return `<button style="--k:var(--${g.k})" class="${only&&only!==g.id?'dim':''}" data-f="${g.id}" data-n="${NX[g.id]||''}"><b>${n}</b><span>${g.t}</span>${newAuto(L,g.id).length?'<i class="nbg">'+newAuto(L,g.id).length+'</i>':''}</button>`}).join('');
@@ -1967,7 +1974,7 @@ document.addEventListener('click',e=>{
   const key=c.dataset.g+':'+c.dataset.id;
   if(b.classList.contains('row')){open=open===key?null:key;return render()}
   const l=S.leads.find(x=>x.id===c.dataset.id),a=b.dataset.a;
-  if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000)))go();else needFull(go)}
+  if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(!NEEDPIN.has(a)&&l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000)))go();else needFull(go)}
 });
 document.addEventListener('input',e=>{
   const t=e.target;if(!sheet)return;
@@ -2102,8 +2109,8 @@ const IC={
  ai:'<circle cx="12" cy="8" r="4"/><path d="M4.5 21c.6-4.2 3.6-6.5 7.5-6.5s6.9 2.3 7.5 6.5"/>'
 };
 const NAVS={
- vendedor:[['pros','Prospectos','list'],['quien','Escribieron','bell'],['moto','Motos','search'],['ine','INEs','id'],['mapa','Mapa','pin']],
- vendana:[['pros','Prospectos','list'],['quien','Escribieron','bell'],['moto','Motos','search'],['ine','INEs','id'],['mapa','Mapa','pin'],['ana','Ana','grid']],
+ vendedor:[['pros','Prospectos','list'],['quien','Escribieron','bell'],['moto','Motos','search'],['ine','INEs','id'],['mapa','Cambaceo','pin']],
+ vendana:[['pros','Prospectos','list'],['quien','Escribieron','bell'],['moto','Motos','search'],['ine','INEs','id'],['mapa','Cambaceo','pin'],['ana','Ana','grid']],
  director:[['pros','Prospectos','list'],['quien','Escribieron','bell'],['conv','Chats','chat'],['quejas','Quejas','flag'],['panel','Panel','grid']],
  tecnico:[['conv','Chats','chat'],['quien','Escribieron','bell'],['make','Gasto','coin'],['onoff','Anas','power'],['venta','Venta','check'],['uso','Uso','clock'],['panel','Panel','grid']],
  admin:[['tram','Trámites','doc'],['inv','Inventario','box']]
@@ -2129,7 +2136,7 @@ function navInit(){
   const n=document.getElementById('nav'),role=ROLE||roleOf(ME);
   let NV=(NAVS[navKey(role)]||[]).slice();
   if(FERDEV()&&NV.length&&!NV.some(x=>x[0]==='p2')){
-    if(role==='vendedor'&&ME==='Fer')NV=[['p2','Clientes','star'],['moto','Informaci\u00f3n','search'],['mapa','Mapa','pin'],['mas','M\u00e1s','grid']];
+    if(role==='vendedor'&&ME==='Fer')NV=[['p2','Clientes','star'],['moto','Informaci\u00f3n','search'],['mapa','Cambaceo','pin'],['mas','M\u00e1s','grid']];
     else if(role==='tecnico')NV=[['conv','Chats','chat'],['onoff','Anas','power'],['make','Gasto','coin'],['mas','M\u00e1s','grid']];
     else if(role==='director')NV=[['p2','Clientes','star'],['conv','Chats','chat'],['quien','Escribieron','bell'],['mas','M\u00e1s','grid']];
   }
