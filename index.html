@@ -848,6 +848,12 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .lc.p2swing{position:relative;z-index:1;transition:none;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .lc .p2mb .lpw .lph b,.lc .p2mb .lpw.pk .lph b{font-weight:800}
 .lc .p2mb .lpw.pk .lph.pb{flex:1 1 100%}
+
+#p2reg .rgb .p2a{min-height:38px;font-size:14px;padding:0 10px}
+#p2reg .rgb{gap:6px}
+#p2reg .rg{gap:8px}
+#p2reg #rgl,#p2reg #rgn{padding:8px 12px}
+#p2reg #rgn{min-height:40px;resize:none}
 </style>
 </head>
 <body>
@@ -1461,8 +1467,8 @@ function regDraw(){
     '<div class="rgb">'+(AI?'<button class="p2a st" data-rg="pick">Registrar</button>':'')+'<button class="p2a" data-rg="add">Escribir a mano</button></div>'+
     (th?'<div class="rgp">'+th+'</div>':'')+
     (b||REG.prep?'<div id="rgst" class="rgf info">'+esc(REG.prog||'Leyendo…')+'</div>':'')+
-    '<input id="rgl" list="rgpl" class="rgi" placeholder="¿De qué lugar son estos prospectos? (opcional)" value="'+esc(REG.lugar)+'" autocomplete="off"><datalist id="rgpl">'+pl+'</datalist>'+
-    '<textarea id="rgn" class="rgi" rows="2" placeholder="Indicaciones para la IA (opcional). Ej: el número va antes del nombre">'+esc(REG.nota)+'</textarea>'+
+    '<input id="rgl" list="rgpl" class="rgi" placeholder="Lugar (opcional)" value="'+esc(REG.lugar)+'" autocomplete="off"><datalist id="rgpl">'+pl+'</datalist>'+
+    '<textarea id="rgn" class="rgi" rows="1" placeholder="Indicaciones para la IA (opcional)">'+esc(REG.nota)+'</textarea>'+
     (AI&&REG.photos.length&&!b&&!REG.prep?'<div class="rgb"><button class="p2a st" data-rg="read">Leer '+(REG.photos.length>1?REG.photos.length+' fotos':'la foto')+' con IA</button></div>':'')+
     (REG.err?'<div class="rgf bad">'+esc(REG.err)+'</div>':'')+
     (REG.rows.length&&nd?'<div class="rgf warn">La IA dudó en '+nd+(nd===1?' lead':' leads')+': revísalos (marcados en ámbar) antes de guardar.</div>':'')+
