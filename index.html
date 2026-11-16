@@ -1975,17 +1975,19 @@ function renderSheet(){
   if(!sheet){el.innerHTML='';return}
   const s=sheet,ctxBox=`<textarea id="sc" rows="2" placeholder="Contexto para Ana (opcional)">${esc(s.ctx)}</textarea>`,err=`<div class="err">${esc(s.err)}</div>`;
   let body='';
-  if(s.mode==='manual'||!AI||s.fill){
+  if(s.mode==='manual'||!AI){
     body=`<input id="sn" placeholder="Nombre" value="${esc(s.name)}" autocomplete="off"><input id="st" inputmode="tel" placeholder="WhatsApp (10 dígitos)" value="${esc(s.tel)}" autocomplete="off">${ctxBox}${err}<button class="b p" id="sman">${s.fill?'Guardar datos':'Guardar en '+esc(AGL(S.ag))}</button>`;
   }else if(!s.found){
     body=`<label class="pick"><b>${s.file?'Cambiar foto':'Subir o tomar foto'}</b><span>Captura de chats, contactos o una lista con nombres y teléfonos</span><input id="sf" type="file" accept="image/\x2A" hidden></label>${s.thumb?`<img class="prev" src="${s.thumb}" alt="">`:''}${err}${s.file?`<button class="b p" id="sread"${s.busy?' disabled':''}>${s.busy?'Leyendo…':'Leer leads con IA'}</button>`:''}`;
+  }else if(s.fill){
+    body=`<div class="note">Toca el lead que corresponde a este guardado y se llenan los datos para que los revises.</div>`+s.found.map((f,i)=>`<button class="b${f.dup?'':' p'}" data-pf="${i}"${f.dup?' disabled':''} style="display:block;width:100%;text-align:left;margin:6px 0">${esc(f.name||'Sin nombre')}<br><small>${esc(f.tel||'sin tel\u00e9fono')}${f.msg?' \u00b7 '+esc(f.msg):''}</small></button>`).join('')+err+`<button class="b" id="sagain">Otra foto</button>`;
   }else{
     const n=s.found.filter(f=>f.on&&!f.dup).length;
     body=`<div class="note">Encontré ${s.found.length}. Corrige lo que haga falta, agrega contexto y revisa la fase que propuso la IA. Marca los que quieres agregar.</div>`+
       s.found.map((f,i)=>`<div class="fr${f.dup?' dup':''}"><input type="checkbox" data-i="${i}" data-k="on"${f.on?' checked':''}${f.dup?' disabled':''}><input data-i="${i}" data-k="name" value="${esc(f.name)}" placeholder="Nombre"><input data-i="${i}" data-k="tel" inputmode="tel" value="${esc(f.tel)}" placeholder="WhatsApp"><input class="fx" data-i="${i}" data-k="xc" value="${esc(f.xc||'')}" placeholder="Contexto (opcional)"><select class="fs" data-i="${i}" data-k="stg">${ETP.map(g=>`<option value="${g.id}"${f.stg===g.id?' selected':''}>${g.t}</option>`).join('')}</select>${f.msg?`<small>${esc(f.msg)}</small>`:''}</div>`).join('')+
       ctxBox+err+`<div class="sub2"><button class="b" id="sagain">Otra foto</button><button class="b p" id="sfound">Agregar ${n} a ${esc(AGL(S.ag))}</button></div>`;
   }
-  el.innerHTML=`<div class="sheet"><div class="sp"><div class="sh"><b>${s.fill?'Llenar datos':'Agregar a '+esc(AGL(S.ag))}</b><button id="sclose" aria-label="Cerrar">×</button></div>${s.loc?`<div class="note">Ubicación lista (±${s.loc[2]} m): se guarda junto con el lead.</div>`:''}${AI&&!s.fill&&ME!=='Fer'?`<div class="seg"><button data-m="foto" class="${s.mode==='foto'?'on':''}">Foto con IA</button><button data-m="manual" class="${s.mode==='manual'?'on':''}">Manual</button></div>`:''}${body}</div></div>`;
+  el.innerHTML=`<div class="sheet"><div class="sp"><div class="sh"><b>${s.fill?'Llenar datos':'Agregar a '+esc(AGL(S.ag))}</b><button id="sclose" aria-label="Cerrar">×</button></div>${s.loc?`<div class="note">Ubicación lista (±${s.loc[2]} m): se guarda junto con el lead.</div>`:''}${AI&&(s.fill||ME!=='Fer')?`<div class="seg"><button data-m="foto" class="${s.mode==='foto'?'on':''}">Foto con IA</button><button data-m="manual" class="${s.mode==='manual'?'on':''}">Manual</button></div>`:''}${body}</div></div>`;
 }
 async function onFile(file){
   if(!file||!sheet)return;
@@ -2092,6 +2094,7 @@ document.addEventListener('click',e=>{
   if(b.id==='mlo'||b.id==='mlo2'){lset('crm-tok','');lset('crm-role','');lset('crm-user','');LR='';LU='';showLogin('Sesión cerrada');return}
   if(b.id==='lgo')return doLogin();
   if(b.id==='logout'){lset('crm-tok','');showLogin('Sesión cerrada');return}
+  if(sheet&&b.dataset.pf!==undefined){const f=sheet.found&&sheet.found[+b.dataset.pf];if(f){sheet.name=f.name;sheet.tel=norm(f.tel);sheet.ctx=[f.xc,f.mt].filter(Boolean).join(' \u00b7 ');sheet.found=null;sheet.mode='manual';sheet.err='';renderSheet()}return}
   if(sheet&&b.dataset.m){sheet.mode=b.dataset.m;sheet.err='';return renderSheet()}
   if(b.id==='mapbtn')return MAPM.show();
   if(b.id==='newbtn')return openSheet();
@@ -3563,10 +3566,9 @@ const MAPM=(function(){
   function hideCard(){sel=null;armQ=false;clearTimeout(armT);$('mpt').className='';}
   function showPh(l){
     sel=l.id;armQ=false;
-    $('mpt').innerHTML=`<div class="mpn"><i style="background:#fbbf24"></i><b>Sin datos</b></div><div class="mpm">Guardado ${ago(l.c)} \u00b7 ubicaci\u00f3n \u00b1${l.loc[2]} m</div><div class="mpa"><button class="b p" id="mpf">Llenar datos</button><button class="b" id="mpe">Poner un lead que ya tengo</button><a class="b" href="https:\x2F\x2Fwww.google.com/maps?q=${l.loc[0]},${l.loc[1]}" target="_blank" rel="noopener">Ir (Maps)</a><button class="b" id="mpm">Mover ubicaci\u00f3n</button><button class="b dg" id="mpq">Borrar</button><button class="b" id="mpc">Cerrar</button></div>`;
+    $('mpt').innerHTML=`<div class="mpn"><i style="background:#fbbf24"></i><b>Sin datos</b></div><div class="mpm">Guardado ${ago(l.c)} \u00b7 ubicaci\u00f3n \u00b1${l.loc[2]} m</div><div class="mpa"><button class="b p" id="mpf">Llenar datos con IA</button><button class="b" id="mpe">Poner un lead que ya tengo</button><button class="b" id="mpm">Mover ubicaci\u00f3n</button><button class="b dg" id="mpq">Borrar</button></div>`;
     $('mpt').className='show';
-    $('mpc').onclick=()=>{hideCard();draw()};
-    $('mpf').onclick=()=>openSheet(null,'manual',l.id);
+    $('mpf').onclick=()=>openSheet(null,AI?'foto':'manual',l.id);
     $('mpe').onclick=()=>{hideCard();draw();openFind('adopt',l.id)};
     $('mpm').onclick=()=>free0(()=>{mv=l.id;hideCard();draw();say('Toca en el mapa el lugar correcto.')});
     $('mpq').onclick=()=>{
@@ -3614,10 +3616,12 @@ const MAPM=(function(){
     if(sel){hideCard();draw()}
   }
   function center(c){V.cx=mx(c.longitude);V.cy=my(c.latitude);if(V.s<0.3)V.s=0.3}
+  const fz=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  function fq(l,q){const h=fz([l.name,l.moto,l.note,l.idf,l.src].concat((l.ctx||[]).map(c=>c&&c.x)).join(' '));return fz(q).split(/\s+/).filter(Boolean).every(w=>h.includes(w))}
   function renderFind(){
     const q=($('mfq').value||'').trim().toLowerCase(),d=q.replace(/\D/g,'');
     const vm=fm==='visit',pm=fm==='ph',ad=fm==='adopt',dd=l=>l.loc&&me?Math.hypot(mx(l.loc[1])-mx(me[1]),my(l.loc[0])-my(me[0])):1e12;
-    const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||String(l.name||'').toLowerCase().includes(q)||(d&&String(l.tel).includes(d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):b.c-a.c).slice(0,40);
+    const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||fq(l,q)||(d&&String(l.tel).includes(d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):b.c-a.c).slice(0,40);
     $('mfr').innerHTML=L.length?L.map(l=>l.ph?`<button class="mrow" data-id="${l.id}">Sin datos<small>Guardado ${ago(l.c)}${l.loc?' · ±'+l.loc[2]+' m':''}</small></button>`:`<button class="mrow" data-id="${l.id}">${esc(l.name)}<small>${esc(fmt(l.tel))} · ${PN[baseOf(l)]}${vm&&!l.loc?' · sin ubicación':''}</small></button>`).join(''):'<div class="note">'+(vm?'No hay leads pendientes de visita.':'No hay leads sin ubicación con esa búsqueda.')+'</div>';
   }
   function openFind(m,aid){fm=m;adopt=aid||null;mv=null;$('mft').textContent=m==='adopt'?'Poner un lead aqu\u00ed':m==='ph'?'Guardados sin datos':m==='visit'?'Por visitar':'Ubicar un lead que no tiene ubicaci\u00f3n';$('mfn').textContent=m==='adopt'?'Toca el lead que ya tienes y se queda en esta ubicaci\u00f3n.':m==='ph'?'Toca uno para verlo en el mapa y llenar sus datos.':m==='visit'?'Toca el lead para verlo en el mapa. Si ya diste Ubicarme, salen del m\u00e1s cercano al m\u00e1s lejano.':'Toca el lead y despu\u00e9s toca en el mapa donde est\u00e1.';$('mfq').value='';renderFind();$('mfs').className='mfs show'}
