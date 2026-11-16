@@ -2362,7 +2362,7 @@ function sgQuote(){
 }
 function sgQDraw(){
   const r=SG.quote,box=document.getElementById('sgQ'),t=[r.total.min,r.total.rec,r.total.may];
-  box.innerHTML=`<div class="note" style="margin:8px 0">Valor ${Number(SG.q.anio)>=2026?'factura':'convenido'}: <b>${sgMx(r.valor)}</b> · Prima anual de contado con IVA</div><div class="sgp">`+SGP.map((p,i)=>`<button type="button" class="sgpk${SG.pk===i?' on':''}" data-pk="${i}"><span>${p[1]}</span><b>${sgMx(t[i])}</b><small>${p[2]}</small></button>`).join('')+`</div>`;
+  box.innerHTML=`<div class="note" style="margin:8px 0">Valor ${Number(SG.q.anio)>=2026?'factura':'convenido'}: <b>${sgMx(SG.q.valorCap&&Number(SG.q.anio)>=2026?Number(SG.q.valorCap):r.valor)}</b> · Prima anual de contado con IVA</div><div class="sgp">`+SGP.map((p,i)=>`<button type="button" class="sgpk${SG.pk===i?' on':''}" data-pk="${i}"><span>${p[1]}</span><b>${sgMx(t[i])}</b><small>${p[2]}</small></button>`).join('')+`</div>`;
   box.querySelectorAll('.sgpk').forEach(bt=>{bt.onclick=()=>{SG.pk=Number(bt.dataset.pk);sgQDraw();sgSum()}});
 }
 function sgRd(f,a,b){return f.slice(a,b).arrayBuffer()}
@@ -2435,7 +2435,7 @@ async function sgCot(file){
   q.uso=SG.cat.usos.find(u=>sgNm(u)===sgNm(c.C31))||'Particular';
   q.valorCap=Number(q.anio)>=2026&&typeof c.X29==='number'?String(Math.round(c.X29)):'';
   const g=k=>c[k]==null?'':String(c[k]).trim();
-  SG.cot={tot:[c.B61,c.J61,c.U61].map(x=>typeof x==='number'?x:null),serv:g('J31'),cl:{rfc:g('C9').toUpperCase(),sexo:g('J9'),nombre:g('Q9'),apP:g('F11'),apM:g('P11'),nacimiento:sgYmd(c.AA11),cp:g('C13'),calle:g('G13'),colonia:g('X13'),numExt:g('D15'),numInt:g('H15'),estado:g('Q15'),correo:g('Q22'),serie:g('S31').toUpperCase(),motor:g('G33'),placas:g('Q33'),color:g('Y33')}};
+  SG.cot={tot:[c.B61,c.J61,c.U61].map(x=>typeof x==='number'?x:null),serv:g('J31'),cl:{rfc:g('C9').toUpperCase(),sexo:g('J9'),nombre:g('Q9'),apP:g('F11'),apM:g('P11'),nacimiento:sgYmd(c.AA11),cp:g('C13'),calle:g('G13'),colonia:g('X13'),numExt:g('D15'),numInt:g('H15'),estado:g('Q15'),correo:g('Q22'),regimen:g('L20'),usoCfdi:g('W20'),beneficiario:g('AG20'),serie:g('S31').toUpperCase(),motor:g('G33'),placas:g('Q33'),color:g('Y33')}};
   st.textContent='Listo ✓ (toca para cambiarla)';
   const vi=document.getElementById('sgVal');if(vi)vi.value=q.valorCap;
   sgSel();sgQuote();
@@ -2475,6 +2475,14 @@ function sgDefs(){
   const pick=(id,re)=>{if(sgV(id))return;const e=document.getElementById(id);[...e.options].forEach(o=>{if(!sgV(id)&&re.test(o.value))e.value=o.value})};
   pick('sg_regimen',/^616/);pick('sg_usoCfdi',/^G03/);
 }
+const SGL={nombre:'nombre',apP:'apellido paterno',apM:'apellido materno',sexo:'sexo',nacimiento:'fecha de nacimiento',cp:'código postal',calle:'calle',numExt:'número exterior',numInt:'número interior',colonia:'colonia',estado:'estado',serie:'número de serie',motor:'número de motor',color:'color'};
+const sgDa=x=>sgNm(String(x==null?'':x).normalize('NFD').replace(/[\u0300-\u036f]/g,''));
+function sgFill(k,v,notes,src){
+  const e=document.getElementById('sg_'+k);if(!e||v===''||v==null)return;
+  const o=SG.cot&&SG.cot.cl?SG.cot.cl[k]:'';
+  if(o&&e.value&&sgDa(e.value)!==sgDa(v)){notes.push('En el Excel el '+SGL[k]+' es «'+e.value+'» y '+src+' dice «'+v+'». Dejé el del Excel, confirma cuál es el correcto.');return}
+  sgSet(k,v);
+}
 async function sgFoto(tipo,file){
   if(!file)return;
   const st=document.getElementById(tipo==='ine'?'sgIs':'sgFs'),ld=document.getElementById('sgLd');
@@ -2485,12 +2493,11 @@ async function sgFoto(tipo,file){
   st.textContent='Listo ✓ (toca para cambiarla)';
   const d=r.d,notes=(r.dudas||[]).slice();
   if(tipo==='ine'){
-    ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia'].forEach(k=>sgSet(k,d[k]));
-    if(d.estado)sgSet('estado',d.estado);
+    ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia','estado'].forEach(k=>sgFill(k,d[k],notes,'la INE'));
     if(d.rfc10&&!sgV('sg_rfc')){sgSet('rfc',d.rfc10);document.getElementById('sgRh').innerHTML='Ya puse las 10 primeras letras y números del RFC (salen del CURP). <b>Agrega la homoclave (3 caracteres)</b> de la constancia fiscal del cliente.'}
     sgRegs();sgDefs();
   }else{
-    ['serie','motor','color'].forEach(k=>sgSet(k,d[k]));
+    ['serie','motor','color'].forEach(k=>sgFill(k,d[k],notes,'la factura'));
     if(d.anio&&SG.q.anio&&Number(d.anio)!==Number(SG.q.anio))notes.push('La factura dice año '+d.anio+' y cotizaste '+SG.q.anio+'.');
     const wd=String(SG.q.version).toUpperCase().split(/\s+/).filter(x=>x.length>1),fm=String(d.modelo||'')+' '+String(d.marca||'');
     if(d.modelo&&wd.length&&!wd.every(x=>fm.toUpperCase().indexOf(x)>=0))notes.push('La factura dice «'+d.modelo+'» y cotizaste «'+SG.q.marca+' '+SG.q.version+'». Confirma que sea la misma moto.');
