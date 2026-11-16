@@ -949,6 +949,10 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .pfxn{color:#5b6676;font:600 13px/1.3 system-ui,-apple-system,sans-serif}
 .pf3{padding-bottom:20px}
 .pfc .sg{background:none;border:0;padding:0;margin:0;box-shadow:none}
+
+.vtcs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.vtcb{flex:none;border:1.5px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:999px;padding:9px 14px;font:700 14px/1 system-ui,-apple-system,sans-serif}
+.vtcb.on{background:#18202b;color:#fff;border-color:#18202b}
 </style>
 </head>
 <body>
@@ -2715,7 +2719,7 @@ const PFT={d:null,t:0,p:null};
 function pfTi(){
   if(PFT.d&&Date.now()-PFT.t<6e4)return Promise.resolve(PFT.d);
   if(PFT.p)return PFT.p;
-  PFT.p=fetch('https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/gviz/tq?tqx=out:csv&sheet=Tiendas&_='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(t=>{const M={};pfCsv(t).slice(1).forEach(x=>{const k=String(x[0]||'').trim().toLowerCase(),u=String(x[1]||'').trim();if(k&&/^https?:/i.test(u))M[k]=u});PFT.d=M;PFT.t=Date.now();PFT.p=null;return M}).catch(()=>{PFT.p=null;return PFT.d||{}});
+  PFT.p=fetch('https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/gviz/tq?tqx=out:csv&sheet=Tiendas&_='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(t=>{const M={};pfCsv(t).slice(1).forEach(x=>{const k=String(x[0]||'').trim().toLowerCase(),u=String(x[1]||'').trim(),u2=String(x[2]||'').trim();if(k&&/^https?:/i.test(u))M[k]=u;if(k&&/^https?:/i.test(u2))M[k+'#2']=u2});PFT.d=M;PFT.t=Date.now();PFT.p=null;return M}).catch(()=>{PFT.p=null;return PFT.d||{}});
   return PFT.p
 }
 function pfLocVid(){
@@ -2732,6 +2736,59 @@ valle:['https:\x2F\x2Fmaps.app.goo.gl/w5NQnYoLCvjvPEmb7','Calle Salitre 103, Col
 aodes:['https:\x2F\x2Fmaps.app.goo.gl/Cv3pwaTTGbxwSeXH9','De Manuel 125, Sta. María Ahuacatlán, C.P. 51200','722 395 5007','Lunes a domingo, 10:00 a 19:00'],
 almoloya:['https:\x2F\x2Fmaps.app.goo.gl/2qBjNsA72iQhL4c47','Carretera Almoloya de Juárez No. 1,600, Col. Nueva Serratón, C.P. 51355','722 140 1360','Lunes a sábado, 10:00 a 19:00']};
 function pfLocTxt(k){const o=PFLOC[k]||PFLOC.lerma;return o[0]+'\n\nDirección:\n'+o[1]+'\n\nWhatsApp:\n'+o[2]+'\n\nHorario:\n'+o[3]}
+function anaMenuView(){
+  const m=document.getElementById('menu');
+  m.innerHTML='<div class="in p2"><div class="mxg"><button class="mxt" data-nv="ana"><span>Tablero de Ana</span></button><button class="mxt" data-nv="anacat"><span>Precios e inventario de Ana</span></button><button class="mxt" data-nv="mas"><span>← Volver</span></button></div></div>';
+  m.style.display='block';m.scrollTop=0
+}
+const UBS={k:'',v:''};
+function ubTxt(k){const M=PFT.d||{},u=M[k];return pfLocTxt(k)+(u?'\n\nVideo de cómo llegar:\n'+u:'')}
+function vsBox(nm,u,pre,empty,col,na){
+  if(!u)return '<div class="pfvn"><b>'+esc(empty)+'</b>'+(ME==='Fer'?'<a target="_blank" rel="noopener" href="https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/edit">Agregar el link en el Sheet videos-motos (pestaña Tiendas, '+col+')</a>':'')+'</div>';
+  const v=pfVid(u);
+  const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-vp="1" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
+  return '<div class="pfvb" id="vsb" data-u="'+esc(u)+'">'+play+'</div>'+(na?'':'<div class="pfva"><button data-vcp="'+esc(u)+'">Copiar link</button><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/?text='+encodeURIComponent(pre+nm+': '+u)+'">Mandar por WhatsApp</a></div>')
+}
+function vsPlay(){
+  const b=document.getElementById('vsb');if(!b)return;const v=pfVid(b.dataset.u);
+  b.innerHTML=v.k==='mp'?'<video src="'+esc(v.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(v.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
+}
+function vsClick(e){
+  const t=e.target,pl=t.closest&&t.closest('[data-vp]');if(pl){vsPlay();return}
+  const cp=t.closest&&t.closest('[data-vcp]');if(cp){pfCopy(cp.dataset.vcp,'Link del video copiado');return}
+  const ub=t.closest&&t.closest('[data-ub]');if(ub){if(ub.dataset.ub==='w')window.open('https:\x2F\x2Fwa.me/?text='+encodeURIComponent(ubTxt(UBS.k)),'_blank','noopener');else ubCopy();return}
+  const ch=t.closest&&t.closest('[data-vk]');if(ch){UBS.k=ch.dataset.vk;vtodDraw()}
+}
+function ubCopy(){const u=(PFT.d||{})[UBS.k];pfCopy(ubTxt(UBS.k),u?'Ubicación y video copiados':'Ubicación copiada')}
+function ubDraw(){
+  const k=UBS.k,nm=(MSUC.find(x=>x[0]===k)||[k,k])[1];
+  pfTi().then(M=>{const w=document.getElementById('ubv');if(w&&UBS.k===k)w.innerHTML=vsBox('Novamotos '+nm,M[k]||'','Video de cómo llegar · ','Todavía no hay video de cómo llegar a esta tienda','columna B',1)})
+}
+function ubicView(){
+  const m=document.getElementById('menu');
+  const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
+  m.innerHTML='<div class="in" id="ubw"><div class="mh2"><b>Ubicación<small>Se copia con el link del video</small></b><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div><div class="pfva"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Maps, dirección, WhatsApp, horario y el video de cómo llegar, como los manda Ana. Al abrir esta pantalla o cambiar de sucursal ya queda copiado.</div></div></div>';
+  m.style.display='block';m.scrollTop=0;
+  const w=document.getElementById('ubw');
+  w.onclick=vsClick;
+  w.onchange=e=>{if(e.target.id==='ubs'){UBS.k=e.target.value;PFS.s=UBS.k;MV.s=UBS.k;ubCopy();ubDraw()}};
+  ubCopy();ubDraw();
+  if(!PFT.d)pfTi().then(()=>{if(document.getElementById('ubw')&&CUR==='ubic')ubCopy()})
+}
+function vtodDraw(){
+  const k=UBS.k,nm=(MSUC.find(x=>x[0]===k)||[k,k])[1],bar=document.getElementById('vtc');
+  if(bar)bar.innerHTML=MSUC.map(x=>'<button type="button" class="vtcb'+(x[0]===k?' on':'')+'" data-vk="'+x[0]+'">'+x[1]+'</button>').join('');
+  const w=document.getElementById('vtv');if(w)w.innerHTML='<div class="pfvn"><b>Buscando video…</b></div>';
+  pfTi().then(M=>{const w2=document.getElementById('vtv');if(w2&&UBS.k===k)w2.innerHTML=vsBox('Novamotos '+nm,M[k+'#2']||'','Video de todas las motos · ','Todavía no hay video de todas las motos de esta sucursal','columna C')})
+}
+function vtodView(){
+  const m=document.getElementById('menu');
+  UBS.k=UBS.k||mSucKey(S.ag)||'lerma';
+  m.innerHTML='<div class="in" id="vtw"><div class="mh2"><b>Video de todas las motos<small>Cada sucursal tiene el suyo</small></b><button data-nv="mas">← Más</button></div><div class="sg"><div id="vtc" class="vtcs"></div><div id="vtv" style="margin-top:12px"></div></div></div>';
+  m.style.display='block';m.scrollTop=0;
+  document.getElementById('vtw').onclick=vsClick;
+  vtodDraw()
+}
 function pfLoc(a){
   const sel=document.getElementById('pfls'),k=(sel&&sel.value)||PFS.s||'lerma',t=pfLocTxt(k);
   if(a==='w'){window.open('https:\x2F\x2Fwa.me/?text='+encodeURIComponent(t),'_blank','noopener');return}
@@ -2755,7 +2812,6 @@ function pfDraw3(){
   +'<div class="pfc"><h4>Video de la moto</h4><div id="pfvw"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
   +'<div class="pfc"><h4>Video de la tienda</h4><div id="pfvw2"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
   +'<div class="pfc"><h4>Dónde hay</h4><div class="pfxs">'+ex+'</div></div>'
-  +'<div class="pfc"><h4>Ubicación de la tienda</h4><label class="pfss pfls"><select id="pfls">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===sk?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>\u25bc</i></label><div id="pfvw3" style="margin-top:12px"></div><div class="pfva"><button data-pfloc="c">Copiar ubicación</button><button data-pfloc="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Maps, dirección, WhatsApp y horario, como los manda Ana.</div></div>'
   +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">Cargando ficha…</div></div></div>'
   +'<div class="pfc mtd"><div class="sg"><b>Seguro</b>'+pfSeg(m)+'</div></div>';
   pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw');if(w)w.innerHTML=pfVidBox(m,M[mnorm(m.n)]||'');const w2=document.getElementById('pfvw2');if(w2)w2.innerHTML=pfVidBox(m,M[mnorm(m.n)+'#2']||'','2')});
@@ -2904,11 +2960,12 @@ function masView(){
   const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
   const TAIL=ME==='Fer'?[]:['<button class="mxt" id="mlo2"><span>Cerrar sesión</span></button>'];
   const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
-  const ANAT=[N('Tablero de Ana','ana'),N('Precios e inventario de Ana','anacat')];
+  const ANAT=[N('Ana','anam')];
+  try{pfTi()}catch(e){}
   const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat([L('WhatsApp de Ana general','https:\x2F\x2Fwa.me/'+ANA)]).concat(ANAT,[N('Flujo de venta','flujo'),N('Tramitar seguro','seg')]));
-  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
+  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),N('Tramitar seguro','seg')]));
+  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
   m.innerHTML='<div class="in p2">'+h+'</div>';
@@ -2919,11 +2976,14 @@ function navGo0(id){
   if(id==='anacat'){AV.go='cat';id='ana'}
   MAPM.hide();navSet(id);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.classList.toggle('p2on',id==='p2'||id==='ia'||id==='mas');m.classList.toggle('pfon',id==='moto'&&PFOK());m.classList.toggle('iaon',id==='ia');
+  m.classList.toggle('p2on',id==='p2'||id==='ia'||id==='mas'||id==='anam');m.classList.toggle('pfon',id==='moto'&&PFOK());m.classList.toggle('iaon',id==='ia');
   if(id==='pros'){m.style.display='none';return}
   if(id==='p2'){p2View();return}
   if(id==='ia'){iaView();return}
   if(id==='mas'){masView();return}
+  if(id==='anam'){anaMenuView();return}
+  if(id==='ubic'){ubicView();return}
+  if(id==='vtod'){vtodView();return}
   if(id==='mapa'){m.style.display='none';MAPM.show();return}
   if(id==='lead'){m.style.display='none';navSet('pros');openSheet();return}
   let body='';
@@ -2933,7 +2993,7 @@ function navGo0(id){
   else if(id==='seg'){segView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
-  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda la INE por ambos lados a <u>Ana general</u>, con el correo y el n\u00famero del cliente.</span></li><li><b>2</b><span>Ana sola la tramita en las dos financieras: <u>Galgo</u> y <u>Maxicash</u>.</span></li><li><b>3</b><span>Ana sola contacta al cliente para que le pase el NIP.</span></li></ol><div class="i10f">\u00a1Todo m\u00e1s f\u00e1cil con Ana!</div></div>';
+  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda la INE por ambos lados a <u>Ana general</u>, con el correo y el n\u00famero del cliente.</span></li><li><b>2</b><span>Ana sola la tramita en las dos financieras: <u>Galgo</u> y <u>Maxicash</u>.</span></li><li><b>3</b><span>Ana sola contacta al cliente para que le pase el NIP.</span></li></ol><div class="i10f">\u00a1Todo m\u00e1s f\u00e1cil con Ana!</div></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana general</a></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
