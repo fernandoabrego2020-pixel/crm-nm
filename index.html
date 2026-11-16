@@ -863,7 +863,8 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #pcbox{position:fixed;left:10px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:85;display:grid;gap:6px;max-width:min(250px,62vw)}
 #pcbox button{border:1px solid #f59e0b;background:#fde68a;color:#78350f;border-radius:10px;padding:8px 10px;font:600 12px/1.3 system-ui,-apple-system,sans-serif;text-align:left;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
 #pcbox button.pcr{background:#fecaca;border-color:#ef4444;color:#7f1d1d}
-.pmf{margin-top:14px;background:none;border:0;color:var(--mu);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer;padding:8px}
+.pmf{margin-top:22px;background:var(--card);border:1.5px solid var(--ln);border-radius:12px;color:var(--tx);font:inherit;font-size:15px;font-weight:600;cursor:pointer;padding:12px 26px}
+.pmn{margin-top:18px;max-width:280px;text-align:center;font-size:12px;color:var(--mu);line-height:1.35}
 #pm .pmq{display:grid;gap:12px;width:100%;max-width:300px;margin-top:18px}
 #pm .pmq button{padding:15px;border-radius:14px;border:1px solid var(--ln);background:var(--card);font-size:16px;font-weight:700;font-family:inherit;color:var(--tx);cursor:pointer}
 #pm .pmq button.y{background:#4338ca;border-color:#4338ca;color:#fff}
@@ -878,6 +879,9 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .rgst{display:grid;gap:6px;margin:6px 0}
 .p2bt{display:flex;align-items:center;gap:6px}
 .rgst .p2a{width:100%}
+#p2reg .rgst .p2a[data-rg="street"]{color:#a3a7b0;font-weight:400}
+#p2reg select.rgi{font:inherit;font-size:15px;color:var(--tx);background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:10px 12px;width:100%;box-sizing:border-box}
+#p2reg select.rgi.e{color:#a3a7b0}
 #mdock #msave{order:-1}
 .lc .lt b{font-size:16px;line-height:21px}
 .lc .p2nw{font-size:10px;padding:2px 7px}
@@ -953,7 +957,7 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 <div id="mapv">
   <div id="mtop"><button id="mback">← Clientes</button><b id="mtt">Cambaceo</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
   <div id="mwrap"><canvas id="mc"></canvas><div id="mst"></div><div id="mpt"></div><div id="mtr"><b id="mtn">Traza la calle</b><div class="mtb"><button id="mtg">Centrar en mí</button><button id="mtu">Deshacer punto</button><button id="mtx">Cancelar</button><button id="mtok" class="p">Listo</button></div></div><div id="mleg"><span><i style="background:#4338ca"></i>Enviar más fotos</span><span><i style="background:#c0283a"></i>Buscar aprobación</span><span><i style="background:#15803d"></i>Buscar visita</span></div></div>
-  <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="mph" style="display:none">Sin datos</button><button id="msave">Guardar ubicación del prospecto</button></div>
+  <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="msave">Guardar ubicación del prospecto</button></div>
   <div class="mfs" id="mfs"><div class="mh"><b id="mft">Ubicar un lead que no tiene ubicación</b><button id="mfx" aria-label="Cerrar">×</button></div><input id="mfq" placeholder="Buscar por nombre o teléfono" autocomplete="off"><div class="note" id="mfn">Toca el lead y se guarda tu ubicación actual para él.</div><div class="res" id="mfr"></div></div>
   <div class="mfs" id="mrs"><div class="mh"><b>Rutas de cambaceo</b><button id="mrx" aria-label="Cerrar">×</button></div><label class="note"><input type="checkbox" id="mrshow" checked style="width:auto;padding:0"> Mostrar rutas en el mapa</label><div class="note" id="mrn"></div><div class="res" id="mrr"></div></div>
 </div>
@@ -971,7 +975,7 @@ const PROT=n=>n==='Administrativo';
 const NEEDPIN=new Set(['mv','rm','back']);const FREEA=new Set(['nxw','nxv','locmap']);const free0=f=>f();let LASTAG={};
 function isFull(){try{const b=TOK.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');return FULLS&&atob(b+'='.repeat((4-b.length%4)%4)).split('|')[2]==='f'}catch(e){return false}}
 function lgTitle(m){const c=document.getElementById('ct');if(!c)return;c.innerHTML=m==='create'?(LFORGOT?'Crea un NIP nuevo<small>Elige 4 a 8 n\u00fameros. El due\u00f1o de la cuenta recibir\u00e1 una alerta durante dos d\u00edas.</small>':'Crear NIP<small>Elige 4 a 8 números. Úsalo siempre que entres.</small>'):m==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':''}
-async function lgProbe(){try{const r=await api('login',{name:LU,pin:''});if(r.err==='setpin'&&document.getElementById('ct')&&LMODE==='enter'){LMODE='create';lgTitle('create')}}catch(e){}}
+async function lgProbe(){try{const r=await api('login',{name:LU,pin:''});if(r.err==='setpin'&&document.getElementById('ct')&&LMODE==='enter'){LMODE='create';lgTitle('create')}if(r.err==='pin'&&r.pl){LPL=r.pl;lset('crm-pl-'+LU,String(r.pl))}}catch(e){}}
 async function viewLogin(n){
   try{const r=await api('login',{name:n,view:1});if(r.err){LU=n;showLogin(r.err==='bloq'?'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.':'Entra con tu NIP');return}
     TOK=r.token;ME=r.name;LU=ME;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);
@@ -987,7 +991,7 @@ let PM=null;
 function pmPad(){
   const m=document.getElementById('pm');if(!m)return;
   const ks=['1','2','3','4','5','6','7','8','9','del','0','go'].map(k=>`<button class="kk ${k==='go'?'ok':''}" data-pk="${k}">${k==='del'?'\u232B':k==='go'?'\u2713':k}</button>`).join('');
-  m.innerHTML=`<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct" id="pmt">Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small></div><div class="dots" id="pmd"></div><div class="lm" id="pme"></div><input type="hidden" id="pmv" value=""><div class="kp">${ks}</div>${(PM&&PM.mode==='enter'&&!NOFG(ME))?'<button class="pmf" data-pk="forgot">Olvid\u00e9 mi NIP</button>':''}</div>`;
+  m.innerHTML=`<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct" id="pmt">Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small></div><div class="dots" id="pmd"></div><div class="lm" id="pme"></div><input type="hidden" id="pmv" value=""><div class="kp">${ks}</div>${(PM&&PM.mode==='enter')?(NOFG(ME)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-pk="forgot">Olvid\u00e9 mi NIP</button>'):''}</div>`;
   pmDraw();if(PM)pmTitle();
 }
 function needFull(cb){
@@ -996,12 +1000,12 @@ function needFull(cb){
   if(!m){m=document.createElement('div');m.id='pm';document.body.appendChild(m)}
   PM={cb:cb,mode:'enter',first:''};
   const hk='crm-hp-'+ME,pm0=PM;
-  if(lget(hk)==='1'){m.style.display='flex';pmPad();return}
+  if(lget(hk)==='1'){m.style.display='flex';pmPad();api('login',{name:ME,pin:''}).then(r=>{if(r&&r.err==='pin'&&r.pl){lset('crm-pl-'+ME,String(r.pl));if(PM===pm0)PM.n=r.pl}}).catch(()=>{});return}
   m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">Un momento\u2026</div></div>';m.style.display='flex';
   api('login',{name:ME,pin:''}).then(r=>{
     if(PM!==pm0)return;
     if(r&&r.err==='setpin'){m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">\u00bfQuieres proteger tu cuenta con un NIP?<small>Con NIP nadie m\u00e1s puede mover ni borrar tus clientes si entra a tu cuenta. Solo lo creas una vez por celular.</small></div><div class="pmq"><button class="y" data-pk="yes">S\u00ed, crear mi NIP</button><button data-pk="no">No</button></div></div>';return}
-    if(r&&r.err==='pin')lset(hk,'1');
+    if(r&&r.err==='pin'){lset(hk,'1');if(r.pl){lset('crm-pl-'+ME,String(r.pl));PM.n=r.pl}}
     pmPad();
   }).catch(()=>{if(PM===pm0)pmPad()});
 }
@@ -1014,19 +1018,20 @@ async function pmKey(k){
   if(k==='no'){const cc=PM.cancel;pmClose();if(cc)cc();toast('Sin NIP solo puedes ver. Para hacer cambios necesitas crear tu NIP.',1);return}
   if(k==='yes'){PM.mode='create';pmPad();return}
   if(k==='forgot'){PM.forgot=1;PM.mode='create';PM.first='';pmPad();return}
+  if(PM.busy)return;
   const i=document.getElementById('pmv'),e=document.getElementById('pme');let v=i.value;
   if(k==='del')v=v.slice(0,-1);else if(k!=='go'){if(v.length<8)v+=k}
   i.value=v;e.textContent='';pmDraw();
-  if(k!=='go')return;
+  if(k!=='go'){const ex=PM.mode==='enter'?(PM.n||+lget('crm-pl-'+ME)||4):PM.mode==='repeat'?PM.first.length:0;if(k==='del'||!ex||v.length!==ex)return}
   if(PM.mode==='create'){if(!/^\d{4,8}$/.test(v)){e.textContent='4 a 8 números';return}PM.first=v;PM.mode='repeat';i.value='';pmDraw();pmTitle();return}
   if(PM.mode==='repeat'){if(v!==PM.first){PM.mode='create';PM.first='';i.value='';pmDraw();pmTitle();e.textContent='No coinciden, elige otra vez';return}}
   if(!v){e.textContent='Escribe tu NIP';return}
-  e.textContent='Revisando…';
+  e.textContent='Revisando…';const pmx=PM;pmx.busy=1;
   try{
-    const r=await api('login',{name:ME,pin:v,setpin:PM.mode==='repeat',forgot:!!PM.forgot});
-    if(r.err){e.textContent=r.err==='pin'?'NIP incorrecto':r.err==='lock'?'Espera 10 min':r.err==='bloq'?'Cuenta bloqueada. Habla con Fer.':r.err==='setpin'?'Primero crea tu NIP':'No se pudo';i.value='';pmDraw();if(r.err==='setpin'){PM.mode='create';pmTitle()}return}
-    TOK=r.token;FULL=true;FULLS=true;lset('crm-hp-'+ME,'1');if(r.pc)lset('crm-pcack',String(r.pc));saveTok(ME,TOK);lset('crm-tok',TOK);bkpSet();const cb=PM.cb;pmClose();cb();
-  }catch(x){e.textContent='Sin conexión'}
+    const r=await api('login',{name:ME,pin:v,setpin:PM.mode==='repeat',forgot:!!PM.forgot});pmx.busy=0;
+    if(r.err){e.textContent=r.err==='pin'?'NIP incorrecto':r.err==='lock'?'Espera 10 min':r.err==='bloq'?'Cuenta bloqueada. Habla con Fer.':r.err==='setpin'?'Primero crea tu NIP':'No se pudo';i.value='';pmDraw();if(r.err==='setpin'){lset('crm-hp-'+ME,'');PM.mode='create';pmTitle()}return}
+    TOK=r.token;FULL=true;FULLS=true;lset('crm-hp-'+ME,'1');lset('crm-pl-'+ME,String(v.length));if(r.pc)lset('crm-pcack',String(r.pc));saveTok(ME,TOK);lset('crm-tok',TOK);bkpSet();const cb=PM.cb;pmClose();cb();
+  }catch(x){pmx.busy=0;e.textContent='Sin conexión'}
 }
 const G=[
  {id:'empezar',t:'Preguntar uso',k:'g1'},
@@ -1544,7 +1549,14 @@ function regClose(){REG.on=0;REG.photos=[];REG.rows=[];const e=document.getEleme
 function regPlaces(){const m={};S.leads.filter(l=>l.own===S.ag&&l.ub).forEach(l=>{m[l.ub]=(m[l.ub]||0)+1});return Object.keys(m).sort((a,b)=>m[b]-m[a]).slice(0,10)}
 function regRow(x,lugar){
   const du=(Array.isArray(x&&x.dudas)?x.dudas:(x&&x.dudas?[x.dudas]:[])).map(d=>String(d).trim()).filter(Boolean).slice(0,3);
-  return {on:1,name:String((x&&(x.nombre||x.name))||'').trim(),tel:norm((x&&(x.telefono||x.tel))||''),tx:String((x&&(x.texto||x.contexto))||'').trim(),mt:String((x&&x.moto)||'').trim(),ub:String((x&&x.ubicacion)||'').trim()||lugar,idf:String((x&&x.identificar)||'').trim().slice(0,60),stg:ETP.some(g=>g.id===(x&&x.etapa))?x.etapa:'empezar',du:du,hand:0};
+  return {on:1,name:String((x&&(x.nombre||x.name))||'').trim(),tel:norm((x&&(x.telefono||x.tel))||''),tx:String((x&&(x.texto||x.contexto))||'').trim(),mt:String((x&&x.moto)||'').trim(),ub:String((x&&x.ubicacion)||'').trim()||lugar,idf:String((x&&x.identificar)||'').trim().slice(0,60),stg:ETP.some(g=>g.id===(x&&x.etapa))?x.etapa:'empezar',du:du,hand:0,lk:''};
+}
+function regPh(){return S.leads.filter(l=>l.ph&&!l.fld&&l.own===S.ag&&l.loc).sort((a,b)=>(a.pn||0)-(b.pn||0))}
+function regLkSel(r,i){
+  const L=regPh();if(!L.length)return '';
+  const used=new Set(REG.rows.map((o,j)=>j!==i&&o.lk?o.lk:null).filter(Boolean));
+  const o=L.filter(l=>!used.has(l.id)||l.id===r.lk).map(l=>'<option value="'+l.id+'"'+(l.id===r.lk?' selected':'')+'>Sin datos '+(l.pn||'')+' \u00b7 guardado hace '+ago(l.c)+' \u00b7 \u00b1'+l.loc[2]+' m</option>').join('');
+  return '<select class="rgi'+(r.lk?'':' e')+'" data-i="'+i+'" data-k="lk"><option value=""'+(r.lk?'':' selected')+'>Enlazar con una ubicaci\u00f3n guardada (opcional)</option>'+o+'</select>';
 }
 function regDup(r,i){const t=norm(r.tel);if(t.length!==10)return '';const d=findDup(t);if(d)return dupMsg(d);if(REG.rows.some((o,j)=>j<i&&norm(o.tel)===t))return 'Repetido en esta lista';return ''}
 function regDoubt(r){const t=norm(r.tel);return r.du.length>0||(t.length>0&&t.length!==10)}
@@ -1560,7 +1572,7 @@ function regBtn(){
 }
 function regAddRow(){
   const lr=REG.rows[REG.rows.length-1];
-  if(!(lr&&regEmpty(lr))){REG.rows.push({on:1,name:'',tel:'',tx:'',mt:'',ub:REG.lugar,idf:'',stg:'empezar',du:[],hand:0});REG.conf=0;regDraw()}
+  if(!(lr&&regEmpty(lr))){REG.rows.push({on:1,name:'',tel:'',tx:'',mt:'',ub:REG.lugar,idf:'',stg:'empezar',du:[],hand:0,lk:''});REG.conf=0;regDraw()}
   const q=document.querySelectorAll('#p2reg .rgr');
   if(q.length){const f=q[q.length-1].querySelector('[data-k="name"]');if(f)f.focus()}
 }
@@ -1581,7 +1593,7 @@ function regDraw(){
       '<textarea rows="2" data-i="'+i+'" data-k="tx" placeholder="Texto tal cual (opcional)">'+esc(r.tx)+'</textarea>'+
       '<div class="rgg"><input data-i="'+i+'" data-k="name" enterkeyhint="next" value="'+esc(r.name)+'" placeholder="Nombre (opcional)" autocomplete="off"><input class="'+((t&&t.length!==10)||r.du.length?'warn':'')+'" data-i="'+i+'" data-k="tel" enterkeyhint="next" inputmode="tel" value="'+esc(r.tel)+'" placeholder="WhatsApp (opcional)" autocomplete="off"></div>'+
       '<div class="rgg"><input data-i="'+i+'" data-k="idf" enterkeyhint="next" value="'+esc(r.idf)+'" placeholder="Cómo identificarlo (opcional)" autocomplete="off"><input data-i="'+i+'" data-k="ub" enterkeyhint="done" value="'+esc(r.ub)+'" placeholder="Lugar (opcional)" autocomplete="off"></div>'+
-      fl.map(f=>'<div class="rgf '+f[0]+'">'+esc(f[1])+'</div>').join('')+'</div>'}).join('');
+      regLkSel(r,i)+fl.map(f=>'<div class="rgf '+f[0]+'">'+esc(f[1])+'</div>').join('')+'</div>'}).join('');
   const nd=REG.rows.filter((r,i)=>regOk(r,i)&&regDoubt(r)).length;
   e.innerHTML='<div class="rg"><div class="rgh"><b>Nuevos prospectos</b><button data-rg="x">Cerrar</button></div>'+
     '<div class="rgb">'+(AI?'<button class="p2a st" data-rg="pick">Leer fotos con IA</button>':'')+'<button class="p2a" data-rg="add">Escribir a mano</button></div>'+
@@ -1637,7 +1649,7 @@ function regSave(){
   if(!sel.length){REG.err='Escribe al menos un dato: nombre, número o texto.';return regDraw()}
   const nd=sel.filter(r=>regDoubt(r)).length;
   if(nd&&!REG.conf){REG.conf=1;REG.err='';regDraw();const q=document.querySelector('#p2reg .rgf.warn');if(q)q.scrollIntoView({block:'center'});return}
-  const t0=Date.now();let np=0;
+  const t0=Date.now();let np=0;const gone=[];
   undo=JSON.stringify(S);UNDO_ADD=true;
   sel.forEach((r,i)=>{
     const tel=norm(r.tel),ok=tel.length===10,id=uid();
@@ -1646,15 +1658,18 @@ function regSave(){
     if(r.idf.trim()){nl.idf=r.idf.trim();if(r.hand)nl.idfm=1;else nl.labv=LABV}
     if(r.ub.trim())nl.ub=r.ub.trim();
     if(REG.line){const q=regAlong(REG.line,(i+0.5)/sel.length);nl.loc=[q[0],q[1],12,t0]}
+    const pl=r.lk?S.leads.find(x=>x.id===r.lk&&x.ph&&!x.fld&&x.loc):null;
+    if(pl){nl.loc=[pl.loc[0],pl.loc[1],pl.loc[2],t0];gone.push(pl.id)}
     setStage(nl,r.stg);
     if(!ok){nl.ph=1;nl.fld=1;np++;if(tel)nl.ctx.push({t:t0+i,x:'Número incompleto anotado: '+tel,auto:true,pend:false})}
     S.leads.push(nl);
   });
+  if(gone.length)S.leads=S.leads.filter(x=>gone.indexOf(x.id)<0);
   if(REG.lugar.trim())lset('crm-lugar',REG.lugar.trim());
   const nn=sel.length;P2.cat='neu';P2.open=null;P2.f=null;P2.q='';P2.sq=0;P2.fp=0;
   regClose();
   const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
-  done(nn+(nn===1?' lead agregado':' leads agregados')+(np?' ('+np+' sin número)':''));
+  done(nn+(nn===1?' lead agregado':' leads agregados')+(np?' ('+np+' sin número)':'')+(gone.length?' · '+gone.length+(gone.length===1?' ubicación enlazada':' ubicaciones enlazadas'):''));
 }
 document.addEventListener('input',e=>{
   const t=e.target;if(!REG.on||!t||!t.closest||!t.closest('#p2reg'))return;
@@ -1664,6 +1679,7 @@ document.addEventListener('input',e=>{
   const r=REG.rows[+i];if(!r)return;
   if(k==='on'){r.on=t.checked?1:0;REG.conf=0;return regDraw()}
   r[k]=t.value;if(k==='idf')r.hand=1;
+  if(k==='lk'){REG.conf=0;return regDraw()}
   if(k==='tel'){r.du=[]}
   REG.conf=0;regBtn();
 });
@@ -2104,7 +2120,7 @@ const ROLEN={vendedor:'Vendedor',director:'Director',tecnico:'Técnico de Ana',a
 const roleOf=n=>n==='Fer'?'tecnico':n==='Director'?'director':n==='Administrativo'?'admin':'vendedor';
 const FIXU={tecnico:'Fer',director:'Director',admin:'Administrativo'};
 let LR='',ROLE='',RO=false;
-let PCHG=0,BLQ=[],PCARM=0,LFORGOT=0;
+let PCHG=0,BLQ=[],PCARM=0,LFORGOT=0,LPL=0;
 const NOFG=n=>n==='Fer'||n==='Director'||n==='Administrativo';
 function pcRender(){
   let b=document.getElementById('pcbox');
@@ -2142,13 +2158,13 @@ function showLogin(msg){
     el.innerHTML=`<div class="lg2">${LOGO}${msg?`<div class="lm">${esc(msg)}</div>`:''}<div class="pgw">${t}</div></div>`;
   }else{
     const n=pname(LU),ks=['1','2','3','4','5','6','7','8','9','del','0','go'].map(k=>`<button class="kk ${k==='go'?'ok':''}" data-k="${k}" aria-label="${k}">${k==='del'?'\u232B':k==='go'?'\u2713':k}</button>`).join('');
-    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw"><button class="lb" data-r="" aria-label="Atrás">\u2190</button><div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div>${NOFG(LU)?'':'<button class="pmf" data-fg="1">Olvid\u00e9 mi NIP</button>'}</div>`;
+    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw"><button class="lb" data-r="" aria-label="Atrás">\u2190</button><div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div>${NOFG(LU)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-fg="1">Olvid\u00e9 mi NIP</button>'}</div>`;
     lgDraw();LMODE='enter';LFIRST='';LFORGOT=0;lgProbe();
   }
   el.style.display='flex';
 }
 function lgDraw(){const pi=document.getElementById('pin'),d=document.getElementById('dots');if(!pi||!d)return;const v=pi.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<v?'f':''}"></i>`).join('')}
-function lgKey(k){const pi=document.getElementById('pin');if(!pi)return;if(k==='go')return doLogin();let v=pi.value;if(k==='del')v=v.slice(0,-1);else if(v.length<8)v+=k;pi.value=v;document.getElementById('le').textContent='';lgDraw()}
+function lgKey(k){const pi=document.getElementById('pin');if(!pi)return;if(k==='go')return doLogin();let v=pi.value;if(k==='del')v=v.slice(0,-1);else if(v.length<8)v+=k;pi.value=v;document.getElementById('le').textContent='';lgDraw();if(k!=='del'){const ex=LMODE==='enter'?(+lget('crm-pl-'+LU)||LPL||4):LMODE==='repeat'?LFIRST.length:0;if(ex&&v.length===ex)doLogin()}}
 document.addEventListener('keydown',ev=>{const L=document.getElementById('login');if(!L||L.style.display==='none'||!document.getElementById('pin'))return;if(/^\d$/.test(ev.key))lgKey(ev.key);else if(ev.key==='Backspace')lgKey('del');else if(ev.key==='Enter')lgKey('go')});
 function finishBoot(){document.getElementById('login').style.display='none';ready=true;pcRender();if(ME==='Fer')lset('crm-ferdev','1');ROLE=ME==='Fer'&&LR==='vendedor'?'vendedor':roleOf(ME);LR=ROLE;lset('crm-role',LR);bkpSet();document.body.classList.toggle('ro',RO);if(AG.includes(ME))S.ag=ME;if(ROLE==='director'&&S.ag==='Fer')S.ag='Lerma Zayuri';render();navInit()}
 async function doLogin(){
@@ -2162,7 +2178,7 @@ async function doLogin(){
     const r=await api('login',{name:LU,pin:pin,setpin:LMODE==='repeat',forgot:!!LFORGOT});
     if(r.err==='setpin'){LMODE='create';document.getElementById('pin').value='';lgDraw();lgTitle('create');e.textContent='';return}
     if(r.err){e.textContent=r.err==='pin'?(pin?'NIP incorrecto':'Escribe tu NIP'):r.err==='weak'?'4 a 8 números':r.err==='lock'?'Espera 10 min':r.err==='bloq'?'Cuenta bloqueada. Habla con Fer para desbloquearla.':'No se pudo entrar';const pi=document.getElementById('pin');if(pi){pi.value='';lgDraw()}const dd=document.getElementById('dots');if(dd){dd.classList.remove('sh');void dd.offsetWidth;dd.classList.add('sh')}return}
-    TOK=r.token;ME=r.name;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);if(r.pc)lset('crm-pcack',String(r.pc));LFORGOT=0;
+    TOK=r.token;ME=r.name;lset('crm-tok',TOK);lset('crm-user',ME);lset('crm-pl-'+ME,String(pin.length));saveTok(ME,TOK);if(r.pc)lset('crm-pcack',String(r.pc));LFORGOT=0;
     const x=await pull();if(x==='err'||x==='auth'){e.textContent='No se pudo cargar los datos';return}
     finishBoot();
   }catch(err){e.textContent='Sin conexión'}
@@ -2971,7 +2987,6 @@ const MAPM=(function(){
   function draw(){
     if(!W||!cx)return;
     $('mvis').textContent='Por visitar ('+S.leads.filter(l=>l.own===S.ag&&l.vz).length+')';
-    {const pn=phN();$('mph').style.display=(mode==='rutas'||!pn)?'none':'';$('mph').textContent='Sin datos ('+pn+') \u00b7 llenar'}
     const k=kReal(),pxm=V.s/k;
     const map=drawTiles();
     if(!map){cx.fillStyle='#000';cx.fillRect(0,0,W,Hh)}
@@ -3197,7 +3212,7 @@ const MAPM=(function(){
       if(FERDEV()){gps(c=>{b.disabled=false;const n=Date.now(),id=uid(),loc=rl(c.latitude,c.longitude,c.accuracy),l={id:id,own:S.ag,src:ACC[S.ag]||null,name:'',moto:'',tel:'ph'+id.toLowerCase(),c:n,s:0,f:0,r:0,note:'',done:false,ctx:[],st:{},ph:1,pn:phNext(),loc:loc};UNDO_ADD=true;undo=JSON.stringify(S);S.leads.push(l);center(c);draw();done('Guardado '+l.pn);say('Guardado como n\u00famero '+l.pn+'. D\u00edctaselo a la IA para llenarlo.')},e=>{b.disabled=false;say('Sin ubicaci\u00f3n. '+((e&&e.message)||''))});return}
       gps(c=>{b.disabled=false;pend=rl(c.latitude,c.longitude,c.accuracy);center(c);hideCard();draw();say('Ubicación lista (±'+Math.round(c.accuracy)+' m). Captura el lead.');openSheet(pend)},e=>{b.disabled=false;say('Sin ubicación. '+((e&&e.message)||''))});
     };
-    $('mph').onclick=()=>openFind('ph');$('mfind').onclick=()=>openFind('find');$('mvis').onclick=()=>openFind('visit');
+    $('mfind').onclick=()=>openFind('find');$('mvis').onclick=()=>openFind('visit');
     $('mfx').onclick=closeFind;
     $('mtu').onclick=()=>{if(tr&&tr.length){tr.pop();trBar();draw()}};
     $('mtx').onclick=()=>trEnd(0);
