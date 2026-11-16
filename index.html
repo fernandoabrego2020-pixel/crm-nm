@@ -856,6 +856,10 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #p2reg #rgn{min-height:40px;resize:none}
 
 .p2lp{display:none!important}
+#pcbox{position:fixed;left:10px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:85;display:grid;gap:6px;max-width:min(250px,62vw)}
+#pcbox button{border:1px solid #f59e0b;background:#fde68a;color:#78350f;border-radius:10px;padding:8px 10px;font:600 12px/1.3 system-ui,-apple-system,sans-serif;text-align:left;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+#pcbox button.pcr{background:#fecaca;border-color:#ef4444;color:#7f1d1d}
+.pmf{margin-top:14px;background:none;border:0;color:var(--mu);font:inherit;font-size:14px;text-decoration:underline;cursor:pointer;padding:8px}
 #pm .pmq{display:grid;gap:12px;width:100%;max-width:300px;margin-top:18px}
 #pm .pmq button{padding:15px;border-radius:14px;border:1px solid var(--ln);background:var(--card);font-size:16px;font-weight:700;font-family:inherit;color:var(--tx);cursor:pointer}
 #pm .pmq button.y{background:#4338ca;border-color:#4338ca;color:#fff}
@@ -962,10 +966,10 @@ let SP='',LMODE='enter',LFIRST='',UNDO_ADD=false,FULL=false,FULLS=true;
 const PROT=n=>n==='Administrativo';
 const NEEDPIN=new Set(['mv','rm','back']);const FREEA=new Set(['nxw','nxv','locmap']);const free0=f=>f();let LASTAG={};
 function isFull(){try{const b=TOK.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');return FULLS&&atob(b+'='.repeat((4-b.length%4)%4)).split('|')[2]==='f'}catch(e){return false}}
-function lgTitle(m){const c=document.getElementById('ct');if(!c)return;c.innerHTML=m==='create'?'Crear NIP<small>Elige 4 a 8 números. Úsalo siempre que entres.</small>':m==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':''}
+function lgTitle(m){const c=document.getElementById('ct');if(!c)return;c.innerHTML=m==='create'?(LFORGOT?'Crea un NIP nuevo<small>Elige 4 a 8 n\u00fameros. El due\u00f1o de la cuenta recibir\u00e1 una alerta durante dos d\u00edas.</small>':'Crear NIP<small>Elige 4 a 8 números. Úsalo siempre que entres.</small>'):m==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':''}
 async function lgProbe(){try{const r=await api('login',{name:LU,pin:''});if(r.err==='setpin'&&document.getElementById('ct')&&LMODE==='enter'){LMODE='create';lgTitle('create')}}catch(e){}}
 async function viewLogin(n){
-  try{const r=await api('login',{name:n,view:1});if(r.err){LU=n;showLogin('Entra con tu NIP');return}
+  try{const r=await api('login',{name:n,view:1});if(r.err){LU=n;showLogin(r.err==='bloq'?'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.':'Entra con tu NIP');return}
     TOK=r.token;ME=r.name;LU=ME;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);
     const x=await pull();if(x==='err'||x==='auth'){showLogin('No se pudo cargar los datos');return}
     finishBoot();
@@ -979,7 +983,7 @@ let PM=null;
 function pmPad(){
   const m=document.getElementById('pm');if(!m)return;
   const ks=['1','2','3','4','5','6','7','8','9','del','0','go'].map(k=>`<button class="kk ${k==='go'?'ok':''}" data-pk="${k}">${k==='del'?'\u232B':k==='go'?'\u2713':k}</button>`).join('');
-  m.innerHTML=`<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct" id="pmt">Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small></div><div class="dots" id="pmd"></div><div class="lm" id="pme"></div><input type="hidden" id="pmv" value=""><div class="kp">${ks}</div></div>`;
+  m.innerHTML=`<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct" id="pmt">Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small></div><div class="dots" id="pmd"></div><div class="lm" id="pme"></div><input type="hidden" id="pmv" value=""><div class="kp">${ks}</div>${(PM&&PM.mode==='enter'&&!NOFG(ME))?'<button class="pmf" data-pk="forgot">Olvid\u00e9 mi NIP</button>':''}</div>`;
   pmDraw();if(PM)pmTitle();
 }
 function needFull(cb){
@@ -998,13 +1002,14 @@ function needFull(cb){
   }).catch(()=>{if(PM===pm0)pmPad()});
 }
 function askFull(){return new Promise(res=>{needFull(()=>res(true));if(PM)PM.cancel=()=>res(false)})}
-function pmTitle(){const t=document.getElementById('pmt');if(!t||!PM)return;t.innerHTML=PM.mode==='create'?'Crear NIP<small>Elige 4 a 8 números. Solo te lo pido para mover de cuenta, borrar o prender y apagar. Una vez por celular.</small>':PM.mode==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':'Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small>'}
+function pmTitle(){const t=document.getElementById('pmt');if(!t||!PM)return;if(PM.forgot&&PM.mode==='create'){t.innerHTML='Crea un NIP nuevo<small>Elige 4 a 8 n\u00fameros. El due\u00f1o de la cuenta recibir\u00e1 una alerta durante dos d\u00edas.</small>';return}t.innerHTML=PM.mode==='create'?'Crear NIP<small>Elige 4 a 8 números. Solo te lo pido para mover de cuenta, borrar o prender y apagar. Una vez por celular.</small>':PM.mode==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':'Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small>'}
 function pmDraw(){const i=document.getElementById('pmv'),d=document.getElementById('pmd');if(!i||!d)return;const v=i.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,k)=>`<i class="${k<v?'f':''}"></i>`).join('')}
 function pmClose(){const m=document.getElementById('pm');if(m)m.style.display='none';PM=null}
 async function pmKey(k){
   if(!PM)return;if(k==='x'){const cc=PM.cancel;pmClose();if(cc)cc();return}
   if(k==='no'){const cc=PM.cancel;pmClose();if(cc)cc();toast('Sin NIP solo puedes ver. Para hacer cambios necesitas crear tu NIP.',1);return}
   if(k==='yes'){PM.mode='create';pmPad();return}
+  if(k==='forgot'){PM.forgot=1;PM.mode='create';PM.first='';pmPad();return}
   const i=document.getElementById('pmv'),e=document.getElementById('pme');let v=i.value;
   if(k==='del')v=v.slice(0,-1);else if(k!=='go'){if(v.length<8)v+=k}
   i.value=v;e.textContent='';pmDraw();
@@ -1014,9 +1019,9 @@ async function pmKey(k){
   if(!v){e.textContent='Escribe tu NIP';return}
   e.textContent='Revisando…';
   try{
-    const r=await api('login',{name:ME,pin:v,setpin:PM.mode==='repeat'});
-    if(r.err){e.textContent=r.err==='pin'?'NIP incorrecto':r.err==='lock'?'Espera 10 min':r.err==='setpin'?'Primero crea tu NIP':'No se pudo';i.value='';pmDraw();if(r.err==='setpin'){PM.mode='create';pmTitle()}return}
-    TOK=r.token;FULL=true;FULLS=true;lset('crm-hp-'+ME,'1');saveTok(ME,TOK);lset('crm-tok',TOK);bkpSet();const cb=PM.cb;pmClose();cb();
+    const r=await api('login',{name:ME,pin:v,setpin:PM.mode==='repeat',forgot:!!PM.forgot});
+    if(r.err){e.textContent=r.err==='pin'?'NIP incorrecto':r.err==='lock'?'Espera 10 min':r.err==='bloq'?'Cuenta bloqueada. Habla con Fer.':r.err==='setpin'?'Primero crea tu NIP':'No se pudo';i.value='';pmDraw();if(r.err==='setpin'){PM.mode='create';pmTitle()}return}
+    TOK=r.token;FULL=true;FULLS=true;lset('crm-hp-'+ME,'1');if(r.pc)lset('crm-pcack',String(r.pc));saveTok(ME,TOK);lset('crm-tok',TOK);bkpSet();const cb=PM.cb;pmClose();cb();
   }catch(x){e.textContent='Sin conexión'}
 }
 const G=[
@@ -1779,7 +1784,7 @@ function p2Send(l){
     const e=r&&r.err;toast(e==='nosend'?'El envío todavía no está conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
   }).catch(()=>{back();toast('No se pudo enviar, intenta otra vez',1)});
 }
-const DEFRX=new Set(['Fer','Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Almoloya','Valle Andrea','Valle Carlos']);
+const DEFRX=new Set(['Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Almoloya','Valle Andrea','Valle Carlos']);
 function p2Wa(l){
   copyTel(l.tel);
   if(DEFRX.has(ME))return p2Chat(l);
@@ -2010,6 +2015,8 @@ document.addEventListener('click',e=>{
   if(b.dataset.r==='forget'){lset('crm-toks','');LR='';LU='';showLogin();return}
   if(b.dataset.r!==undefined){LR='';LU='';lset('crm-user','');showLogin();return}
   if(b.dataset.p){LU=b.dataset.p;LR=b.dataset.lr||roleOf(LU);const st=toks()[LU];if(st){lset('crm-tok',st);lset('crm-user',LU);lset('crm-role',LR);boot();return}if(!PROT(LU)){lset('crm-user',LU);lset('crm-role',LR);viewLogin(LU);return}showLogin();return}
+  if(b.dataset.pc)return pcClick(b);
+  if(b.dataset.fg){LFORGOT=1;LMODE='create';LFIRST='';const pi=document.getElementById('pin');if(pi){pi.value='';lgDraw()}lgTitle('create');return}
   if(b.dataset.k)return lgKey(b.dataset.k);
   if(b.dataset.pk)return pmKey(b.dataset.pk);
   if(b.dataset.nv)return navGo(b.dataset.nv);
@@ -2076,9 +2083,9 @@ async function push(){
 async function pull(){
   if(pushing)return false;
   let r;try{r=await api('state')}catch(e){return 'err'}
-  if(r.err==='auth'){const n=ME||LU;forgetTok(n);if(n&&!PROT(n)&&!pull.retry){pull.retry=1;TOK='';try{const q=await api('login',{name:n,view:1});if(!q.err){TOK=q.token;ME=q.name;lset('crm-tok',TOK);saveTok(ME,TOK);pull.retry=0;return pull()}}catch(e){}pull.retry=0}showLogin('Entra con tu NIP');return 'auth'}
+  if(r.err==='auth'){const n=ME||LU;forgetTok(n);if(n&&!PROT(n)&&!pull.retry){pull.retry=1;TOK='';try{const q=await api('login',{name:n,view:1});if(q.err==='bloq')pull.bl=1;if(!q.err){TOK=q.token;ME=q.name;lset('crm-tok',TOK);saveTok(ME,TOK);pull.retry=0;return pull()}}catch(e){}pull.retry=0}showLogin(pull.bl?(pull.bl=0,'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.'):'Entra con tu NIP');return 'auth'}
   if(r.err)return 'err';
-  FULLS=r.full!==false;AI=!!r.ai;ADMIN=!!r.admin;RO=!!r.ro;PISO=r.piso||'';document.body.classList.toggle('ro',RO);TAKEN=new Map((r.taken||[]).map(x=>[x.tel,x.own]));let changed=false;const srv=new Map();
+  FULLS=r.full!==false;AI=!!r.ai;ADMIN=!!r.admin;RO=!!r.ro;PISO=r.piso||'';PCHG=r.pc||0;BLQ=r.bloq||[];pcRender();document.body.classList.toggle('ro',RO);TAKEN=new Map((r.taken||[]).map(x=>[x.tel,x.own]));let changed=false;const srv=new Map();
   r.leads.forEach(sl=>srv.set(sl.tel,sl));
   srv.forEach((sl,t)=>{
     const sj=ser(sl),ll=S.leads.find(x=>x.tel===t);
@@ -2093,6 +2100,31 @@ const ROLEN={vendedor:'Vendedor',director:'Director',tecnico:'Técnico de Ana',a
 const roleOf=n=>n==='Fer'?'tecnico':n==='Director'?'director':n==='Administrativo'?'admin':'vendedor';
 const FIXU={tecnico:'Fer',director:'Director',admin:'Administrativo'};
 let LR='',ROLE='',RO=false;
+let PCHG=0,BLQ=[],PCARM=0,LFORGOT=0;
+const NOFG=n=>n==='Fer'||n==='Director'||n==='Administrativo';
+function pcRender(){
+  let b=document.getElementById('pcbox');
+  const ack=lget('crm-pcack')===String(PCHG),sy=PCHG>0&&!ack&&ready&&!!TOK;
+  const bl=(ME==='Fer'&&ready&&TOK)?BLQ:[];
+  if(!sy&&!bl.length){if(b)b.remove();return}
+  if(!b){b=document.createElement('div');b.id='pcbox';document.body.appendChild(b)}
+  b.innerHTML=(sy?'<button class="pcy" data-pc="blk">'+(PCARM?'\u00bfSeguro? Se bloquea tu cuenta. Toca otra vez.':'Alguien cambi\u00f3 tu NIP. Si t\u00fa no fuiste, toca aqu\u00ed.')+'</button>':'')+bl.map(x=>'<button class="pcr" data-pc="unb" data-n="'+esc(x.n)+'">Cuenta bloqueada: '+esc(x.n)+'. Toca para desbloquear.</button>').join('');
+}
+function pcClick(b){
+  if(b.dataset.pc==='blk'){
+    if(!PCARM){PCARM=1;pcRender();setTimeout(()=>{PCARM=0;pcRender()},5000);return}
+    PCARM=0;
+    api('pin_block').then(r=>{
+      if(r&&r.ok){const n=ME;forgetTok(n);TOK='';lset('crm-tok','');PCHG=0;pcRender();showLogin('Tu cuenta qued\u00f3 bloqueada. Habla con Fer para desbloquearla.')}
+      else{pcRender();toast('No se pudo bloquear',1)}
+    }).catch(()=>{pcRender();toast('Sin conexi\u00f3n',1)});
+    return;
+  }
+  if(b.dataset.pc==='unb'){
+    const n=b.dataset.n;
+    needFull(()=>{api('pin_unblock',{name:n}).then(r=>{if(r&&r.ok){BLQ=BLQ.filter(x=>x.n!==n);pcRender();toast('Cuenta desbloqueada: '+n,1)}else toast('No se pudo desbloquear',1)}).catch(()=>toast('Sin conexi\u00f3n',1))});
+  }
+}
 const DISP={Atlacomulco:['Abel','Atlacomulco'],Almoloya:['Jari','Almoloya']};
 function pname(a){if(DISP[a])return DISP[a];const w=a.split(' ');return w.length>1?[w[w.length-1],w.slice(0,-1).join(' ')]:[a,'']}
 function showLogin(msg){
@@ -2106,15 +2138,15 @@ function showLogin(msg){
     el.innerHTML=`<div class="lg2">${LOGO}${msg?`<div class="lm">${esc(msg)}</div>`:''}<div class="pgw">${t}</div></div>`;
   }else{
     const n=pname(LU),ks=['1','2','3','4','5','6','7','8','9','del','0','go'].map(k=>`<button class="kk ${k==='go'?'ok':''}" data-k="${k}" aria-label="${k}">${k==='del'?'\u232B':k==='go'?'\u2713':k}</button>`).join('');
-    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw"><button class="lb" data-r="" aria-label="Atrás">\u2190</button><div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div></div>`;
-    lgDraw();LMODE='enter';LFIRST='';lgProbe();
+    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw"><button class="lb" data-r="" aria-label="Atrás">\u2190</button><div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div>${NOFG(LU)?'':'<button class="pmf" data-fg="1">Olvid\u00e9 mi NIP</button>'}</div>`;
+    lgDraw();LMODE='enter';LFIRST='';LFORGOT=0;lgProbe();
   }
   el.style.display='flex';
 }
 function lgDraw(){const pi=document.getElementById('pin'),d=document.getElementById('dots');if(!pi||!d)return;const v=pi.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<v?'f':''}"></i>`).join('')}
 function lgKey(k){const pi=document.getElementById('pin');if(!pi)return;if(k==='go')return doLogin();let v=pi.value;if(k==='del')v=v.slice(0,-1);else if(v.length<8)v+=k;pi.value=v;document.getElementById('le').textContent='';lgDraw()}
 document.addEventListener('keydown',ev=>{const L=document.getElementById('login');if(!L||L.style.display==='none'||!document.getElementById('pin'))return;if(/^\d$/.test(ev.key))lgKey(ev.key);else if(ev.key==='Backspace')lgKey('del');else if(ev.key==='Enter')lgKey('go')});
-function finishBoot(){document.getElementById('login').style.display='none';ready=true;if(ME==='Fer')lset('crm-ferdev','1');ROLE=ME==='Fer'&&LR==='vendedor'?'vendedor':roleOf(ME);LR=ROLE;lset('crm-role',LR);bkpSet();document.body.classList.toggle('ro',RO);if(AG.includes(ME))S.ag=ME;if(ROLE==='director'&&S.ag==='Fer')S.ag='Lerma Zayuri';render();navInit()}
+function finishBoot(){document.getElementById('login').style.display='none';ready=true;pcRender();if(ME==='Fer')lset('crm-ferdev','1');ROLE=ME==='Fer'&&LR==='vendedor'?'vendedor':roleOf(ME);LR=ROLE;lset('crm-role',LR);bkpSet();document.body.classList.toggle('ro',RO);if(AG.includes(ME))S.ag=ME;if(ROLE==='director'&&S.ag==='Fer')S.ag='Lerma Zayuri';render();navInit()}
 async function doLogin(){
   const pin=document.getElementById('pin').value.trim(),e=document.getElementById('le');if(document.getElementById('dots')&&document.getElementById('dots').dataset.busy)return;
   if(!LU){return}
@@ -2123,10 +2155,10 @@ async function doLogin(){
   try{
     if(LMODE==='create'){if(!/^\d{4,8}$/.test(pin)){e.textContent='4 a 8 números';return}LFIRST=pin;LMODE='repeat';document.getElementById('pin').value='';lgDraw();lgTitle('repeat');e.textContent='';return}
     if(LMODE==='repeat'&&pin!==LFIRST){LMODE='create';LFIRST='';document.getElementById('pin').value='';lgDraw();lgTitle('create');e.textContent='No coinciden, elige otra vez';return}
-    const r=await api('login',{name:LU,pin:pin,setpin:LMODE==='repeat'});
+    const r=await api('login',{name:LU,pin:pin,setpin:LMODE==='repeat',forgot:!!LFORGOT});
     if(r.err==='setpin'){LMODE='create';document.getElementById('pin').value='';lgDraw();lgTitle('create');e.textContent='';return}
-    if(r.err){e.textContent=r.err==='pin'?(pin?'NIP incorrecto':'Escribe tu NIP'):r.err==='weak'?'4 a 8 números':r.err==='lock'?'Espera 10 min':'No se pudo entrar';const pi=document.getElementById('pin');if(pi){pi.value='';lgDraw()}const dd=document.getElementById('dots');if(dd){dd.classList.remove('sh');void dd.offsetWidth;dd.classList.add('sh')}return}
-    TOK=r.token;ME=r.name;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);
+    if(r.err){e.textContent=r.err==='pin'?(pin?'NIP incorrecto':'Escribe tu NIP'):r.err==='weak'?'4 a 8 números':r.err==='lock'?'Espera 10 min':r.err==='bloq'?'Cuenta bloqueada. Habla con Fer para desbloquearla.':'No se pudo entrar';const pi=document.getElementById('pin');if(pi){pi.value='';lgDraw()}const dd=document.getElementById('dots');if(dd){dd.classList.remove('sh');void dd.offsetWidth;dd.classList.add('sh')}return}
+    TOK=r.token;ME=r.name;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);if(r.pc)lset('crm-pcack',String(r.pc));LFORGOT=0;
     const x=await pull();if(x==='err'||x==='auth'){e.textContent='No se pudo cargar los datos';return}
     finishBoot();
   }catch(err){e.textContent='Sin conexión'}
