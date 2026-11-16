@@ -953,6 +953,42 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .vtcs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
 .vtcb{flex:none;border:1.5px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:999px;padding:9px 14px;font:700 14px/1 system-ui,-apple-system,sans-serif}
 .vtcb.on{background:#18202b;color:#fff;border-color:#18202b}
+#sgw .sgc{border:1px solid var(--ln);background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px}
+#sgw h4{margin:0 0 10px;font-size:15px}
+#sgw .sgg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#sgw label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu);min-width:0}
+#sgw label small{font-size:11px}
+#sgw select,#sgw input[type=text],#sgw input[type=email],#sgw input[type=date],#sgw input:not([type]),#sgw input[inputmode]{border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:10px;padding:11px;font:inherit;font-size:15px;width:100%;min-width:0;box-sizing:border-box}
+#sgw input.bad,#sgw select.bad{border-color:#d33}
+#sgw em{font-style:normal;font-size:11px;color:var(--mu)}
+#sgw em.bad{color:#d33}#sgw em.warn{color:#b7791f}
+#sgw .sgp{display:grid;grid-template-columns:1fr;gap:8px}
+#sgw .sgpk{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:2px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:12px;padding:11px 13px;font:inherit}
+#sgw .sgpk span{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+#sgw .sgpk b{font-size:20px}
+#sgw .sgpk small{font-size:12px;color:var(--mu)}
+#sgw .sgpk.on{border-color:#6d5dfc;background:rgba(109,93,252,.08)}
+#sgw .sgs{font-size:14px;line-height:1.5;margin-bottom:10px}
+#sgw .sgck{flex-direction:row;align-items:flex-start;gap:8px;font-size:13px;color:var(--tx);margin:6px 0}
+#sgw .sgck input{width:20px;height:20px;flex:none}
+#sgw .sgbtn{display:block;width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#6d5dfc,#c026d3);color:#fff;font:inherit;font-size:15px;font-weight:700;padding:14px;margin-top:10px}
+#sgw .sgbtn.sec{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
+#sgw .sgbtn:disabled{opacity:.5}
+#sgw .sgerr{border:1px solid #d33;background:rgba(221,51,51,.08);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+#sgw .sgdu{border:1px solid #d69e2e;background:rgba(214,158,46,.1);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+#sgw .sgda{display:flex;gap:8px}#sgw .sgda .sgbtn{flex:1}
+#sgw .sgok{border-color:#2f9e5b}
+#sgw .sgok .bad{color:#d33}
+#sgw .sgh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--ln)}
+#sgw .sgh:first-child{border-top:0}
+#sgw .sgh small{display:block;color:var(--mu);font-size:11px}
+#sgw .sgr{display:flex;align-items:center;gap:8px;white-space:nowrap}
+#sgw .sgmini{border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:8px;padding:6px 10px;font:inherit;font-size:12px}
+#sgw .sgcfg{margin-top:12px;border-top:1px solid var(--ln);padding-top:10px}
+#sgw .sgfile{position:relative;border:2px dashed var(--ln);border-radius:12px;padding:14px 10px;text-align:center;align-items:center;gap:4px;color:var(--tx);font-size:13px;cursor:pointer}
+#sgw .sgfile input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+#sgw .sgfile span{font-weight:700}#sgw .sgfile i{font-style:normal;color:var(--mu);font-size:12px}
+#sgw .sgdet summary{cursor:pointer;font-size:14px;font-weight:600}
 </style>
 </head>
 <body>
@@ -2271,13 +2307,183 @@ function navSet(id){try{document.documentElement.classList.toggle('fdv',FERDEV()
 const IMG=[['Traslado diario','13DaPNJGQ8pwbCu0AI67puE6OhTKkkrBm',1],['Cuatrimoto','1ERQ5iCoFhkiYnnpXUvRd_REuSkKFqhLe',3],['Doble propósito','1fucT_n1HVF5bG7kDzNsj6qTQgGFJcXwK',4],['Deportiva','1zLSfk9ofF5EFZKZyA4TjqfLkzWOcPREj',6],['Scooter','1OQ_dsaspqImVZN6-bcmuxVS7NmO7Axj8',9],['Trabajo y carga','1AbFJPcvTrudYnClp5hnafaeZ51VPLpp0',2],['Chopper y custom','1OXa0XsgW6oQBeOk0qgNt9Mrn1Tc_9qb9',5]];
 const SEG=[["200/MH",46500,1852,5508,6916,2261,7745,9856],["250/MH 250CC",55000,1852,6176,7764,2261,8747,11128],["Acorazada 150cc",30500,1852,4250,5319,2261,5858,7462],["CCR200 (Plus)",39900,1852,4989,6257,2261,6966,8869],["Chopper Krathos 250",46500,1852,5508,6916,2261,7745,9856],["Jin 150cc",25000,1852,3818,4769,2261,5209,6637],["K29",69900,1852,7347,9252,2261,10504,13360],["KB300",35000,1852,4604,5768,2261,6389,8135],["KPM 250",69900,1852,7347,9252,2261,10504,13360],["KPR 250",69900,1852,7347,9252,2261,10504,13360],["KPT200",55000,1852,6176,7764,2261,8747,11128],["KPT400",139900,1852,12850,16238,2261,18758,23840],["LF110-2G",19900,1852,3417,4261,2261,4608,5874],["LF150-5",19900,1852,3417,4261,2261,4608,5874],["LF150T-12C",27900,1852,4046,5059,2261,5551,7072],["LF200-5",27800,1852,4038,5049,2261,5540,7056],["M12 150cc",27900,1852,4046,5059,2261,5551,7072],["Matt 150cc",27000,1852,3975,4970,2261,5445,6938],["Matt 250cc",33000,1852,4446,5568,2261,6153,7835],["MH150X",28700,1852,4108,5139,2261,5646,7192],["Motocarro Rampante 250cc (Plus)",65000,1852,6962,8762,2261,9926,12626],["MT 125cc",20000,1852,3424,4271,2261,4620,5889],["Pathcross 300",99000,1852,9635,12155,2261,13935,17716],["Pathcross 550 L (Lux / Defensa alta)",169000,1852,15138,19143,2261,22190,28197],["Pathcross 550 L (Pro)",165000,1852,14823,18742,2261,21718,27597],["Pathcross 550 L (Standard)",145000,1852,13251,16747,2261,19360,24603],["Pathcross 650 L",199000,1852,17496,22137,2261,25727,32688],["Pathcross L Mud Pro 1000",299000,1852,25357,32117,2261,37519,47659],["Raven 300cc",43500,1852,5272,6616,2261,7391,9407],["SS3",53000,1852,6019,7565,2261,8511,10830],["Starship 4",159900,1852,14422,18234,2261,21117,26834],["Starship 6",239000,1852,20641,26129,2261,30444,38677],["TigerCat 300cc",41700,1852,5130,6436,2261,7179,9137],["Titán 300cc",109000,1852,10421,13153,2261,15115,19213],["Trapper 150",18900,1852,3338,4161,2261,4490,5725],["V16S",89900,1852,8919,11247,2261,12862,16354],["V400",139900,1852,12850,16238,2261,18758,23840],["Worcross 650 (Sencillo)",299000,1852,25357,32117,2261,37519,47659],["Worcross 650 X3 (Puertas y winch)",329000,1852,27716,35111,2261,41057,52150],["Workcross 1000 X3 (HVAC)",409000,1852,34005,43096,2261,50490,64128],["Workcross 1000 X6 (HVAC)",529000,1852,43438,55074,2261,64640,82094],["X-Trail 150",29900,1852,4203,5259,2261,5787,7372]];
 const mxn=n=>'$'+Math.round(n).toLocaleString('es-MX');
+const SGP=[['Lo mínimo que necesitas.','Mínimo','Daños a terceros, defensa legal, muerte accidental, asistencia vial y servicios funerarios.'],['Recomendación Seguros Azteca.','Recomendado','Lo del mínimo + robo total y daños por pérdida total.'],['Mayor Protección.','Mayor','Lo del recomendado + pérdida parcial y gastos médicos.']];
+const SG={cat:null,q:{anio:'',marca:'',tipo:'',version:'',uso:'Particular',valorCap:''},pk:1,quote:null,busy:false,seq:0,hist:null};
+const sgMx=n=>n==null?'—':'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+const sgOpt=(arr,sel,ph)=>(ph!=null?`<option value="">${esc(ph)}</option>`:'')+arr.map(x=>{const v=Array.isArray(x)?x[0]:x,t=Array.isArray(x)?x[1]:x;return `<option value="${esc(v)}"${String(v)===String(sel)?' selected':''}>${esc(t)}</option>`}).join('');
+const sgUniq=a=>{const s={},o=[];a.forEach(x=>{const k=String(x).trim();if(!s[k]){s[k]=1;o.push(x)}});return o};
+const sgV=id=>{const e=document.getElementById(id);return e?e.value:''};
 function segView(){
   const m=document.getElementById('menu');
-  m.innerHTML=`<div class="in"><div class="mh2"><b>Seguros<small>Prima anual de contado, IVA incluido</small></b><button data-nv="moto">← Motos</button></div><input id="sgq" placeholder="Busca la moto (ej. 125, DM, cuatri)" autocomplete="off" style="width:100%;margin-bottom:10px"><div id="sgr"></div><div class="note" style="margin-top:10px">Recomendado = Seguros Azteca (robo y pérdida total). Mayor protección suma pérdida parcial y gastos médicos. Reparto/trabajo/mensajería/seguridad tiene otra tarifa.</div></div>`;m.style.display='block';
-  const q=document.getElementById('sgq'),r=document.getElementById('sgr');
-  const draw=()=>{const t=q.value.trim().toLowerCase();const L=SEG.filter(x=>!t||x[0].toLowerCase().includes(t));
-    r.innerHTML=L.length?L.map(x=>`<details class="sg"><summary><b>${esc(x[0])}</b><span>${mxn(x[1])}</span></summary><table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>${mxn(x[2])}</td><td>${mxn(x[5])}</td></tr><tr><td>Recomendado</td><td><b>${mxn(x[3])}</b></td><td><b>${mxn(x[6])}</b></td></tr><tr><td>Mayor</td><td>${mxn(x[4])}</td><td>${mxn(x[7])}</td></tr></table></details>`).join(''):'<div class="soonp">Sin resultados</div>'};
-  q.oninput=draw;draw();
+  m.innerHTML=`<div class="in" id="sgw"><div class="mh2"><b>Tramitar seguro<small>Cotiza y emite la póliza de Seguros Azteca</small></b><button data-nv="mas">← Más</button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
+  if(SG.cat){sgBuild();return}
+  api('seg_cat').then(r=>{if(!r||!r.ok)throw 0;SG.cat=r;sgBuild()}).catch(()=>{const b=document.getElementById('sgb');if(b)b.innerHTML='<div class="sgerr">No pude cargar el catálogo. Revisa tu conexión y vuelve a entrar.</div>'});
+}
+function sgBuild(){
+  const b=document.getElementById('sgb');if(!b)return;
+  b.className='';
+  b.innerHTML=`<div class="sgc"><h4>1 · Cotiza</h4><div class="sgg"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  sgSel();sgHist();
+  ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
+  document.getElementById('sgVal').oninput=sgChg;
+}
+function sgSel(){
+  const c=SG.cat.cat,q=SG.q;
+  const yrs=sgUniq(c.map(x=>x[0])).sort((a,b)=>b-a);
+  const mk=sgUniq(c.filter(x=>String(x[0])===String(q.anio)).map(x=>x[1])).sort();
+  const tp=sgUniq(c.filter(x=>String(x[0])===String(q.anio)&&x[1]===q.marca).map(x=>x[2])).sort();
+  const vr=sgUniq(c.filter(x=>String(x[0])===String(q.anio)&&x[1]===q.marca&&x[2]===q.tipo).map(x=>x[3])).sort();
+  document.getElementById('sgAnio').innerHTML=sgOpt(yrs,q.anio,'Elige');
+  document.getElementById('sgMarca').innerHTML=sgOpt(mk,q.marca,'Elige');
+  document.getElementById('sgTipo').innerHTML=sgOpt(tp,q.tipo,'Elige');
+  document.getElementById('sgVer').innerHTML=sgOpt(vr,q.version,'Elige');
+  document.getElementById('sgUso').innerHTML=sgOpt(SG.cat.usos,q.uso);
+  document.getElementById('sgValL').style.display=(Number(q.anio)>=2026)?'':'none';
+}
+function sgChg(ev){
+  const q=SG.q,id=ev&&ev.target&&ev.target.id;
+  q.anio=sgV('sgAnio');q.marca=sgV('sgMarca');q.tipo=sgV('sgTipo');q.version=sgV('sgVer');q.uso=sgV('sgUso')||'Particular';q.valorCap=sgV('sgVal').replace(/[^0-9]/g,'');
+  if(id==='sgAnio'){q.marca='';q.tipo='';q.version=''}
+  if(id==='sgMarca'){q.tipo='';q.version=''}
+  if(id==='sgTipo'){q.version=''}
+  if(Number(q.anio)<2026)q.valorCap='';
+  if(id!=='sgVal'&&id!=='sgUso')sgSel();
+  sgQuote();
+}
+function sgQuote(){
+  const q=SG.q,box=document.getElementById('sgQ'),f=document.getElementById('sgF');
+  if(!(q.anio&&q.marca&&q.tipo&&q.version)){SG.quote=null;box.innerHTML='';f.style.display='none';return}
+  const n=++SG.seq;box.innerHTML='<div class="note">Calculando…</div>';
+  api('seg_quote',{anio:q.anio,marca:q.marca,tipo:q.tipo,version:q.version,uso:q.uso,valorCap:q.valorCap}).then(r=>{
+    if(n!==SG.seq)return;
+    if(!r||!r.ok||r.valor==null){SG.quote=null;box.innerHTML='<div class="sgerr">Esa moto no está en el catálogo de Seguros Azteca.</div>';f.style.display='none';return}
+    SG.quote=r;sgQDraw();sgForm();
+  }).catch(()=>{if(n===SG.seq)box.innerHTML='<div class="sgerr">No pude cotizar. Intenta de nuevo.</div>'});
+}
+function sgQDraw(){
+  const r=SG.quote,box=document.getElementById('sgQ'),t=[r.total.min,r.total.rec,r.total.may];
+  box.innerHTML=`<div class="note" style="margin:8px 0">Valor ${Number(SG.q.anio)>=2026?'factura':'convenido'}: <b>${sgMx(r.valor)}</b> · Prima anual de contado con IVA</div><div class="sgp">`+SGP.map((p,i)=>`<button type="button" class="sgpk${SG.pk===i?' on':''}" data-pk="${i}"><span>${p[1]}</span><b>${sgMx(t[i])}</b><small>${p[2]}</small></button>`).join('')+`</div>`;
+  box.querySelectorAll('.sgpk').forEach(bt=>{bt.onclick=()=>{SG.pk=Number(bt.dataset.pk);sgQDraw();sgSum()}});
+}
+function sgField(id,lab,type,ph){return `<label>${lab}<input id="sg_${id}" type="${type||'text'}"${ph?` placeholder="${ph}"`:''} autocomplete="off"><em id="sge_${id}"></em></label>`}
+function sgSelF(id,lab,html,w){return `<label${w?' style="grid-column:1/-1"':''}>${lab}<select id="sg_${id}">${html}</select><em id="sge_${id}"></em></label>`}
+function sgForm(){
+  const f=document.getElementById('sgF');
+  if(f.dataset.built){sgSum();f.style.display='';return}
+  f.dataset.built='1';f.style.display='';
+  const C=SG.cat;
+  f.innerHTML=`<div class="sgc"><h4>2 · Sube las fotos</h4><div class="note" style="margin-bottom:8px">Se leen solas y tú solo confirmas.</div><div class="sgg"><label class="sgfile" id="sgfI"><span>INE (frente)</span><input type="file" accept="image/\x2A" id="sgI"><i id="sgIs">Subir foto</i></label><label class="sgfile" id="sgfF"><span>Factura de la moto</span><input type="file" accept="image/\x2A" id="sgFa"><i id="sgFs">Subir foto</i></label></div><div id="sgLd"></div></div><div class="sgc"><h4>3 · Confirma</h4><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet"><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div><div class="sgc"><h4>4 · Emitir</h4><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> El cliente autoriza que se le envíe la póliza a su correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  sgRegs();
+  document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
+  document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
+  document.getElementById('sgI').onchange=e=>sgFoto('ine',e.target.files[0]);
+  document.getElementById('sgFa').onchange=e=>sgFoto('factura',e.target.files[0]);
+  document.getElementById('sgGo').onclick=()=>sgEmit(false);
+  sgSum();
+}
+function sgSet(k,v){const e=document.getElementById('sg_'+k);if(e&&v!==''&&v!=null)e.value=v}
+function sgDefs(){
+  const rfc=sgV('sg_rfc');if(rfc.length!==13)return;
+  const pick=(id,re)=>{if(sgV(id))return;const e=document.getElementById(id);[...e.options].forEach(o=>{if(!sgV(id)&&re.test(o.value))e.value=o.value})};
+  pick('sg_regimen',/^616/);pick('sg_usoCfdi',/^G03/);
+}
+async function sgFoto(tipo,file){
+  if(!file)return;
+  const st=document.getElementById(tipo==='ine'?'sgIs':'sgFs'),ld=document.getElementById('sgLd');
+  st.textContent='Leyendo…';
+  let r;
+  try{const img=await shrink(file);r=await api('seg_leer',{img:img,tipo:tipo})}catch(e){r=null}
+  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No pude leer la foto. Intenta con otra más clara o captura los datos abajo.'}</div>`;document.getElementById('sgDet').open=true;return}
+  st.textContent='Listo ✓ (toca para cambiarla)';
+  const d=r.d,notes=(r.dudas||[]).slice();
+  if(tipo==='ine'){
+    ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia'].forEach(k=>sgSet(k,d[k]));
+    if(d.estado)sgSet('estado',d.estado);
+    if(d.rfc10&&!sgV('sg_rfc')){sgSet('rfc',d.rfc10);document.getElementById('sgRh').innerHTML='Ya puse las 10 primeras letras y números del RFC (salen del CURP). <b>Agrega la homoclave (3 caracteres)</b> de la constancia fiscal del cliente.'}
+    sgRegs();sgDefs();
+  }else{
+    ['serie','motor','color'].forEach(k=>sgSet(k,d[k]));
+    if(d.anio&&SG.q.anio&&Number(d.anio)!==Number(SG.q.anio))notes.push('La factura dice año '+d.anio+' y cotizaste '+SG.q.anio+'.');
+    const wd=String(SG.q.version).toUpperCase().split(/\s+/).filter(x=>x.length>1),fm=String(d.modelo||'')+' '+String(d.marca||'');
+    if(d.modelo&&wd.length&&!wd.every(x=>fm.toUpperCase().indexOf(x)>=0))notes.push('La factura dice «'+d.modelo+'» y cotizaste «'+SG.q.marca+' '+SG.q.version+'». Confirma que sea la misma moto.');
+  }
+  ld.innerHTML=notes.length?`<div class="sgdu"><b>Revisa:</b><br>${notes.map(x=>'• '+esc(x)).join('<br>')}</div>`:'';
+  const miss=['nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','colonia','serie'].some(k=>!sgV('sg_'+k));
+  if(miss||notes.length)document.getElementById('sgDet').open=true;
+}
+function sgRegs(){
+  const rfc=sgV('sg_rfc'),p=rfc.length===13?'F':rfc.length===12?'M':'';
+  const keep=(id,arr)=>{const cur=sgV(id),L=arr.filter(x=>!p||x[1].indexOf(p)>=0).map(x=>x[0]);const e=document.getElementById(id);e.innerHTML=sgOpt(L,L.indexOf(cur)>=0?cur:'','Elige')};
+  keep('sg_regimen',SG.cat.reg);keep('sg_usoCfdi',SG.cat.cfdi);
+}
+function sgSum(){
+  const s=document.getElementById('sgS');if(!s||!SG.quote)return;
+  const t=[SG.quote.total.min,SG.quote.total.rec,SG.quote.total.may][SG.pk],q=SG.q;
+  s.innerHTML=`<b>${esc(q.marca)} ${esc(q.tipo)} ${esc(q.version)} ${esc(q.anio)}</b><br>${esc(SGP[SG.pk][1])} · uso ${esc(q.uso)}<br>Prima total: <b>${sgMx(t)}</b>`;
+}
+function sgDatos(){
+  const q=SG.q,d={anio:Number(q.anio),marca:q.marca,tipo:q.tipo,version:q.version,uso:q.uso,valorCap:q.valorCap===''?'':Number(q.valorCap),paquete:SGP[SG.pk][0]};
+  ['rfc','nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','numInt','colonia','regimen','usoCfdi','correo','beneficiario','serie','motor','placas','color','servicio'].forEach(k=>{d[k]=sgV('sg_'+k)});
+  d.autoriza=!!(document.getElementById('sg_autoriza')||{}).checked;
+  return d;
+}
+function sgClear(){document.querySelectorAll('#sgF em').forEach(e=>{e.textContent=''});document.querySelectorAll('#sgF .bad').forEach(e=>e.classList.remove('bad'))}
+function sgMark(list,cls){
+  let first=null;
+  list.forEach(x=>{const e=document.getElementById('sge_'+x.f),i=document.getElementById('sg_'+x.f);
+    if(e){e.textContent=(e.textContent?e.textContent+' · ':'')+x.m;e.className=cls}
+    if(i&&cls==='bad'){i.classList.add('bad')}
+    if(!first&&(i||e))first=i||e});
+  if(first&&first.scrollIntoView)first.scrollIntoView({block:'center',behavior:'smooth'});
+}
+async function sgEmit(force){
+  if(SG.busy||!SG.quote)return;
+  const btn=document.getElementById('sgGo'),msg=document.getElementById('sgM');
+  sgClear();msg.innerHTML='';
+  SG.busy=true;btn.disabled=true;btn.textContent='Emitiendo… (puede tardar unos segundos)';
+  let r;
+  try{r=await api('seg_emit',{datos:sgDatos(),force:!!force})}catch(e){r=null}
+  SG.busy=false;btn.disabled=false;btn.textContent='Emitir póliza';
+  if(!r){msg.innerHTML='<div class="sgerr">No pude comunicarme con el servidor. NO se sabe si la póliza se emitió: revisa abajo en “Pólizas emitidas” antes de volver a intentar.</div>';sgHist();return}
+  if(r.err){msg.innerHTML=`<div class="sgerr">${r.err==='auth'?'Tu sesión venció, entra otra vez.':esc(r.err)}</div>`;return}
+  if(!r.ok&&r.errs&&r.errs.length){
+    msg.innerHTML=`<div class="sgerr"><b>Falta corregir:</b><br>${r.errs.map(x=>'• '+esc(x.m)).join('<br>')}</div>`;
+    sgMark(r.errs,'bad');return}
+  if(!r.ok&&r.dudas&&r.dudas.length){
+    msg.innerHTML=`<div class="sgdu"><b>Antes de emitir, revisa esto:</b><br>${r.dudas.map(x=>'• '+esc(x.m)).join('<br>')}<div class="sgda"><button type="button" class="sgbtn sec" id="sgFix">Corregir</button><button type="button" class="sgbtn" id="sgYes">Está bien, emitir</button></div></div>`;
+    sgMark(r.dudas,'warn');
+    document.getElementById('sgFix').onclick=()=>{msg.innerHTML='';sgClear()};
+    document.getElementById('sgYes').onclick=()=>sgEmit(true);
+    return}
+  if(r.ok){sgDone(r)}
+}
+function sgDl(b64,name,mime){
+  const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  const url=URL.createObjectURL(new Blob([u],{type:mime||'application/pdf'}));
+  const a=document.createElement('a');a.href=url;a.download=name;a.target='_blank';document.body.appendChild(a);a.click();
+  setTimeout(()=>{a.remove();URL.revokeObjectURL(url)},60000);
+}
+function sgDone(r){
+  const o=document.getElementById('sgR'),f=document.getElementById('sgF'),qb=document.getElementById('sgQ');
+  f.style.display='none';qb.style.display='none';
+  o.innerHTML=`<div class="sgc sgok"><h4>Póliza emitida</h4><div class="sgs">Número: <b>${esc(r.poliza)}</b><br>Prima total: <b>${sgMx(r.total)}</b><br>${r.correo?'Se envió al correo del cliente.':'<span class="bad">No se pudo enviar al correo del cliente: descárgala y mándala tú.</span>'}</div><button class="sgbtn" id="sgDl" type="button">Descargar póliza (PDF)</button><button class="sgbtn sec" id="sgNew" type="button">Nueva póliza</button></div>`;
+  document.getElementById('sgDl').onclick=()=>sgDl(r.pdf,r.nombre,'application/pdf');
+  document.getElementById('sgNew').onclick=()=>{o.innerHTML='';SG.q={anio:'',marca:'',tipo:'',version:'',uso:'Particular',valorCap:''};SG.pk=1;SG.quote=null;sgBuild()};
+  sgHist();
+  try{o.scrollIntoView({block:'start',behavior:'smooth'})}catch(e){}
+}
+async function sgHist(){
+  const h=document.getElementById('sgH');if(!h)return;
+  let r;try{r=await api('seg_list')}catch(e){r=null}
+  if(!document.getElementById('sgH'))return;
+  if(!r||!r.ok){h.textContent='No pude cargar el historial.';return}
+  const adm=ME==='Fer';
+  const cfg=adm?`<div class="sgcfg"><small>Último consecutivo real usado (la siguiente póliza será el número siguiente)</small><div style="display:flex;gap:8px"><input id="sgLast" inputmode="numeric" placeholder="Ej. 245"><button class="sgbtn sec" id="sgSave" type="button">Guardar</button></div><div id="sgCfgM" class="note"></div></div>`:'';
+  h.className='';
+  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b><small>${esc(x.poliza.slice(-11,-4))} · ${new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Mexico_City'})} · ${esc(x.paquete.replace(/\.$/,''))}${adm?' · '+esc(x.cuenta):''}</small></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-p="${esc(x.poliza)}" type="button">PDF</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
+  h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.p})}catch(e){g=null}bt.disabled=false;bt.textContent='PDF';if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
+  const sv=document.getElementById('sgSave');
+  if(sv)sv.onclick=async()=>{const v=sgV('sgLast').replace(/[^0-9]/g,'');if(!v)return;let g;try{g=await api('seg_cfg',{last:v})}catch(e){g=null}document.getElementById('sgCfgM').textContent=g&&g.ok?'Listo. La siguiente póliza será '+g.next:'No se pudo guardar.'};
 }
 const hm=n=>n>=60?Math.floor(n/60)+' h '+String(n%60).padStart(2,'0')+' min':n+' min';
 async function usoView(){
@@ -2990,7 +3196,7 @@ function navGo0(id){
   if(id==='ine')body=`<div class="fin" style="--k:var(--g4)"><div class="ft">Maxicash</div><div class="fb"><a class="fw" target="_blank" rel="noopener" href="${WA('ine maxicash')}">Por WhatsApp<small>Ana lo tramita</small></a><a class="fp" target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Abrir portal<small>Lo tramito yo</small></a></div></div><div class="fin" style="--k:var(--g3)"><div class="ft">Galgo</div><div class="fb"><a class="fw" target="_blank" rel="noopener" href="${WA('ine galgo')}">Por WhatsApp<small>Ana lo tramita</small></a><a class="fp" target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Abrir portal<small>Lo tramito yo</small></a></div></div><div class="note">Para cancelar escribe: <b>${INE_CANCEL}</b></div>`;
   else if(id==='moto'){if(PFOK())pfView();else motosView();return}
   else if(id==='ana'){anaView();return}
-  else if(id==='seg')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Sube tu <u>cotizaci\u00f3n</u> de seguro.</span></li><li><b>2</b><span>Los datos se capturan y se revisan solos.</span></li><li><b>3</b><span>Recibes tu <u>p\u00f3liza</u> en 5 segundos.</span></li></ol><div class="i10f">\u00a1Tu seguro sin capturar nada!</div></div>';
+  else if(id==='seg'){segView();return}
   else if(id==='tvent')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Sube la <u>factura</u> de la moto y la <u>INE</u> del cliente por ambos lados.</span></li><li><b>2</b><span>Se llenan solas todas las hojas de la venta: recibo, contrato, carta factura, p\u00f3liza y las dem\u00e1s.</span></li><li><b>3</b><span>Te queda el paquete completo listo para imprimir.</span></li></ol><div class="i10f">\u00a1Una venta lista en segundos!</div></div>';
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
