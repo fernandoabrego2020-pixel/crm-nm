@@ -1747,7 +1747,7 @@ function iaAsk(q){
 }
 function iaView(){
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in p2 iaw"><div class="p2h"><b>Ana</b>'+(FERDEV()?'':'<button class="p2s" id="mlo">Salir</button>')+'</div><div class="iam" id="iam"></div><form class="iaf" id="iaf" autocomplete="off"><input id="iaq" placeholder="Pregunta lo que sea…" enterkeyhint="send"><button type="submit">Enviar</button></form></div>';
+  m.innerHTML='<div class="in p2 iaw"><div class="p2h"><b>Ana</b>'+(FERDEV()&&ME==='Fer'?'':'<button class="p2s" id="mlo">Salir</button>')+'</div><div class="iam" id="iam"></div><form class="iaf" id="iaf" autocomplete="off"><input id="iaq" placeholder="Pregunta lo que sea…" enterkeyhint="send"><button type="submit">Enviar</button></form></div>';
   m.style.display='block';iaDraw();
   document.getElementById('iaf').onsubmit=e=>{e.preventDefault();const i=document.getElementById('iaq'),q=i.value.trim();if(q&&!IA.busy){i.value='';iaAsk(q)}};
 }
@@ -2238,14 +2238,14 @@ const navKey=role=>role==='vendedor'&&ANA_CON.includes(ME)?'vendana':role;
 const NLINK={panel:()=>GS(SH_PANEL),quejas:()=>GS(SH_QUEJAS),inv:()=>pisoUrl()};
 const NDEF={vendedor:'pros',director:'pros',tecnico:'conv',admin:'tram'};
 const NTIT={uso:'Tiempo de uso',quien:'Escribieron',conv:'Chats',make:'Gasto de Make',onoff:'Prender y apagar Anas',venta:'Registrar venta',tram:'Trámites'};
-const FERDEV=()=>lget('crm-ferdev')==='1';
+const FERDEV=()=>{const f=lget('crm-ferdev');if(f==='1')return true;if(f==='0'||!ME)return false;return (ROLE||roleOf(ME))==='vendedor'};
 function swCur(){return ME==='Fer'?(ROLE==='tecnico'?'@tecnico':'@vendedor'):'@'+ME}
 const SWL={'@vendedor':'Vendedores','@tecnico':'T\u00e9cnico','@Director':'Director','@Administrativo':'Administrativo'};
 function swOpts(){const c=swCur();return Object.keys(SWL).filter(k=>k!==c)}
 function swSel(){return '<select class="swx"><option value="" selected disabled>'+esc(SWL[swCur()]||'Cambiar')+'</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join('')+'</select>'}
 function swGo(name,lr){LU=name;LR=lr||roleOf(name);const st=toks()[name];if(st){lset('crm-tok',st);lset('crm-user',name);lset('crm-role',LR);boot();return}if(!PROT(name)){lset('crm-user',name);lset('crm-role',LR);viewLogin(name);return}showLogin()}
 function swTo(v){if(v==='@vendedor')return swGo('Fer','vendedor');if(v==='@tecnico')return swGo('Fer','tecnico');if(v&&v.charAt(0)==='@')swGo(v.slice(1))}
-function swFix(){if(!FERDEV())return;document.querySelectorAll('#menu button#mlo').forEach(b=>{b.outerHTML=swSel()})}
+function swFix(){if(!FERDEV()||ME!=='Fer')return;document.querySelectorAll('#menu button#mlo').forEach(b=>{b.outerHTML=swSel()})}
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('swx')){const v=t.value;t.value='';swTo(v)}});
 new MutationObserver(swFix).observe(document.getElementById('menu'),{childList:true,subtree:true});
 function navHide(){const n=document.getElementById('nav');n.style.display='none';document.body.classList.remove('hasnav');document.getElementById('menu').style.display='none'}
@@ -2254,7 +2254,7 @@ function navInit(){
   const n=document.getElementById('nav'),role=ROLE||roleOf(ME);
   let NV=(NAVS[navKey(role)]||[]).slice();
   if(FERDEV()&&NV.length&&!NV.some(x=>x[0]==='p2')){
-    if(role==='vendedor'&&ME==='Fer')NV=[['p2','Clientes','star'],['moto','Informaci\u00f3n','search'],['mapa','Cambaceo','pin'],['mas','M\u00e1s','grid']];
+    if(role==='vendedor')NV=[['p2','Clientes','star'],['moto','Informaci\u00f3n','search'],['mapa','Cambaceo','pin'],['mas','M\u00e1s','grid']];
     else if(role==='tecnico')NV=[['conv','Chats','chat'],['onoff','Anas','power'],['make','Gasto','coin'],['mas','M\u00e1s','grid']];
     else if(role==='director')NV=[['p2','Clientes','star'],['conv','Chats','chat'],['quien','Escribieron','bell'],['mas','M\u00e1s','grid']];
   }
@@ -2661,7 +2661,7 @@ const PF1=[['Cuatrimotos',[['treck-titan-300cc','Titan','300 cc'],['treck-warrio
 ['Trabajo',[['treck-trapper-150','Trapper','150 cc'],['treck-krathos-200cc','Krathos','200 cc'],['treck-jin-150cc','Jin','150 cc']]],
 ['Doble prop\u00f3sito',[['treck-matt-150cc','Matt','150 cc'],['treck-matt-250cc','Matt','250 cc'],['treck-raven-300cc','Raven','300 cc'],['treck-tigercat-300cc','TigerCat','300 cc'],['lifan-kpt200','KPT','200 cc']]],
 ['Veh\u00edculos comerciales',[['treck-motocarro-rampante-250cc-plus','Rampante','250 cc'],['winmex-motocarro-wm250','Motocarro WM','250 cc'],['winmex-motocarro-wm200','Motocarro WM','200 cc']]]];
-const PFOK=()=>FERDEV()&&ME==='Fer'&&(ROLE||roleOf(ME))==='vendedor';
+const PFOK=()=>FERDEV()&&(ROLE||roleOf(ME))==='vendedor';
 const pfSlug=n=>String(n||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 function pfJs(f){return PFL[f]||(PFL[f]=new Promise(r=>{const e=document.createElement('script');e.src=f+'?v=1';e.onload=()=>r(1);e.onerror=()=>{PFL[f]=0;r(0)};document.head.appendChild(e)}))}
 function pfDraw1(){
@@ -2673,7 +2673,7 @@ function pfView(){
   m.innerHTML='<div class="pf" id="pf"></div>';m.style.display='block';m.scrollTop=0;
   const p=document.getElementById('pf');
   p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay(pl.dataset.pfplay);return}const lc=e.target.closest&&e.target.closest('[data-pfloc]');if(lc){pfLoc(lc.dataset.pfloc);return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
-  p.onchange=e=>{if(e.target.id==='pfs'){PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s}};
+  p.onchange=e=>{if(e.target.id==='pfs'){PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s;pfLocVid()}};
   pfDraw1();
   pfJs('pf1.js').then(()=>{if(CUR==='moto'&&PFS.v===1&&document.getElementById('pf'))pfDraw1()});
   if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
@@ -2706,10 +2706,22 @@ function pfSeg(m){
 }
 function pfVidBox(m,u,k){
   k=k||'';
-  if(!u)return '<div class="pfvn"><b>'+(k?'Todavía no hay video de la tienda':'Todavía no hay video de esta moto')+'</b>'+(FERDEV()?'<a target="_blank" rel="noopener" href="https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/edit">Agregar el link en el Sheet videos-motos'+(k?' (columna C)':'')+'</a>':'')+'</div>';
+  if(!u)return '<div class="pfvn"><b>'+(k==='3'?'Todavía no hay video de esta tienda':k?'Todavía no hay video de la tienda':'Todavía no hay video de esta moto')+'</b>'+(ME==='Fer'?'<a target="_blank" rel="noopener" href="https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/edit">Agregar el link en el Sheet videos-motos'+(k==='3'?' (pestaña Tiendas)':k?' (columna C)':'')+'</a>':'')+'</div>';
   const v=pfVid(u);
-  const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-pfplay="'+(k?'2':'1')+'" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
+  const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-pfplay="'+(k||'1')+'" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
   return '<div class="pfvb" id="pfvb'+k+'" data-u="'+esc(u)+'">'+play+'</div><div class="pfva"><button data-pfcp="'+esc(u)+'">Copiar link</button><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/?text='+encodeURIComponent((k?'Video de la tienda · ':'')+m.n+': '+u)+'">Mandar por WhatsApp</a></div>'
+}
+const PFT={d:null,t:0,p:null};
+function pfTi(){
+  if(PFT.d&&Date.now()-PFT.t<6e4)return Promise.resolve(PFT.d);
+  if(PFT.p)return PFT.p;
+  PFT.p=fetch('https:\x2F\x2Fdocs.google.com/spreadsheets/d/'+PFVID+'/gviz/tq?tqx=out:csv&sheet=Tiendas&_='+Date.now()).then(r=>r.ok?r.text():Promise.reject()).then(t=>{const M={};pfCsv(t).slice(1).forEach(x=>{const k=String(x[0]||'').trim().toLowerCase(),u=String(x[1]||'').trim();if(k&&/^https?:/i.test(u))M[k]=u});PFT.d=M;PFT.t=Date.now();PFT.p=null;return M}).catch(()=>{PFT.p=null;return PFT.d||{}});
+  return PFT.p
+}
+function pfLocVid(){
+  const sel=document.getElementById('pfls');if(!sel)return;
+  const k=sel.value||'lerma',nm=(MSUC.find(x=>x[0]===k)||[k,k])[1];
+  pfTi().then(M=>{const w=document.getElementById('pfvw3');if(w&&document.getElementById('pfls')&&document.getElementById('pfls').value===k)w.innerHTML=pfVidBox({n:'Novamotos '+nm},M[k]||'','3')})
 }
 const PFLOC={
 lerma:['https:\x2F\x2Fmaps.app.goo.gl/MkyHAj7k4sTySNk7A','Av. de Las Partidas 602 esq. P.º del Cedro, Fracc. Cedros, C.P. 52004','722 155 6623','Lunes a sábado, 10:00 a 19:00'],
@@ -2726,7 +2738,7 @@ function pfLoc(a){
   pfCopy(t,'Ubicación copiada')
 }
 function pfPlay(k){
-  const b=document.getElementById('pfvb'+(k==='2'?'2':''));if(!b)return;const v=pfVid(b.dataset.u);
+  const b=document.getElementById('pfvb'+(k==='2'||k==='3'?k:''));if(!b)return;const v=pfVid(b.dataset.u);
   b.innerHTML=v.k==='mp'?'<video src="'+esc(v.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(v.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
 }
 function pfDraw3(){
@@ -2743,10 +2755,11 @@ function pfDraw3(){
   +'<div class="pfc"><h4>Video de la moto</h4><div id="pfvw"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
   +'<div class="pfc"><h4>Video de la tienda</h4><div id="pfvw2"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
   +'<div class="pfc"><h4>Dónde hay</h4><div class="pfxs">'+ex+'</div></div>'
-  +'<div class="pfc"><h4>Ubicación de la tienda</h4><label class="pfss pfls"><select id="pfls">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===sk?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>\u25bc</i></label><div class="pfva"><button data-pfloc="c">Copiar ubicación</button><button data-pfloc="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Maps, dirección, WhatsApp y horario, como los manda Ana.</div></div>'
+  +'<div class="pfc"><h4>Ubicación de la tienda</h4><label class="pfss pfls"><select id="pfls">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===sk?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>\u25bc</i></label><div id="pfvw3" style="margin-top:12px"></div><div class="pfva"><button data-pfloc="c">Copiar ubicación</button><button data-pfloc="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Maps, dirección, WhatsApp y horario, como los manda Ana.</div></div>'
   +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">Cargando ficha…</div></div></div>'
   +'<div class="pfc mtd"><div class="sg"><b>Seguro</b>'+pfSeg(m)+'</div></div>';
   pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw');if(w)w.innerHTML=pfVidBox(m,M[mnorm(m.n)]||'');const w2=document.getElementById('pfvw2');if(w2)w2.innerHTML=pfVidBox(m,M[mnorm(m.n)+'#2']||'','2')});
+  pfLocVid();
   api('ficha',{n:m.n}).then(f=>f,()=>null).then(f=>{if(PFS.v!==3||PFS.m!==m.n)return;const b=document.getElementById('pff');if(b)b.innerHTML=mFicha(f,m.n)})
 }
 const PFS={k:'',s:'',v:1,m:''};
@@ -2783,7 +2796,7 @@ async function pfOpen(k){
 async function motosView(){
   MV.s=mSucKey(S.ag);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  const FD=FERDEV()&&ME==='Fer'&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div><div class="lkx lk2"><button data-nv="ana">Ana<small>Horario, bloqueados y precios</small></button><button data-nv="anacat">Actualizar cat\u00e1logo<small>Precios e inventario</small></button></div>':'';
+  const FD=FERDEV()&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div><div class="lkx lk2"><button data-nv="ana">Ana<small>Horario, bloqueados y precios</small></button><button data-nv="anacat">Actualizar cat\u00e1logo<small>Precios e inventario</small></button></div>':'';
   m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>`}<div id="mtb"></div></div>`;m.style.display='block';
   const b=document.getElementById('mtb');
   b.onchange=e=>{const t=e.target;if(t.id==='mtu'){MV.u=t.value;mChips();mDrawList();mStrip()}else if(t.id==='mts'){MV.s=t.value;mChips();mDrawList();mStrip()}};
@@ -2868,7 +2881,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   else if(a==='apply'){const items=AV.ft.ch.filter(x=>x.on).map(x=>({r:x.r,n:x.n,p:x.p}));if(items.length)avCatSave(items)}}
 async function anaView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in" id="avi">${FERDEV()&&ME==='Fer'?'<button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button>':''}<div class="mh2"><b>Ana<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="avi">${FERDEV()?'<button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button>':''}<div class="mh2"><b>Ana<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
   const b=document.getElementById('avb');AV.sub='';AV.ft=null;AV.ed={};
   b.onclick=avClick;
   b.onchange=e=>{const t=e.target;
@@ -2889,11 +2902,12 @@ function masView(){
   const ch='<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',ex='<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>';
   const L=(t,h)=>'<a class="mxt" target="_blank" rel="noopener" href="'+h+'"><span>'+t+'</span>'+ex+'</a>';
   const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
-  const G=a=>'<div class="mxg">'+a.join('')+'</div>';
+  const TAIL=ME==='Fer'?[]:['<button class="mxt" id="mlo2"><span>Cerrar sesión</span></button>'];
+  const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
   const ANAT=[N('Tablero de Ana','ana'),N('Precios e inventario de Ana','anacat')];
   const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),L('WhatsApp de Ana general','https:\x2F\x2Fwa.me/'+ANA)].concat(ANAT,[N('Flujo de venta','flujo'),N('Tramitar seguro','seg')]));
+  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat([L('WhatsApp de Ana general','https:\x2F\x2Fwa.me/'+ANA)]).concat(ANAT,[N('Flujo de venta','flujo'),N('Tramitar seguro','seg')]));
   else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
