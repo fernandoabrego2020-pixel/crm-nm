@@ -539,7 +539,7 @@ body.p2lock{overflow:hidden}
 .lkx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
 .lkx a{display:flex;align-items:center;justify-content:center;min-height:50px;border-radius:12px;font-weight:700;font-size:16px;text-decoration:none;color:#fff}
 .lkx a{flex-direction:column;gap:2px;text-align:center;line-height:1.2}.lkx a small{font-weight:500;font-size:12px;opacity:.92}
-body.fermap #mtop,body.fermap #mvis,body.fermap #mdock .r2b,body.fermap #mrs{display:none!important}
+body.fermap #mtop,body.fermap #mvis,body.fermap #mdock .r2b,body.fermap #mrs,body.fermap #mleg{display:none!important}
 body.fermap #mdock .r2{grid-template-columns:1fr 1fr!important}
 .p2f{background:#fff;border:1px solid #dfe3e9;border-radius:12px;padding:12px;margin-bottom:12px}
 .p2f b{display:block;font-size:14px;margin-bottom:4px}
@@ -681,8 +681,12 @@ body.p2lock #toast{z-index:90}
 .mxg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .mxt{position:relative;display:flex;align-items:center;justify-content:center;text-align:center;box-sizing:border-box;width:100%;height:96px;padding:10px 22px;border-radius:14px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:600;line-height:1.25;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .mxt:active{background:var(--ln)}
-.mxs{overflow:hidden}
-.mxs .swx{position:absolute;left:0;top:0;width:100%;height:100%;max-width:none;opacity:0;border:0;border-radius:14px;font-size:16px}
+.i10{background:var(--card);border:1.5px solid var(--ln);border-radius:14px;padding:18px 16px}
+.i10p{display:inline-block;background:#fef3c7;color:#92400e;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700;margin-bottom:14px}
+.i10 ol{list-style:none;margin:0;padding:0}
+.i10 li{display:flex;gap:12px;align-items:flex-start;margin-bottom:14px;font-size:16px;line-height:1.4}
+.i10 li b{flex:none;width:28px;height:28px;border-radius:50%;background:var(--tx);color:var(--card);display:flex;align-items:center;justify-content:center;font-size:14px}
+.i10f{font-size:18px;font-weight:800;margin-top:6px}
 .mxt svg{position:absolute;top:9px;right:9px;width:14px;height:14px;fill:none;stroke:var(--mu);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
 .p2mo{display:flex;align-items:center;justify-content:space-between;width:100%;box-sizing:border-box;min-height:40px;padding:0 4px;background:none;border:0;color:var(--mu);font:inherit;font-size:13px;font-weight:600;text-align:left;cursor:pointer}
@@ -2885,12 +2889,11 @@ function masView(){
   const ch='<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',ex='<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>';
   const L=(t,h)=>'<a class="mxt" target="_blank" rel="noopener" href="'+h+'"><span>'+t+'</span>'+ex+'</a>';
   const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
-  const TAIL=(FERDEV()?['<label class="mxt mxs"><span>Cambiar de perfil</span>'+swSel()+'</label>']:[]).concat(['<button class="mxt" id="mlo2"><span>Cerrar sesi\u00f3n</span></button>']);
-  const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
+  const G=a=>'<div class="mxg">'+a.join('')+'</div>';
   const ANAT=[N('Tablero de Ana','ana'),N('Precios e inventario de Ana','anacat')];
   const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),L('WhatsApp de Ana general','https:\x2F\x2Fwa.me/'+ANA)].concat(ANAT,[N('Flujo de venta','flujo')]));
+  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),L('WhatsApp de Ana general','https:\x2F\x2Fwa.me/'+ANA)].concat(ANAT,[N('Flujo de venta','flujo'),N('Tramitar seguro','seg')]));
   else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
@@ -2916,11 +2919,12 @@ function navGo0(id){
   else if(id==='seg'){segView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
+  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda la INE por ambos lados a <u>Ana general</u>, con el correo y el n\u00famero del cliente.</span></li><li><b>2</b><span>Ana sola la tramita en las dos financieras: <u>Galgo</u> y <u>Maxicash</u>.</span></li><li><b>3</b><span>Ana sola contacta al cliente para que le pase el NIP.</span></li></ol><div class="i10f">\u00a1Todo m\u00e1s f\u00e1cil con Ana!</div></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
-  const tt=id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
+  const tt=id==='ine10'?'Tramitar INE en 10 segundos':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
   m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
@@ -3043,9 +3047,9 @@ const MAPM=(function(){
       cx.lineCap='butt';
       cx.font='700 13px system-ui,sans-serif';cx.lineWidth=4;cx.strokeStyle='#000';cx.strokeText('Tú estás aquí',x+20,y+5);cx.fillStyle='#fff';cx.fillText('Tú estás aquí',x+20,y+5);
     }
-    const stepR=niceStep(70/pxm),len=stepR*pxm,bx=14,by=Hh-16;
+    if(!FERDEV()){const stepR=niceStep(70/pxm),len=stepR*pxm,bx=14,by=Hh-16;
     const lt=map&&!dark;[[lt?'rgba(255,255,255,.9)':'#000',5],[lt?'#14151f':'#e8eaee',2]].forEach(a=>{cx.strokeStyle=a[0];cx.lineWidth=a[1];cx.beginPath();cx.moveTo(bx,by-5);cx.lineTo(bx,by);cx.lineTo(bx+len,by);cx.lineTo(bx+len,by-5);cx.stroke()});
-    cx.font='12px system-ui,sans-serif';cx.lineWidth=3;cx.strokeStyle=lt?'rgba(255,255,255,.9)':'#000';cx.strokeText(fmtM(stepR),bx,by-9);cx.fillStyle=lt?'#14151f':'#e8eaee';cx.fillText(fmtM(stepR),bx,by-9);
+    cx.font='12px system-ui,sans-serif';cx.lineWidth=3;cx.strokeStyle=lt?'rgba(255,255,255,.9)':'#000';cx.strokeText(fmtM(stepR),bx,by-9);cx.fillStyle=lt?'#14151f':'#e8eaee';cx.fillText(fmtM(stepR),bx,by-9)}
     if(map){cx.font='10px system-ui,sans-serif';cx.fillStyle='#8a8f9c';cx.textAlign='right';cx.fillText('© OpenStreetMap',W-6,Hh-6);cx.textAlign='left'}
   }
   const DAYMS=864e5;
@@ -3086,7 +3090,7 @@ const MAPM=(function(){
     document.querySelector('#mdock .r2').style.gridTemplateColumns=r?'1fr':'';
     document.querySelector('#mdock .r2b').style.display=r?'grid':'none';
     hideCard();closeFind();$('mrs').className='mfs';mv=null;mt();resize();
-    if(r){renderR();fit();say('Solo rutas. Toca Rutas para ver cada día.')}else{fit();say(pts().length+' con ubicación · '+S.leads.filter(x=>x.own===S.ag&&!x.loc).length+' sin ubicación')}
+    if(r){renderR();fit();say('Solo rutas. Toca Rutas para ver cada día.')}else{fit();say(FERDEV()?'':pts().length+' con ubicación · '+S.leads.filter(x=>x.own===S.ag&&!x.loc).length+' sin ubicación')}
     draw();
   }
   function bufSave(){lset('crm-rbuf',JSON.stringify(buf.slice(-300)))}
@@ -3275,7 +3279,7 @@ const MAPM=(function(){
       if(!mode)setMode('pros');
       const l=id&&S.leads.find(x=>x.id===id);
       if(l&&l.loc){V.cx=mx(l.loc[1]);V.cy=my(l.loc[0]);V.s=Math.max(V.s,0.5);showCard(l);draw()}
-      else{fit();const n=pts().length,m=S.leads.filter(x=>x.own===S.ag&&!x.loc).length;say(n+' con ubicación · '+m+' sin ubicación'+(FERDEV()?'':' · '+S.leads.filter(x=>x.own===S.ag&&x.vz).length+' por visitar'))}
+      else{fit();const n=pts().length,m=S.leads.filter(x=>x.own===S.ag&&!x.loc).length;say(FERDEV()?'':n+' con ubicación · '+m+' sin ubicación'+(FERDEV()?'':' · '+S.leads.filter(x=>x.own===S.ag&&x.vz).length+' por visitar'))}
     });
   }
   function hide(){if(!inited)return;if(tr)trEnd(0);mode='';mv=null;$('mapv').style.display='none';shown=false;closeFind();$('mrs').className='mfs'}
