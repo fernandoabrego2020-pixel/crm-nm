@@ -858,6 +858,18 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .p2lp{display:none!important}
 .lc .lt b{font-size:16px;line-height:21px}
 .lc .p2nw{font-size:10px;padding:2px 7px}
+
+#menu.pfon{padding:0;--bg:#e9ebee;background:#e9ebee;overflow-x:hidden}
+.pf{position:relative;display:flex;flex-direction:column;min-height:100%;max-width:560px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top,0px)) 6px 8px;background:repeating-linear-gradient(135deg,#f6f7f9 0 44px,#e1e4e8 44px 88px);color:#18202b}
+.pfr{align-self:flex-start;margin:6px 0 0 -6px;padding:6px 28px 6px 14px;background:linear-gradient(90deg,#f26a1b,#e8481c);color:#fff;font:900 14px/1 system-ui,-apple-system,sans-serif;letter-spacing:.05em;text-transform:uppercase;clip-path:polygon(0 0,100% 0,calc(100% - 14px) 100%,0 100%);border-radius:0 6px 6px 0;box-shadow:0 2px 6px rgba(0,0,0,.18)}
+.pfg{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:minmax(100px,1fr);flex:var(--n) 1 0;min-height:calc(var(--n)*100px)}
+.pfm{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;border:0;background:none;padding:2px 2px 3px;margin:0;min-width:0;min-height:0;cursor:pointer;-webkit-tap-highlight-color:transparent;font:inherit;color:inherit}
+.pfm:active{transform:scale(.96)}
+.pfm .pfi{flex:1;min-height:0;width:100%;position:relative}
+.pfm img{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 5px 4px rgba(0,0,0,.25))}
+.pfm b{display:block;margin-top:2px;color:#e8481c;font:900 italic 13px/1.05 system-ui,-apple-system,sans-serif;text-transform:uppercase;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 5px #fff}
+.pfm small{display:block;color:#e8481c;font:800 italic 11px/1.1 system-ui,-apple-system,sans-serif;text-shadow:0 0 3px #fff,0 0 3px #fff}
+.pfm .pfh{position:absolute;left:15%;right:15%;bottom:0;height:50%;border-radius:10px;background:rgba(0,0,0,.06)}
 </style>
 </head>
 <body>
@@ -2471,6 +2483,33 @@ function mDraw(){const b=document.getElementById('mtb');if(!b||!MV.d)return;{con
 const mSucKey=a=>{a=String(a||'');if(/aodes/i.test(a))return'aodes';const k=a.split(' ')[0].toLowerCase();return MSUC.some(x=>x[0]===k)?k:'lerma'};
 const SUCD={lerma:'1ngWM2hFas_i7chSZHgPNnZojWEnaKVJd',atlacomulco:'1eDYSyoKkHXOq3guBNIUvpUFLGSKhI4sq',santiago:'1jqyrs7wZ7sTpAj4lTM6vEhi9dernMb7K',tenancingo:'11viJBj0sjMD1RY504euhXOd9y30QVpZW',valle:'1jRUq053OCr7YIu1hdU6oiiyrlVAF4loH',aodes:'1vI6DtAeETFl8hRAWzZWIEd_iYaK5UmOD',almoloya:'1c5Mo2SIvuMJF7wk5V-rdXr9CaOtJxzYX'};
 const FLOWH='<div class="flx"><div class="flh">Flujo de venta</div><ol><li><b>Inter\u00e9s</b><span>\u00bfCu\u00e1l moto le gust\u00f3?</span></li><li><b>INE</b><span>P\u00eddela y t\u00e1mitala</span></li><li><b>Visita</b><span>Dale un d\u00eda: \u201c\u00bfma\u00f1ana o s\u00e1bado?\u201d</span></li><li><b>Urgencia</b><span>Algo real que pueda perder</span></li></ol></div>';
+
+const PFL={};
+const PF1=[['Cuatrimotos',[['treck-titan-300cc','Titan','300 cc'],['treck-warrior-200cc','Warrior','200 cc'],['winmex-mh150x','MH150X','150 cc']]],
+['Urbanas',[['treck-mt-125cc','MT 125',''],['treck-acorazada-150cc','Acorazada','150 cc'],['treck-m12-150cc','M12','150 cc'],['treck-chopper-krathos-250','Krathos','250 cc'],['lifan-ss3','SS3','200 cc'],['lifan-kpr-250','KPR','250 cc']]],
+['Trabajo',[['treck-trapper-150','Trapper','150 cc'],['treck-krathos-200cc','Krathos','200 cc'],['treck-jin-150cc','Jin','150 cc']]],
+['Doble prop\u00f3sito',[['treck-matt-150cc','Matt','150 cc'],['treck-matt-250cc','Matt','250 cc'],['treck-raven-300cc','Raven','300 cc'],['treck-tigercat-300cc','TigerCat','300 cc'],['lifan-kpt200','KPT','200 cc']]],
+['Veh\u00edculos comerciales',[['treck-motocarro-rampante-250cc-plus','Rampante','250 cc'],['winmex-motocarro-wm250','Motocarro WM','250 cc'],['winmex-motocarro-wm200','Motocarro WM','200 cc']]]];
+const PFOK=()=>FERDEV()&&ME==='Fer'&&(ROLE||roleOf(ME))==='vendedor';
+const pfSlug=n=>String(n||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+function pfJs(f){return PFL[f]||(PFL[f]=new Promise(r=>{const e=document.createElement('script');e.src=f+'?v=1';e.onload=()=>r(1);e.onerror=()=>{PFL[f]=0;r(0)};document.head.appendChild(e)}))}
+function pfDraw1(){
+  const p=document.getElementById('pf');if(!p)return;const I=window.PFI||{};
+  p.innerHTML=PF1.map(([t,L])=>'<div class="pfr">'+esc(t)+'</div><div class="pfg" style="--n:'+Math.ceil(L.length/3)+'">'+L.map(x=>'<button class="pfm" data-pf="'+x[0]+'"><span class="pfi">'+(I[x[0]]?'<img src="'+I[x[0]]+'" alt="">':'<span class="pfh"></span>')+'</span><b>'+esc(x[1])+'</b>'+(x[2]?'<small>'+esc(x[2])+'</small>':'')+'</button>').join('')+'</div>').join('')
+}
+function pfView(){
+  const m=document.getElementById('menu');m.classList.add('pfon');
+  m.innerHTML='<div class="pf" id="pf"></div>';m.style.display='block';m.scrollTop=0;
+  const p=document.getElementById('pf');
+  p.onclick=e=>{const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
+  pfDraw1();
+  pfJs('pf1.js').then(()=>{if(CUR==='moto'&&document.getElementById('pf'))pfDraw1()});
+  if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
+}
+function pfOpen(k){
+  const m=MV.d&&MV.d.m.find(x=>pfSlug(x.n)===k);
+  toast(m?(m.n+(m.p?' \u00b7 '+mxn(m.p):'')+' \u2014 el siguiente panfleto viene en la fase 2'):'El siguiente panfleto viene en la fase 2',1)
+}
 async function motosView(){
   MV.s=mSucKey(S.ag);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
@@ -2596,7 +2635,7 @@ function navGo0(id){
   if(id==='anacat'){AV.go='cat';id='ana'}
   MAPM.hide();navSet(id);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.classList.toggle('p2on',id==='p2'||id==='ia'||id==='mas');m.classList.toggle('iaon',id==='ia');
+  m.classList.toggle('p2on',id==='p2'||id==='ia'||id==='mas');m.classList.toggle('pfon',id==='moto'&&PFOK());m.classList.toggle('iaon',id==='ia');
   if(id==='pros'){m.style.display='none';return}
   if(id==='p2'){p2View();return}
   if(id==='ia'){iaView();return}
@@ -2605,7 +2644,7 @@ function navGo0(id){
   if(id==='lead'){m.style.display='none';navSet('pros');openSheet();return}
   let body='';
   if(id==='ine')body=`<div class="fin" style="--k:var(--g4)"><div class="ft">Maxicash</div><div class="fb"><a class="fw" target="_blank" rel="noopener" href="${WA('ine maxicash')}">Por WhatsApp<small>Ana lo tramita</small></a><a class="fp" target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Abrir portal<small>Lo tramito yo</small></a></div></div><div class="fin" style="--k:var(--g3)"><div class="ft">Galgo</div><div class="fb"><a class="fw" target="_blank" rel="noopener" href="${WA('ine galgo')}">Por WhatsApp<small>Ana lo tramita</small></a><a class="fp" target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Abrir portal<small>Lo tramito yo</small></a></div></div><div class="note">Para cancelar escribe: <b>${INE_CANCEL}</b></div>`;
-  else if(id==='moto'){motosView();return}
+  else if(id==='moto'){if(PFOK())pfView();else motosView();return}
   else if(id==='ana'){anaView();return}
   else if(id==='seg'){segView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
