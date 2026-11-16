@@ -769,7 +769,6 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 
 /* v103 */
 #menu.p2on{overflow-x:hidden;overscroll-behavior-x:none;touch-action:pan-y pinch-zoom}
-#p2b{overflow-x:clip}
 .p2t{position:sticky;top:-8px;z-index:4;background:var(--bg)}
 .p2t.stk{box-shadow:0 -60px 0 60px var(--bg),0 1px 0 var(--ln)}
 .p2t .p2c{flex:1 1 auto;min-width:0;padding:0 4px;justify-content:center}
@@ -801,6 +800,30 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 .lc .lt{align-items:center}
 .lc .lt small,.lc .lt small.d8,.lc .lt small.d14{color:var(--g8);font-weight:700}
 .lc .lt .p2wq{margin-left:2px}
+
+:root{--dk:#161b27;--dk2:#232a3a;--dkl:#2f3748}
+.p2h{background:var(--dk);box-shadow:0 0 0 100vmax var(--dk);clip-path:inset(-100vmax -100vmax 0 -100vmax);margin:0;padding-bottom:6px;min-height:50px}
+.p2h b{color:#fff}
+.p2h select{background:var(--dk2);border-color:var(--dkl);color:#fff}
+.p2r{margin-top:10px}
+.p2t{background:var(--dk);box-shadow:0 0 0 100vmax var(--dk);clip-path:inset(0 -100vmax);border-bottom:0}
+.p2t.stk{box-shadow:0 0 0 100vmax var(--dk);clip-path:inset(-100vmax -100vmax 0 -100vmax)}
+.p2t .p2c span{color:#a9b2c3}
+.p2t .p2c span.n{background:rgba(255,255,255,.14);color:#fff}
+.p2t .p2c.on span{color:#fff}
+.p2t .p2c.on,.p2t .p2c.on.imp,.p2t .p2c.on.neu,.p2t .p2c.on.bas{border-bottom-color:#8f89ff}
+.p2t .p2c.on span.n{background:#5b52e6;color:#fff}
+.p2t .tbq.sm{color:#dfe4ee}
+.p2t .tbq.sm.on{background:#fff;color:var(--dk)}
+.p2t.p2fx{background:var(--dk);box-shadow:0 4px 16px rgba(0,0,0,.35);clip-path:none}
+.p2t.p2fx .p2c.dzt{background:rgba(255,255,255,.08);border-color:#8f89ff}
+.p2t.p2fx .p2c.dzt.hot{border-color:var(--g1)}
+.p2t.p2fx .p2c.dzt.hot{background:var(--g1)}
+html.fdv #nav{background:var(--dk);border-top:0}
+html.fdv .nv{color:#98a2b5}
+html.fdv .nv.on{color:#fff}
+html.fdv .nv.on svg{background:rgba(255,255,255,.14)}
+html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 </style>
 </head>
 <body>
@@ -824,6 +847,7 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 <div id="nav"></div>
 <div id="login" class="loginov" style="display:flex"><div class="note">Cargando…</div></div>
 <script>
+try{document.documentElement.classList.toggle('fdv',localStorage.getItem('crm-ferdev')==='1')}catch(e){}
 const H=3600e3,D=24*H;
 const AG=['Fer','Lerma Zayuri','Lerma Mario','Lerma Leo','Santiago Katy','Santiago Maggy','Valle Andrea','Valle Carlos','Valle Aodes Karla','Atlacomulco','Almoloya','Tenancingo Alexis','Tenancingo Toño'];
 const ACC={Fer:'fer','Lerma Zayuri':'lerma','Lerma Mario':'lerma','Lerma Leo':'lerma','Santiago Katy':'santiago','Santiago Maggy':'santiago','Valle Andrea':'valle','Valle Carlos':'valle','Valle Aodes Karla':'aodes',Atlacomulco:'atlacomulco',Almoloya:'almoloya','Tenancingo Alexis':'tenancingo','Tenancingo Toño':'tenancingo'};
@@ -1980,7 +2004,7 @@ function navInit(){
   n.style.display='flex';n.style.justifyContent='space-around';document.body.classList.add('hasnav');window.__nbadge(window.__nb||0);
   navGo(NV.some(x=>x[0]==='p2')?'p2':(NDEF[role]||'pros'));
 }
-function navSet(id){CUR=id;const bs=document.querySelectorAll('#nav .nv');let hit=0;bs.forEach(b=>{if(b.dataset.nv===id)hit=1});bs.forEach(b=>b.classList.toggle('on',b.dataset.nv===id||(!hit&&b.dataset.nv==='mas')))}
+function navSet(id){try{document.documentElement.classList.toggle('fdv',FERDEV())}catch(e){}CUR=id;const bs=document.querySelectorAll('#nav .nv');let hit=0;bs.forEach(b=>{if(b.dataset.nv===id)hit=1});bs.forEach(b=>b.classList.toggle('on',b.dataset.nv===id||(!hit&&b.dataset.nv==='mas')))}
 const IMG=[['Traslado diario','13DaPNJGQ8pwbCu0AI67puE6OhTKkkrBm',1],['Cuatrimoto','1ERQ5iCoFhkiYnnpXUvRd_REuSkKFqhLe',3],['Doble propósito','1fucT_n1HVF5bG7kDzNsj6qTQgGFJcXwK',4],['Deportiva','1zLSfk9ofF5EFZKZyA4TjqfLkzWOcPREj',6],['Scooter','1OQ_dsaspqImVZN6-bcmuxVS7NmO7Axj8',9],['Trabajo y carga','1AbFJPcvTrudYnClp5hnafaeZ51VPLpp0',2],['Chopper y custom','1OXa0XsgW6oQBeOk0qgNt9Mrn1Tc_9qb9',5]];
 const SEG=[["200/MH",46500,1852,5508,6916,2261,7745,9856],["250/MH 250CC",55000,1852,6176,7764,2261,8747,11128],["Acorazada 150cc",30500,1852,4250,5319,2261,5858,7462],["CCR200 (Plus)",39900,1852,4989,6257,2261,6966,8869],["Chopper Krathos 250",46500,1852,5508,6916,2261,7745,9856],["Jin 150cc",25000,1852,3818,4769,2261,5209,6637],["K29",69900,1852,7347,9252,2261,10504,13360],["KB300",35000,1852,4604,5768,2261,6389,8135],["KPM 250",69900,1852,7347,9252,2261,10504,13360],["KPR 250",69900,1852,7347,9252,2261,10504,13360],["KPT200",55000,1852,6176,7764,2261,8747,11128],["KPT400",139900,1852,12850,16238,2261,18758,23840],["LF110-2G",19900,1852,3417,4261,2261,4608,5874],["LF150-5",19900,1852,3417,4261,2261,4608,5874],["LF150T-12C",27900,1852,4046,5059,2261,5551,7072],["LF200-5",27800,1852,4038,5049,2261,5540,7056],["M12 150cc",27900,1852,4046,5059,2261,5551,7072],["Matt 150cc",27000,1852,3975,4970,2261,5445,6938],["Matt 250cc",33000,1852,4446,5568,2261,6153,7835],["MH150X",28700,1852,4108,5139,2261,5646,7192],["Motocarro Rampante 250cc (Plus)",65000,1852,6962,8762,2261,9926,12626],["MT 125cc",20000,1852,3424,4271,2261,4620,5889],["Pathcross 300",99000,1852,9635,12155,2261,13935,17716],["Pathcross 550 L (Lux / Defensa alta)",169000,1852,15138,19143,2261,22190,28197],["Pathcross 550 L (Pro)",165000,1852,14823,18742,2261,21718,27597],["Pathcross 550 L (Standard)",145000,1852,13251,16747,2261,19360,24603],["Pathcross 650 L",199000,1852,17496,22137,2261,25727,32688],["Pathcross L Mud Pro 1000",299000,1852,25357,32117,2261,37519,47659],["Raven 300cc",43500,1852,5272,6616,2261,7391,9407],["SS3",53000,1852,6019,7565,2261,8511,10830],["Starship 4",159900,1852,14422,18234,2261,21117,26834],["Starship 6",239000,1852,20641,26129,2261,30444,38677],["TigerCat 300cc",41700,1852,5130,6436,2261,7179,9137],["Titán 300cc",109000,1852,10421,13153,2261,15115,19213],["Trapper 150",18900,1852,3338,4161,2261,4490,5725],["V16S",89900,1852,8919,11247,2261,12862,16354],["V400",139900,1852,12850,16238,2261,18758,23840],["Worcross 650 (Sencillo)",299000,1852,25357,32117,2261,37519,47659],["Worcross 650 X3 (Puertas y winch)",329000,1852,27716,35111,2261,41057,52150],["Workcross 1000 X3 (HVAC)",409000,1852,34005,43096,2261,50490,64128],["Workcross 1000 X6 (HVAC)",529000,1852,43438,55074,2261,64640,82094],["X-Trail 150",29900,1852,4203,5259,2261,5787,7372]];
 const mxn=n=>'$'+Math.round(n).toLocaleString('es-MX');
