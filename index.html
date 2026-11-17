@@ -2312,7 +2312,7 @@ function navSet(id){try{document.documentElement.classList.toggle('fdv',FERDEV()
 const IMG=[['Traslado diario','13DaPNJGQ8pwbCu0AI67puE6OhTKkkrBm',1],['Cuatrimoto','1ERQ5iCoFhkiYnnpXUvRd_REuSkKFqhLe',3],['Doble propósito','1fucT_n1HVF5bG7kDzNsj6qTQgGFJcXwK',4],['Deportiva','1zLSfk9ofF5EFZKZyA4TjqfLkzWOcPREj',6],['Scooter','1OQ_dsaspqImVZN6-bcmuxVS7NmO7Axj8',9],['Trabajo y carga','1AbFJPcvTrudYnClp5hnafaeZ51VPLpp0',2],['Chopper y custom','1OXa0XsgW6oQBeOk0qgNt9Mrn1Tc_9qb9',5]];
 const SEG=[["200/MH",46500,1852,5508,6916,2261,7745,9856],["250/MH 250CC",55000,1852,6176,7764,2261,8747,11128],["Acorazada 150cc",30500,1852,4250,5319,2261,5858,7462],["CCR200 (Plus)",39900,1852,4989,6257,2261,6966,8869],["Chopper Krathos 250",46500,1852,5508,6916,2261,7745,9856],["Jin 150cc",25000,1852,3818,4769,2261,5209,6637],["K29",69900,1852,7347,9252,2261,10504,13360],["KB300",35000,1852,4604,5768,2261,6389,8135],["KPM 250",69900,1852,7347,9252,2261,10504,13360],["KPR 250",69900,1852,7347,9252,2261,10504,13360],["KPT200",55000,1852,6176,7764,2261,8747,11128],["KPT400",139900,1852,12850,16238,2261,18758,23840],["LF110-2G",19900,1852,3417,4261,2261,4608,5874],["LF150-5",19900,1852,3417,4261,2261,4608,5874],["LF150T-12C",27900,1852,4046,5059,2261,5551,7072],["LF200-5",27800,1852,4038,5049,2261,5540,7056],["M12 150cc",27900,1852,4046,5059,2261,5551,7072],["Matt 150cc",27000,1852,3975,4970,2261,5445,6938],["Matt 250cc",33000,1852,4446,5568,2261,6153,7835],["MH150X",28700,1852,4108,5139,2261,5646,7192],["Motocarro Rampante 250cc (Plus)",65000,1852,6962,8762,2261,9926,12626],["MT 125cc",20000,1852,3424,4271,2261,4620,5889],["Pathcross 300",99000,1852,9635,12155,2261,13935,17716],["Pathcross 550 L (Lux / Defensa alta)",169000,1852,15138,19143,2261,22190,28197],["Pathcross 550 L (Pro)",165000,1852,14823,18742,2261,21718,27597],["Pathcross 550 L (Standard)",145000,1852,13251,16747,2261,19360,24603],["Pathcross 650 L",199000,1852,17496,22137,2261,25727,32688],["Pathcross L Mud Pro 1000",299000,1852,25357,32117,2261,37519,47659],["Raven 300cc",43500,1852,5272,6616,2261,7391,9407],["SS3",53000,1852,6019,7565,2261,8511,10830],["Starship 4",159900,1852,14422,18234,2261,21117,26834],["Starship 6",239000,1852,20641,26129,2261,30444,38677],["TigerCat 300cc",41700,1852,5130,6436,2261,7179,9137],["Titán 300cc",109000,1852,10421,13153,2261,15115,19213],["Trapper 150",18900,1852,3338,4161,2261,4490,5725],["V16S",89900,1852,8919,11247,2261,12862,16354],["V400",139900,1852,12850,16238,2261,18758,23840],["Worcross 650 (Sencillo)",299000,1852,25357,32117,2261,37519,47659],["Worcross 650 X3 (Puertas y winch)",329000,1852,27716,35111,2261,41057,52150],["Workcross 1000 X3 (HVAC)",409000,1852,34005,43096,2261,50490,64128],["Workcross 1000 X6 (HVAC)",529000,1852,43438,55074,2261,64640,82094],["X-Trail 150",29900,1852,4203,5259,2261,5787,7372]];
 const mxn=n=>'$'+Math.round(n).toLocaleString('es-MX');
-const SGP=[['Lo mínimo que necesitas.','Mínimo','Daños a terceros, defensa legal, muerte accidental, asistencia vial y servicios funerarios.'],['Recomendación Seguros Azteca.','Recomendado','Lo del mínimo + robo total y daños por pérdida total.'],['Mayor Protección.','Mayor','Lo del recomendado + pérdida parcial y gastos médicos.']];
+const SGP=[['Lo mínimo que necesitas.','Mínimo','Terceros y asistencia'],['Recomendación Seguros Azteca.','Recomendado','+ Robo total'],['Mayor Protección.','Mayor','+ Daños parciales y médicos']];
 const SG={cat:null,q:{anio:'',marca:'',tipo:'',version:'',uso:'Particular',valorCap:''},pk:1,quote:null,busy:false,seq:0,hist:null};
 const sgMx=n=>n==null?'—':'$'+Number(n).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
 const sgOpt=(arr,sel,ph)=>(ph!=null?`<option value="">${esc(ph)}</option>`:'')+arr.map(x=>{const v=Array.isArray(x)?x[0]:x,t=Array.isArray(x)?x[1]:x;return `<option value="${esc(v)}"${String(v)===String(sel)?' selected':''}>${esc(t)}</option>`}).join('');
@@ -2320,14 +2320,14 @@ const sgUniq=a=>{const s={},o=[];a.forEach(x=>{const k=String(x).trim();if(!s[k]
 const sgV=id=>{const e=document.getElementById(id);return e?e.value:''};
 function segView(){
   const m=document.getElementById('menu');
-  m.innerHTML=`<div class="in" id="sgw"><div class="mh2"><b>Tramitar seguro<small>Cotiza y emite la póliza de Seguros Azteca</small></b><button data-nv="mas">← Más</button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="sgw"><div class="mh2"><b>Tramitar seguro<small>Seguros Azteca</small></b><button data-nv="mas">← Más</button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
   if(SG.cat){sgBuild();return}
   api('seg_cat').then(r=>{if(!r||!r.ok)throw 0;SG.cat=r;sgBuild()}).catch(()=>{const b=document.getElementById('sgb');if(b)b.innerHTML='<div class="sgerr">No pude cargar el catálogo. Revisa tu conexión y vuelve a entrar.</div>'});
 }
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><h4>1 · Sube tus archivos</h4><label class="sgfile" id="sgfC"><span>Cotización (Excel), INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca aquí y elige los 3 archivos desde Archivos</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>.</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><label class="sgfile" id="sgfC"><span>Subir INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca para elegir (Excel opcional)</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
   document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{const fl=[...e.target.files];e.target.value='';sgRoute(fl)};SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
@@ -2361,17 +2361,17 @@ function sgChg(ev){
 }
 function sgQuote(){
   const q=SG.q,box=document.getElementById('sgQ'),f=document.getElementById('sgF');
-  if(!(q.anio&&q.marca&&q.tipo&&q.version)){SG.quote=null;box.innerHTML='';f.style.display='none';return}
+  if(!(q.anio&&q.marca&&q.tipo&&q.version)){SG.quote=null;box.innerHTML='';sgSum();sgRdBtn();return}
   const n=++SG.seq;box.innerHTML='<div class="note">Calculando…</div>';
   return api('seg_quote',{anio:q.anio,marca:q.marca,tipo:q.tipo,version:q.version,uso:q.uso,valorCap:q.valorCap}).then(r=>{
     if(n!==SG.seq)return;
-    if(!r||!r.ok||r.valor==null){SG.quote=null;box.innerHTML='<div class="sgerr">Esa moto no está en el catálogo de Seguros Azteca.</div>';f.style.display='none';return}
+    if(!r||!r.ok||r.valor==null){SG.quote=null;box.innerHTML='<div class="sgerr">Moto fuera de catálogo.</div>';sgSum();sgRdBtn();return}
     SG.quote=r;sgQDraw();sgForm();sgCotApply();
   }).catch(()=>{if(n===SG.seq)box.innerHTML='<div class="sgerr">No pude cotizar. Intenta de nuevo.</div>'});
 }
 function sgQDraw(){
   const r=SG.quote,box=document.getElementById('sgQ'),t=[r.total.min,r.total.rec,r.total.may];
-  box.innerHTML=`<div class="note" style="margin:8px 0">Valor ${Number(SG.q.anio)>=2026?'factura':'convenido'}: <b>${sgMx(SG.q.valorCap&&Number(SG.q.anio)>=2026?Number(SG.q.valorCap):r.valor)}</b> · Prima anual de contado con IVA</div><div class="sgp">`+SGP.map((p,i)=>`<button type="button" class="sgpk${SG.pk===i?' on':''}" data-pk="${i}"><span>${p[1]}</span><b>${sgMx(t[i])}</b><small>${p[2]}</small></button>`).join('')+`</div>`;
+  box.innerHTML=`<div class="note" style="margin:10px 0 6px"><b>${esc(SG.q.marca)} ${esc(SG.q.version)} ${esc(SG.q.anio)}</b> · Elige plan</div><div class="sgp">`+SGP.map((p,i)=>`<button type="button" class="sgpk${SG.pk===i?' on':''}" data-pk="${i}"><span>${p[1]}</span><b>${sgMx(t[i])}</b><small>${p[2]}</small></button>`).join('')+`</div>`;
   box.querySelectorAll('.sgpk').forEach(bt=>{bt.onclick=()=>{SG.pk=Number(bt.dataset.pk);sgQDraw();sgSum()}});
 }
 function sgRd(f,a,b){return f.slice(a,b).arrayBuffer()}
@@ -2436,9 +2436,9 @@ async function sgCot(file){
   st.textContent='Leyendo…';ld.innerHTML='';
   let c=null;
   try{c=await sgCells(file)}catch(e){c=null}
-  if(!c||!c.C27||!c.H27||!c.P27||!c.X27){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML='<div class="sgerr">No encontré la moto en ese archivo. Sube el cotizador de Seguros Azteca ya guardado con año, marca, tipo y versión capturados.</div>';return}
+  if(!c||!c.C27||!c.H27||!c.P27||!c.X27){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML='<div class="sgerr">Excel sin moto. Usaré la factura.</div>';return}
   const e=SG.cat.cat.find(x=>Number(x[0])===Number(c.C27)&&sgNm(x[1])===sgNm(c.H27)&&sgNm(x[2])===sgNm(c.P27)&&sgNm(x[3])===sgNm(c.X27));
-  if(!e){st.textContent='Listo, pero la moto no está';ld.innerHTML='<div class="sgerr">Esa moto ('+esc(c.C27+' '+c.H27+' '+c.P27+' '+c.X27)+') no está en el catálogo de Seguros Azteca.</div>';return}
+  if(!e){st.textContent='Listo, pero la moto no está';ld.innerHTML='<div class="sgerr">Moto del Excel fuera de catálogo.</div>';return}
   const q=SG.q;
   q.anio=String(e[0]);q.marca=e[1];q.tipo=e[2];q.version=e[3];
   q.uso=SG.cat.usos.find(u=>sgNm(u)===sgNm(c.C31))||'Particular';
@@ -2450,15 +2450,15 @@ async function sgCot(file){
   sgSel();await sgQuote();
 }
 function sgCotApply(){
-  const o=SG.cot;if(!o||o.done===SG.seq)return;
-  o.done=SG.seq;
-  Object.keys(o.cl).forEach(k=>{if(o.cl[k])sgSet(k,o.cl[k])});
+  const o=SG.cot;if(!o||o.done)return;
+  o.done=1;
+  Object.keys(o.cl).forEach(k=>{if(o.cl[k]&&!sgV('sg_'+k))sgSet(k,o.cl[k])});
   if(o.serv)sgSet('servicio',o.serv);
   sgRegs();sgDefs();
   const t=SG.quote&&SG.quote.total?[SG.quote.total.min,SG.quote.total.rec,SG.quote.total.may]:null,ld=document.getElementById('sgCl'),bad=[];
-  if(t)o.tot.forEach((x,i)=>{if(x!=null&&Math.abs(x-t[i])>0.05)bad.push(SGP[i][1]+': tu Excel '+sgMx(x)+' y el sistema '+sgMx(t[i]))});
+  if(t)o.tot.forEach((x,i)=>{if(x!=null&&Math.abs(x-t[i])>0.05)bad.push(SGP[i][1]+': Excel '+sgMx(x)+' · sistema '+sgMx(t[i]))});
   const has=o.tot.some(x=>x!=null);
-  ld.innerHTML=bad.length?'<div class="sgdu"><b>Ojo, los precios no coinciden:</b><br>'+bad.map(x=>'• '+esc(x)).join('<br>')+'<br>Revisa la moto y el valor factura antes de emitir.</div>':has?'<div class="note" style="margin-top:8px">Precios iguales a tu cotización de Excel ✓</div>':'';
+  ld.innerHTML=bad.length?'<div class="sgdu"><b>Precio distinto al Excel:</b><br>'+bad.map(x=>'• '+esc(x)).join('<br>')+'</div>':'';
   const miss=['nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','colonia','serie'].filter(k=>!sgV('sg_'+k)).length;
   if(!miss&&o.cl.rfc)document.getElementById('sgRh').innerHTML='';
 }
@@ -2466,10 +2466,10 @@ function sgField(id,lab,type,ph){return `<label>${lab}<input id="sg_${id}" type=
 function sgSelF(id,lab,html,w){return `<label${w?' style="grid-column:1/-1"':''}>${lab}<select id="sg_${id}">${html}</select><em id="sge_${id}"></em></label>`}
 function sgForm(){
   const f=document.getElementById('sgF');
-  if(f.dataset.built){sgSum();f.style.display='';return}
+  if(f.dataset.built){sgSum();sgRdBtn();f.style.display='';return}
   f.dataset.built='1';f.style.display='';
   const C=SG.cat;
-  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><div style="display:none"><i id="sgIs"></i><i id="sgFs"></i></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc"><h4>2 · Emitir</h4><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> El cliente autoriza que se le envíe la póliza a su correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><div style="display:none"><i id="sgIs"></i><i id="sgFs"></i></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
   sgRegs();
   document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
   document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
@@ -2479,7 +2479,7 @@ function sgForm(){
   sgSum();
 }
 function sgOpenChk(){const p=document.getElementById('sgChk');if(p){p.style.display='';const d=document.getElementById('sgDet');if(d)d.open=true;const b=document.getElementById('sgChkB');if(b)b.textContent='Ocultar datos'}}
-function sgRdBtn(){const g=document.getElementById('sgGo');if(g)g.disabled=!!SG.rd}
+function sgRdBtn(){const g=document.getElementById('sgGo');if(g)g.disabled=!!SG.rd||!SG.quote}
 function sgSet(k,v){const e=document.getElementById('sg_'+k);if(e&&v!==''&&v!=null)e.value=v}
 function sgDefs(){
   const rfc=sgV('sg_rfc');if(rfc.length!==13)return;
@@ -2490,8 +2490,9 @@ const SGL={correo:'correo',nombre:'nombre',apP:'apellido paterno',apM:'apellido 
 const sgDa=x=>sgNm(String(x==null?'':x).normalize('NFD').replace(/[\u0300-\u036f]/g,''));
 function sgFill(k,v,notes,src){
   const e=document.getElementById('sg_'+k);if(!e||v===''||v==null)return;
-  const o=SG.cot&&SG.cot.cl?SG.cot.cl[k]:'';
-  if(o&&e.value&&sgDa(e.value)!==sgDa(v)){notes.push('En el Excel el '+SGL[k]+' es «'+e.value+'» y '+src+' dice «'+v+'». Dejé el del Excel, confirma cuál es el correcto.');return}
+  const old=e.value;
+  if(k==='correo'){if(old){if(sgDa(old)!==sgDa(v))notes.push('Correo: Excel «'+old+'» · '+src+' «'+v+'»');return}sgSet(k,v);return}
+  if(old&&sgDa(old)!==sgDa(v)&&SG.cot&&SG.cot.cl&&SG.cot.cl[k])notes.push(SGL[k]+': '+src+' «'+v+'» · Excel «'+old+'»');
   sgSet(k,v);
 }
 async function sgPaste(){
@@ -2511,16 +2512,17 @@ async function sgRoute(files){
 }
 async function sgRoute0(files){
   const L=[...files],ex=L.filter(f=>/\.xls[mx]$/i.test(f.name||'')),rest=L.filter(f=>ex.indexOf(f)<0);
+  sgForm();
   for(const f of ex)await sgCot(f);
-  if(rest.length&&!document.getElementById('sgGo')){const ld=document.getElementById('sgCl');if(ld&&!ld.innerHTML)ld.innerHTML='<div class="sgerr">Falta la cotización en Excel. Súbela junto con la INE y la factura.</div>';return}
   for(const f of rest){
     const pdf=/\.pdf$/i.test(f.name||'')||f.type==='application\x2Fpdf';
     if(pdf)await sgFoto('factura',f);
     else if(!SG.done.ine){if(!(await sgFoto('ine',f)))await sgFoto('factura',f)}
     else await sgFoto('factura',f);
   }
-  const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para agregar o cambiar archivos';
-  const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">Cotización '+(SG.cot?'✓':'falta')+' · INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
+  const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para cambiar';
+  const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
+  sgSum();
 }
 function sgNts(){
   const ld=document.getElementById('sgLd'),n=[].concat(SG.nt.ine||[],SG.nt.factura||[]);
@@ -2531,30 +2533,49 @@ async function sgFoto(tipo,file){
   if(!file)return false;
   const st=document.getElementById(tipo==='ine'?'sgIs':'sgFs'),ld=document.getElementById('sgLd');
   st.textContent='Leyendo…';
-  let r;
+  let r;const cs=document.getElementById('sgCs');if(cs)cs.textContent='Leyendo '+(tipo==='ine'?'INE':'factura')+'…';
   try{
     const pdf=/\.pdf$/i.test(file.name||'')||file.type==='application\x2Fpdf';
     if(pdf){if(file.size>4e6)throw 0;r=await api('seg_leer',{pdf:await sgRd2(file),tipo:tipo})}
     else{const img=await shrink(file);r=await api('seg_leer',{img:img,tipo:tipo})}
   }catch(e){r=null}
-  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No pude leer el archivo. Intenta con otro más claro o captura los datos abajo.'}</div>`;sgOpenChk();return false}
-  st.textContent='Listo ✓ (toca para cambiarla)';SG.done[tipo]=1;
+  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No se pudo leer. Intenta otra foto.'}</div>`;sgOpenChk();return false}
+  SG.done[tipo]=1;
   const d=r.d,notes=(r.dudas||[]).slice();
   if(tipo==='ine'){
-    ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia','estado'].forEach(k=>sgFill(k,d[k],notes,'la INE'));
-    if(d.rfc10&&!sgV('sg_rfc')){sgSet('rfc',d.rfc10);document.getElementById('sgRh').innerHTML='Ya puse las 10 primeras letras y números del RFC (salen del CURP). <b>Agrega la homoclave (3 caracteres)</b> de la constancia fiscal del cliente.'}
-    sgFill('correo',d.correo,notes,'la hoja de la INE');
+    ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia','estado'].forEach(k=>sgFill(k,d[k],notes,'INE'));
+    if(!sgV('sg_rfc'))sgSet('rfc','XAXX010101000');
+    sgFill('correo',d.correo,notes,'INE');
     sgRegs();sgDefs();
   }else{
-    ['serie','motor','color'].forEach(k=>sgFill(k,d[k],notes,'la factura'));
-    if(d.anio&&SG.q.anio&&Number(d.anio)!==Number(SG.q.anio))notes.push('La factura dice año '+d.anio+' y cotizaste '+SG.q.anio+'.');
-    const wd=String(SG.q.version).toUpperCase().split(/\s+/).filter(x=>x.length>1),fm=String(d.modelo||'')+' '+String(d.marca||''),fq=fm.toUpperCase().replace(/\s/g,'');
-    if(d.modelo&&wd.length&&fq.indexOf(String(SG.q.version).toUpperCase().replace(/\s/g,''))<0&&!wd.every(x=>fm.toUpperCase().indexOf(x)>=0))notes.push('La factura dice «'+d.modelo+'» y cotizaste «'+SG.q.marca+' '+SG.q.version+'». Confirma que sea la misma moto.');
+    ['serie','motor','color'].forEach(k=>sgFill(k,d[k],notes,'Factura'));
+    await sgMoto(d,notes);
   }
-  if(tipo==='factura'&&d.total&&SG.quote&&Number(SG.q.anio)>=2026){const vu=Number(SG.q.valorCap)||SG.quote.valor;if(vu&&Math.abs(Number(d.total)-vu)>1)notes.push('La factura dice un total de '+sgMx(d.total)+' y la cotización usa un valor factura de '+sgMx(vu)+'.')}
   SG.nt[tipo]=notes;sgNts();
   const miss=['nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','colonia','serie'].some(k=>!sgV('sg_'+k));
   return true;
+}
+const sgN=x=>String(x==null?'':x).toUpperCase().replace(/[^A-Z0-9]/g,'');
+function sgMatch(d){
+  const c=SG.cat.cat,y=Number(d.anio)||0,mk=sgN(d.marca),md=sgN(d.modelo)+mk;
+  if(!mk)return null;
+  let L=c.filter(x=>{const m=sgN(x[1]);return m&&(m===mk||mk.indexOf(m)>=0||m.indexOf(mk)>=0)});
+  if(y){const L2=L.filter(x=>Number(x[0])===y);if(L2.length)L=L2}
+  L=L.filter(x=>sgN(x[3])&&md.indexOf(sgN(x[3]))>=0);
+  if(!L.length)return null;
+  const top=Math.max(...L.map(x=>Number(x[0])));if(!y)L=L.filter(x=>Number(x[0])===top);
+  const m=Math.max(...L.map(x=>sgN(x[3]).length));L=L.filter(x=>sgN(x[3]).length===m);
+  return sgUniq(L.map(x=>x[2])).length===1?L[0]:null;
+}
+async function sgMoto(d,notes){
+  const e=sgMatch(d),q=SG.q,man=document.getElementById('sgMan');
+  if(!e){if(man){man.style.display='';man.open=true}notes.push('Moto no reconocida: elígela arriba.');return}
+  if(man)man.style.display='none';
+  const same=String(q.anio)===String(e[0])&&q.marca===e[1]&&q.tipo===e[2]&&q.version===e[3],val=Number(e[0])>=2026&&d.total?String(Math.round(Number(d.total))):'';
+  if(same&&q.valorCap===val&&SG.quote)return;
+  q.anio=String(e[0]);q.marca=e[1];q.tipo=e[2];q.version=e[3];q.valorCap=val;
+  const cl=document.getElementById('sgCl');if(cl)cl.innerHTML='';
+  sgSel();await sgQuote();
 }
 function sgRegs(){
   const rfc=sgV('sg_rfc'),p=rfc.length===13?'F':rfc.length===12?'M':'';
@@ -2562,9 +2583,10 @@ function sgRegs(){
   keep('sg_regimen',SG.cat.reg);keep('sg_usoCfdi',SG.cat.cfdi);
 }
 function sgSum(){
+  const em=document.getElementById('sgEm');if(em)em.style.display=SG.quote?'':'none';
   const s=document.getElementById('sgS');if(!s||!SG.quote)return;
-  const t=[SG.quote.total.min,SG.quote.total.rec,SG.quote.total.may][SG.pk],q=SG.q;
-  s.innerHTML=`<b>${esc(q.marca)} ${esc(q.tipo)} ${esc(q.version)} ${esc(q.anio)}</b><br>${esc(SGP[SG.pk][1])} · uso ${esc(q.uso)}<br>Prima total: <b>${sgMx(t)}</b>`;
+  const t=[SG.quote.total.min,SG.quote.total.rec,SG.quote.total.may][SG.pk],q=SG.q,nm=[sgV('sg_nombre'),sgV('sg_apP')].filter(Boolean).join(' ');
+  s.innerHTML=`<b>${esc(SGP[SG.pk][1])} · ${sgMx(t)}</b><br><small>${esc(nm||'Sin nombre')} · ${esc(sgV('sg_rfc')||'sin RFC')} · ${esc(sgV('sg_correo')||'sin correo')}</small>`;
 }
 function sgDatos(){
   const q=SG.q,d={anio:Number(q.anio),marca:q.marca,tipo:q.tipo,version:q.version,uso:q.uso,valorCap:q.valorCap===''?'':Number(q.valorCap),paquete:SGP[SG.pk][0]};
@@ -2611,7 +2633,7 @@ function sgDl(b64,name,mime){
 function sgDone(r){
   const o=document.getElementById('sgR'),f=document.getElementById('sgF'),qb=document.getElementById('sgQ');
   f.style.display='none';qb.style.display='none';
-  o.innerHTML=`<div class="sgc sgok"><h4>Póliza emitida</h4><div class="sgs">Número: <b>${esc(r.poliza)}</b><br>Prima total: <b>${sgMx(r.total)}</b><br>${r.correo?'Se envió al correo del cliente.':'<span class="bad">No se pudo enviar al correo del cliente: descárgala y mándala tú.</span>'}</div><button class="sgbtn" id="sgDl" type="button">Descargar póliza (PDF)</button><button class="sgbtn sec" id="sgNew" type="button">Nueva póliza</button></div>`;
+  o.innerHTML=`<div class="sgc sgok"><h4>Póliza emitida</h4><div class="sgs"><b>${esc(r.poliza)}</b><br>${sgMx(r.total)}<br>${r.correo?'Enviada al correo ✓':'<span class="bad">No se envió al correo: descárgala.</span>'}</div><button class="sgbtn" id="sgDl" type="button">Descargar PDF</button><button class="sgbtn sec" id="sgNew" type="button">Nueva póliza</button></div>`;
   document.getElementById('sgDl').onclick=()=>sgDl(r.pdf,r.nombre,'application/pdf');
   document.getElementById('sgNew').onclick=()=>{o.innerHTML='';SG.q={anio:'',marca:'',tipo:'',version:'',uso:'Particular',valorCap:''};SG.pk=1;SG.quote=null;sgBuild()};
   sgHist();
