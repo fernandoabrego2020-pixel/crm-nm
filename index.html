@@ -998,6 +998,47 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #sgw .sgfile input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
 #sgw .sgfile span{font-weight:700}#sgw .sgfile i{font-style:normal;color:var(--mu);font-size:12px}
 #sgw .sgdet summary{cursor:pointer;font-size:14px;font-weight:600}
+#tvw .sgc{border:1px solid var(--ln);background:var(--card);border-radius:14px;padding:14px;margin-bottom:12px}
+#tvw h4{margin:0 0 10px;font-size:15px}
+#tvw .sgg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#tvw label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu);min-width:0}
+#tvw label small{font-size:11px}
+#tvw select,#tvw input[type=text],#tvw input[type=email],#tvw input[type=date],#tvw input:not([type]),#tvw input[inputmode]{border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:10px;padding:11px;font:inherit;font-size:15px;width:100%;min-width:0;box-sizing:border-box}
+#tvw input.bad,#tvw select.bad{border-color:#d33}
+#tvw em{font-style:normal;font-size:11px;color:var(--mu)}
+#tvw em.bad{color:#d33}#tvw em.warn{color:#b7791f}
+#tvw .sgp{display:grid;grid-template-columns:1fr;gap:8px}
+#tvw .sgpk{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:2px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:12px;padding:11px 13px;font:inherit}
+#tvw .sgpk span{font-size:12px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em}
+#tvw .sgpk b{font-size:20px}
+#tvw .sgpk small{font-size:12px;color:var(--mu)}
+#tvw .sgpk.on{border-color:#6d5dfc;background:rgba(109,93,252,.08)}
+#tvw .sgs{font-size:14px;line-height:1.5;margin-bottom:10px}
+#tvw .sgck{flex-direction:row;align-items:flex-start;gap:8px;font-size:13px;color:var(--tx);margin:6px 0}
+#tvw .sgck input{width:20px;height:20px;flex:none}
+#tvw .sgbtn{display:block;width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#6d5dfc,#c026d3);color:#fff;font:inherit;font-size:15px;font-weight:700;padding:14px;margin-top:10px}
+#tvw .sgdocs{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+#tvw .sgdoc{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--ln);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;font-size:12px;padding:8px;text-decoration:none;cursor:pointer}
+#tvw .sgdoc img{width:100%;height:auto;max-height:420px;object-fit:contain;border-radius:8px;background:#fff}
+#tvw .sgbtn.sec{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
+#tvw .sgbtn:disabled{opacity:.5}
+#tvw .sgerr{border:1px solid #d33;background:rgba(221,51,51,.08);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+#tvw .sgdu{border:1px solid #d69e2e;background:rgba(214,158,46,.1);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+#tvw .sgda{display:flex;gap:8px}#tvw .sgda .sgbtn{flex:1}
+#tvw .sgok{border-color:#2f9e5b}
+#tvw .sgok .bad{color:#d33}
+#tvw .sgh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--ln)}
+#tvw .sgh:first-child{border-top:0}
+#tvw .sgh small{display:block;color:var(--mu);font-size:11px}
+#tvw .sgr{display:flex;align-items:center;gap:8px;white-space:nowrap}
+#tvw .sgmini{border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:8px;padding:6px 10px;font:inherit;font-size:12px}
+#tvw .sgcfg{margin-top:12px;border-top:1px solid var(--ln);padding-top:10px}
+#tvw .sgfile{position:relative;border:2px dashed var(--ln);border-radius:12px;padding:14px 10px;text-align:center;align-items:center;gap:4px;color:var(--tx);font-size:13px;cursor:pointer}
+#tvw .sgfile input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+#tvw .sgfile span{font-weight:700}#tvw .sgfile i{font-style:normal;color:var(--mu);font-size:12px}
+#tvw .sgdet summary{cursor:pointer;font-size:14px;font-weight:600}
+#tvw .sgmini{text-decoration:none;display:inline-block}
+#sgw .sgdel{border:1px solid #d33;background:var(--bg);color:#d33;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px}
 </style>
 </head>
 <body>
@@ -2559,7 +2600,7 @@ async function sgRoute0(files){
     if(pdf){if(!(await sgFoto('factura',f,true)))skip.push(f)}
     else if(!SG.done.ine){if(!(await sgFoto('ine',f,true))&&!(await sgFoto('factura',f,true)))skip.push(f)}
     else if(!SG.done.factura){if(!(await sgFoto('factura',f,true)))skip.push(f)}
-    else skip.push(f);
+    else{if(!(await sgFoto('ine',f,true))&&!(await sgFoto('factura',f,true)))skip.push(f)}
   }
   if(SG.done.ine&&!sgV('sg_nombre')&&skip.length){const z=skip.slice();skip.length=0;for(const f of z)if(!(await sgFoto('ine',f,true)))skip.push(f)}
   if(skip.length||!SG.done.ine||!SG.done.factura){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">'+(!SG.done.ine&&!SG.done.factura?'No reconocí ni INE ni factura en los archivos.':!SG.done.ine?'Falta la INE (frente).':!SG.done.factura?'Falta la factura.':'Omití '+skip.length+' archivo'+(skip.length>1?'s':'')+' que no era INE ni factura (¿reverso de la INE?).')+'</div>'}
@@ -2693,8 +2734,9 @@ async function sgHist(){
   const adm=ME==='Fer';
   const cfg=adm&&false?`<div class="sgcfg"><small>Último consecutivo real usado (la siguiente póliza será el número siguiente)</small><div style="display:flex;gap:8px"><input id="sgLast" inputmode="numeric" placeholder="Ej. 245"><button class="sgbtn sec" id="sgSave" type="button">Guardar</button></div><div id="sgCfgM" class="note"></div></div>`:'';
   h.className='';
-  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b><small>${esc(x.poliza.slice(-11,-4))} · ${new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Mexico_City'})} · ${esc(x.paquete.replace(/\.$/,''))}${adm?' · '+esc(x.cuenta):''}</small></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-p="${esc(x.poliza)}" type="button">PDF</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
-  h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.p})}catch(e){g=null}bt.disabled=false;bt.textContent='PDF';if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
+  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b><small>${esc(x.poliza.slice(-11,-4))} · ${new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Mexico_City'})} · ${esc(x.paquete.replace(/\.$/,''))}${adm?' · '+esc(x.cuenta):''}</small></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-pol="${esc(x.poliza)}" type="button">PDF</button>${adm?`<button class="sgdel" data-pdel="${esc(x.poliza)}" type="button">Borrar</button>`:''}</div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
+  h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.pol})}catch(e){g=null}bt.disabled=false;bt.textContent='PDF';if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
+  h.querySelectorAll('.sgdel').forEach(bt=>{bt.onclick=async()=>{if(!confirm('\u00bfBorrar esta p\u00f3liza? Se quita de la lista y los archivos van a la papelera. El correo que ya se mand\u00f3 no se puede recuperar.'))return;bt.disabled=true;bt.textContent='\u2026';let g;try{g=await api('seg_del',{poliza:bt.dataset.pdel})}catch(e){g=null}if(g&&g.ok)sgHist();else{bt.disabled=false;bt.textContent='Borrar';alert('No pude borrarla.')}}});
   const sv=document.getElementById('sgSave');
   if(sv)sv.onclick=async()=>{const v=sgV('sgLast').replace(/[^0-9]/g,'');if(!v)return;let g;try{g=await api('seg_cfg',{last:v})}catch(e){g=null}document.getElementById('sgCfgM').textContent=g&&g.ok?'Listo. La siguiente póliza será '+g.next:'No se pudo guardar.'};
 }
@@ -3372,6 +3414,101 @@ async function anaView(){
   if(AV.go==='cat'){AV.go='';AV.q='';AV.ed={};return avCatLoad()}
   avDraw()}
 function navGo(id){navGo0(id);torreBg(id)}
+const TV={f:{factura:null,ine_frente:null,ine_vuelta:null,pago:[],financiera:[]},m:[{medio:'Efectivo',monto:'',detalle:''}],v:{responsable:'ZAYURI CALDERON',financiera:'',origen:''},busy:false,ok:null};
+const TVO=['Tienda','Recomendado o referido','Facebook','WhatsApp','Google','Otro'];
+function tvView(){
+  const m=document.getElementById('menu');
+  m.innerHTML='<div class="in" id="tvw"><div class="mh2"><b>Tramitar venta<small>Paquete de entrega</small></b><button data-nv="mas">← Más</button></div><div id="tvb"></div></div>';m.style.display='block';
+  tvBuild();tvHist();
+}
+function tvInp(id,lab,mode,full){return '<label'+(full?' style="grid-column:1\x2F-1"':'')+'>'+lab+'<input id="tv_'+id+'" type="text"'+(mode?' inputmode="'+mode+'"':'')+' autocomplete="off" value="'+esc(TV.v[id]||'')+'"></label>'}
+function tvSlot(k,tit,sub,multi,pdf){return '<label class="sgfile"><span>'+tit+'</span><input type="file" id="tvf_'+k+'" accept="'+(pdf?'application\x2Fpdf':'image\x2F*')+'"'+(multi?' multiple':'')+'><i id="tvs_'+k+'">'+sub+'</i></label>'}
+function tvSt(k){
+  const e=document.getElementById('tvs_'+k);if(!e)return;const v=TV.f[k];
+  if(Array.isArray(v))e.textContent=v.length?('✓ '+v.length+(v.length===1?' archivo':' archivos')+' · toca para cambiar'):'Toca para elegir';
+  else e.textContent=v?('✓ '+(v.name||'listo')+' · toca para cambiar'):'Toca para elegir';
+}
+function tvBuild(){
+  const b=document.getElementById('tvb');if(!b)return;
+  const cred=TV.v.financiera&&TV.v.financiera!=='CONTADO';
+  b.innerHTML='<div id="tvOk"></div>'+
+  '<div class="sgc"><h4>1. Documentos</h4><div style="display:grid;gap:10px">'+tvSlot('factura','Factura de la moto (PDF)','Toca para elegir',false,true)+tvSlot('ine_frente','INE · frente','Toca para elegir')+tvSlot('ine_vuelta','INE · vuelta','Toca para elegir')+tvSlot('pago','Comprobantes de pago','Solo si pagó con tarjeta, transferencia o Mercado Pago',true)+'<div id="tvFin">'+(cred?tvSlot('financiera','Captura de la financiera pidiendo la entrega','Toca para elegir',true):'')+'</div></div></div>'+
+  '<div class="sgc"><h4>2. Datos de la venta</h4><div class="sgg">'+tvInp('cliente','Nombre del cliente (opcional)','',true)+tvInp('telefono','Teléfono del cliente','tel')+tvInp('correo','Correo del cliente','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
+  '<label>Financiera<select id="tv_financiera"><option value="">Elige</option>'+['MAXIKASH','GALGO','CONTADO'].map(x=>'<option value="'+x+'"'+(TV.v.financiera===x?' selected':'')+'>'+(x==='CONTADO'?'Contado':x.charAt(0)+x.slice(1).toLowerCase())+'</option>').join('')+'</select></label>'+
+  '<label>Origen del prospecto<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+
+  tvInp('uso','Para qué va a usar la moto','',true)+tvInp('responsable','Responsable de la entrega','',true)+'</div></div>'+
+  '<div class="sgc"><h4>3. Medios de pago del enganche</h4><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">Agregar otro medio</button><div class="note" id="tvSum" style="margin-top:8px"></div></div>'+
+  '<div class="sgc"><h4>4. Referidos (los 2)</h4><div class="sgg">'+tvInp('r1n','Referido 1 · nombre')+tvInp('r1t','Teléfono','tel')+tvInp('r2n','Referido 2 · nombre')+tvInp('r2t','Teléfono','tel')+'</div></div>'+
+  '<div id="tvE"></div><button type="button" class="sgbtn" id="tvGo">Enviar la venta</button><div class="note" style="margin-top:8px">Se guarda en la carpeta de ventas. Luego dile a Claude «venta nueva» y arma las dos hojas para imprimir.</div>'+
+  '<div id="tvH" style="margin-top:14px"></div>';
+  ['factura','ine_frente','ine_vuelta','pago','financiera'].forEach(k=>{
+    const el=document.getElementById('tvf_'+k);if(!el)return;tvSt(k);
+    el.onchange=e=>{const fl=[...e.target.files];e.target.value='';if(!fl.length)return;
+      if(k==='pago'||k==='financiera')TV.f[k]=fl;
+      else if(k==='factura'&&!(/\.pdf$/i.test(fl[0].name||'')||fl[0].type==='application\x2Fpdf')){const er=document.getElementById('tvE');if(er)er.innerHTML='<div class="sgerr">La factura debe ser el PDF, no una foto.</div>';return}
+      else TV.f[k]=fl[0];
+      tvSt(k)}});
+  ['cliente','telefono','correo','precio_real','enganche_real','uso','responsable','r1n','r1t','r2n','r2t'].forEach(id=>{const el=document.getElementById('tv_'+id);if(el)el.oninput=()=>{TV.v[id]=el.value;if(id==='enganche_real')tvSum()}});
+  document.getElementById('tv_financiera').onchange=e=>{TV.v.financiera=e.target.value;const c=e.target.value&&e.target.value!=='CONTADO',x=document.getElementById('tvFin');
+    if(x){x.innerHTML=c?tvSlot('financiera','Captura de la financiera pidiendo la entrega','Toca para elegir',true):'';const el=document.getElementById('tvf_financiera');if(el){tvSt('financiera');el.onchange=ev=>{const fl=[...ev.target.files];ev.target.value='';if(fl.length){TV.f.financiera=fl;tvSt('financiera')}}}}};
+  document.getElementById('tv_origen').onchange=e=>{TV.v.origen=e.target.value};
+  document.getElementById('tvMa').onclick=()=>{TV.m.push({medio:'',monto:'',detalle:''});tvMed()};
+  document.getElementById('tvGo').onclick=tvSend;
+  tvMed();
+}
+function tvMed(){
+  const b=document.getElementById('tvM');if(!b)return;
+  b.innerHTML=TV.m.map((x,i)=>'<div class="sgg" style="margin-bottom:10px"><label>Medio<input type="text" list="tvMl" id="tvm_n'+i+'" value="'+esc(x.medio)+'" autocomplete="off"></label><label>Monto<input type="text" inputmode="decimal" id="tvm_a'+i+'" value="'+esc(x.monto)+'" autocomplete="off"></label><label style="grid-column:1\x2F-1">Detalle (opcional)<input type="text" id="tvm_d'+i+'" value="'+esc(x.detalle)+'" autocomplete="off"></label>'+(TV.m.length>1?'<button type="button" class="sgmini" id="tvm_x'+i+'" style="grid-column:1\x2F-1">Quitar este medio</button>':'')+'</div>').join('')+'<datalist id="tvMl"><option value="Efectivo"><option value="Tarjeta"><option value="Transferencia"><option value="Mercado Pago"><option value="Depósito"></datalist>';
+  TV.m.forEach((x,i)=>{
+    document.getElementById('tvm_n'+i).oninput=e=>{x.medio=e.target.value};
+    document.getElementById('tvm_a'+i).oninput=e=>{x.monto=e.target.value;tvSum()};
+    document.getElementById('tvm_d'+i).oninput=e=>{x.detalle=e.target.value};
+    const q=document.getElementById('tvm_x'+i);if(q)q.onclick=()=>{TV.m.splice(i,1);tvMed()}});
+  tvSum();
+}
+const tvNum=v=>{const x=Number(String(v==null?'':v).replace(/[$,\s]/g,''));return isFinite(x)?x:0};
+function tvSum(){
+  const e=document.getElementById('tvSum');if(!e)return;
+  const s=TV.m.reduce((a,x)=>a+tvNum(x.monto),0),g=tvNum(TV.v.enganche_real);
+  e.innerHTML='Suman <b>'+mxn(s)+'</b>'+(g?(Math.abs(s-g)<0.51?' · coincide con el enganche ✓':' · el enganche real es <b>'+mxn(g)+'</b>'):'');
+}
+function tvDatos(){
+  const v=TV.v;
+  return {cliente:v.cliente||'',telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',
+    medios:TV.m.map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle})),referidos:[{nombre:v.r1n||'',telefono:v.r1t||''},{nombre:v.r2n||'',telefono:v.r2t||''}]};
+}
+async function tvSend(){
+  if(TV.busy)return;
+  const er=document.getElementById('tvE'),bt=document.getElementById('tvGo');
+  const falta=[];if(!TV.f.factura)falta.push('la factura (PDF)');if(!TV.f.ine_frente)falta.push('la INE por el frente');if(!TV.f.ine_vuelta)falta.push('la INE por la vuelta');
+  if(falta.length){er.innerHTML='<div class="sgerr">Falta subir '+falta.join(', ')+'.</div>';return}
+  TV.busy=true;bt.disabled=true;bt.textContent='Subiendo… no cierres la página';er.innerHTML='';
+  try{
+    const files=[];
+    const add=async(k,f)=>{const pdf=/\.pdf$/i.test(f.name||'')||f.type==='application\x2Fpdf';files.push({k:k,n:f.name||k,pdf:pdf,b64:pdf?await sgRd2(f):await shrink(f,1800,.82)})};
+    await add('factura',TV.f.factura);await add('ine_frente',TV.f.ine_frente);await add('ine_vuelta',TV.f.ine_vuelta);
+    for(const f of TV.f.pago)await add('pago',f);
+    if(TV.v.financiera&&TV.v.financiera!=='CONTADO')for(const f of TV.f.financiera)await add('financiera',f);
+    const r=await api('seg_venta_save',{datos:tvDatos(),files:files});
+    if(r&&r.ok){
+      TV.f={factura:null,ine_frente:null,ine_vuelta:null,pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:TV.v.responsable||'ZAYURI CALDERON',financiera:'',origen:''};
+      tvBuild();tvHist();
+      const o=document.getElementById('tvOk');if(o)o.innerHTML='<div class="sgc sgok"><b>Venta enviada ✓</b><div class="note" style="margin-top:6px">Número: <b>'+esc(r.id)+'</b>'+(r.dup?' (ya estaba guardada)':'')+'<br>Ahora dile a Claude: «venta nueva» y te arma las dos hojas para imprimir.</div></div>';
+      window.scrollTo(0,0);const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
+    }else{
+      er.innerHTML='<div class="sgerr"><b>Revisa:</b><br>'+((r&&r.errs)||[(r&&r.err)||'No se pudo guardar.']).map(x=>'• '+esc(x)).join('<br>')+'</div>';
+    }
+  }catch(e){er.innerHTML='<div class="sgerr">No se pudo enviar. Revisa tu conexión y vuelve a intentar (si ya se había guardado, no se duplica).</div>'}
+  TV.busy=false;const g=document.getElementById('tvGo');if(g){g.disabled=false;g.textContent='Enviar la venta'}
+}
+async function tvHist(){
+  const h=document.getElementById('tvH');if(!h)return;
+  let r;try{r=await api('seg_venta_list')}catch(e){r=null}
+  const h2=document.getElementById('tvH');if(!h2)return;
+  if(!r||!r.ok||!r.rows.length){h2.innerHTML='';return}
+  h2.innerHTML='<h4 style="margin:0 0 8px;font-size:15px">Ventas enviadas</h4>'+r.rows.map(x=>'<div class="sgc" style="padding:10px 12px;margin-bottom:8px"><b>'+esc(x.cliente||x.id)+'</b> <span style="float:right;color:var(--mu);font-size:12px">'+(x.fecha?new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+'</span><div class="note" style="margin-top:4px">'+esc(x.id)+(x.fin?' · '+esc(x.fin):'')+(DN(ME)&&x.cuenta!==ME?' · '+esc(x.cuenta):'')+'</div>'+
+    (x.estado==='lista'?'<div style="display:flex;gap:8px;margin-top:8px"><a class="sgmini" target="_blank" rel="noopener" href="'+esc(x.pdf1)+'">Hoja blanca</a>'+(x.pdf2?'<a class="sgmini" target="_blank" rel="noopener" href="'+esc(x.pdf2)+'">Factura verde</a>':'')+'</div>':'<div class="note" style="margin-top:6px">Pendiente: Claude aún no arma las hojas.</div>')+'</div>').join('');
+}
 function masView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const ch='<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',ex='<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 01-1 1H5a1 1 0 01-1-1V7a1 1 0 011-1h5"/></svg>';
@@ -3384,7 +3521,7 @@ function masView(){
   const QUIEN=N('Quién escribió','quien');
   let h='';
   if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),N('Tramitar venta','tvent'),N('Tramitar seguro','seg')]));
-  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
+  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
   m.innerHTML='<div class="in p2">'+h+'</div>';
@@ -3410,7 +3547,7 @@ function navGo0(id){
   else if(id==='moto'){if(PFOK())pfView();else motosView();return}
   else if(id==='ana'){anaView();return}
   else if(id==='seg'){segView();return}
-  else if(id==='tvent')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Sube la <u>factura</u> de la moto y la <u>INE</u> del cliente por ambos lados.</span></li><li><b>2</b><span>Se llenan solas todas las hojas de la venta: recibo, contrato, carta factura, p\u00f3liza y las dem\u00e1s.</span></li><li><b>3</b><span>Te queda el paquete completo listo para imprimir.</span></li></ol><div class="i10f">\u00a1Una venta lista en segundos!</div></div>';
+  else if(id==='tvent'){tvView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
   else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda la INE por ambos lados a <u>Ana general</u>, con el correo y el n\u00famero del cliente.</span></li><li><b>2</b><span>Ana sola la tramita en las dos financieras: <u>Galgo</u> y <u>Maxicash</u>.</span></li><li><b>3</b><span>Ana sola contacta al cliente para que le pase el NIP.</span></li></ol><div class="i10f">\u00a1Todo m\u00e1s f\u00e1cil con Ana!</div></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana general</a></div>';
