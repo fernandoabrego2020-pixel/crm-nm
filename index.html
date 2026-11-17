@@ -2392,7 +2392,7 @@ function segView(){
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><label class="sgfile" id="sgfC"><span>Subir INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca para elegir (Excel opcional)</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><label class="sgfile" id="sgfC"><span>Subir INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Elegir (Excel opcional)</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
   document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{const fl=[...e.target.files];e.target.value='';sgRoute(fl)};SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
@@ -3434,30 +3434,30 @@ const TV={f:{factura:null,ine:[],pago:[],financiera:[]},m:[{medio:'Efectivo',mon
 const TVO=['Tienda','Recomendado o referido','Facebook','WhatsApp','Google','Otro'];
 function tvView(){
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in" id="tvw"><div class="mh2"><button data-nv="mas">← Más</button></div><div id="tvb"></div></div>';m.style.display='block';
+  m.innerHTML='<div class="in" id="tvw"><div id="tvb"></div></div>';m.style.display='block';
   tvBuild();tvHist();
 }
 function tvInp(id,lab,mode,full){return '<label'+(full?' style="grid-column:1\x2F-1"':'')+'>'+lab+'<input id="tv_'+id+'" type="text"'+(mode?' inputmode="'+mode+'"':'')+' autocomplete="off" value="'+esc(TV.v[id]||'')+'"></label>'}
 function tvSlot(k,tit,sub,multi,pdf){return '<label class="sgfile"><span>'+tit+'</span><input type="file" id="tvf_'+k+'" accept="'+(pdf?'application\x2Fpdf':'image\x2F*')+'"'+(multi?' multiple':'')+'><i id="tvs_'+k+'">'+sub+'</i></label>'}
 function tvSt(k){
   const e=document.getElementById('tvs_'+k);if(!e)return;const v=TV.f[k];
-  if(Array.isArray(v))e.textContent=v.length?('✓ '+v.length+(v.length===1?' archivo':' archivos')+' · toca para cambiar'):'Toca para elegir';
-  else e.textContent=v?('✓ '+(v.name||'listo')+' · toca para cambiar'):'Toca para elegir';
+  if(Array.isArray(v))e.textContent=v.length?('✓ '+v.length+(v.length===1?' archivo':' archivos')+' · toca para cambiar'):'Elegir';
+  else e.textContent=v?('✓ '+(v.name||'listo')+' · toca para cambiar'):'Elegir';
 }
 function tvBuild(){
   const b=document.getElementById('tvb');if(!b)return;
   b.innerHTML='<div id="tvOk"></div>'+
-  '<div class="sgc"><h4>1. Documentos</h4><div style="display:grid;gap:10px">'+tvSlot('factura','Factura de la moto (PDF) \u00b7 obligatoria','Toca para elegir',false,true)+tvSlot('ine','INE del cliente','Una foto con los dos lados, o frente y vuelta por separado',true)+'</div></div>'+
-  '<div class="sgc"><h4>2. Datos de la venta</h4><div class="sgg">'+tvInp('telefono','Teléfono del cliente','tel')+tvInp('correo','Correo del cliente','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
+  '<div class="sgc"><h4>Archivos</h4><div style="display:grid;gap:10px">'+tvSlot('factura','Factura PDF \u00b7 obligatoria','Elegir',false,true)+tvSlot('ine','INE','1 foto o 2 (frente y vuelta)',true)+'</div></div>'+
+  '<div class="sgc"><h4>Datos</h4><div class="sgg">'+tvInp('telefono','Tel\u00e9fono','tel')+tvInp('correo','Correo','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
   '<label>Financiera<select id="tv_financiera"><option value="">Elige</option>'+['MAXIKASH','GALGO','CONTADO'].map(x=>'<option value="'+x+'"'+(TV.v.financiera===x?' selected':'')+'>'+(x==='CONTADO'?'Contado':x.charAt(0)+x.slice(1).toLowerCase())+'</option>').join('')+'</select></label>'+
-  '<label>Origen del prospecto<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+
-  tvInp('uso','Para qué va a usar la moto','',true)+tvInp('responsable','Responsable de la entrega','',true)+'</div></div>'+
-  '<details class="sgc sgdet"><summary>Datos extra (opcional)</summary><div style="margin-top:10px">'+
-  '<h4 style="margin:0 0 4px">Medios de pago del enganche</h4><div class="note" style="margin-bottom:8px">Con esto salen el recibo de enganche y la nota de cr\u00e9dito.</div><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">Agregar otro medio</button><div class="note" id="tvSum" style="margin-top:8px"></div>'+
-  '<h4 style="margin:14px 0 8px">Comprobantes y capturas</h4><div style="display:grid;gap:10px">'+tvSlot('pago','Comprobantes de pago','Si pag\u00f3 con tarjeta, transferencia o Mercado Pago',true)+tvSlot('financiera','Captura de la financiera pidiendo la entrega','Toca para elegir',true)+'</div>'+
-  '<h4 style="margin:14px 0 4px">Referidos</h4><div class="note" style="margin-bottom:8px">Si los llenas sale la hoja de referidos.</div><div class="sgg">'+tvInp('r1n','Referido 1 (nombre)','')+tvInp('r1t','Tel\u00e9fono','tel')+tvInp('r2n','Referido 2 (nombre)','')+tvInp('r2t','Tel\u00e9fono','tel')+'</div>'+
+  '<label>Origen<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+
+  tvInp('uso','Uso de la moto','',true)+tvInp('responsable','Responsable','',true)+'</div></div>'+
+  '<details class="sgc sgdet"><summary>Datos extra</summary><div style="margin-top:10px">'+
+  '<h4 style="margin:0 0 8px">Medios de pago \u2192 recibo + nota de cr\u00e9dito</h4><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">+ medio</button><div class="note" id="tvSum" style="margin-top:8px"></div>'+
+  '<h4 style="margin:14px 0 8px">Comprobantes \u00b7 Financiera</h4><div style="display:grid;gap:10px">'+tvSlot('pago','Comprobantes de pago','Elegir',true)+tvSlot('financiera','Captura de la financiera','Elegir',true)+'</div>'+
+  '<h4 style="margin:14px 0 8px">Referidos \u2192 hoja de referidos</h4><div class="sgg">'+tvInp('r1n','Referido 1','')+tvInp('r1t','Tel\u00e9fono','tel')+tvInp('r2n','Referido 2','')+tvInp('r2t','Tel\u00e9fono','tel')+'</div>'+
   '</div></details>'+
-  '<div id="tvE"></div><button type="button" class="sgbtn" id="tvGo">Enviar la venta</button><div class="note" style="margin-top:8px">Se guarda en la carpeta de ventas. Luego dile a Claude \u00abventa nueva\u00bb y arma las hojas para imprimir.</div>'+
+  '<div id="tvE"></div><button type="button" class="sgbtn" id="tvGo">Enviar</button>'+
   '<div id="tvH" style="margin-top:14px"></div>';
   ['factura','ine','pago','financiera'].forEach(k=>{
     const el=document.getElementById('tvf_'+k);if(!el)return;tvSt(k);
@@ -3492,25 +3492,24 @@ function tvSum(){
 function tvDatos(){
   const v=TV.v;
   return {telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',
-    medios:TV.m.map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle})),referidos:[{nombre:v.r1n||'',telefono:v.r1t||''},{nombre:v.r2n||'',telefono:v.r2t||''}]};
+    medios:TV.m.filter(x=>String(x.monto||'').trim()).map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle})),referidos:[{nombre:v.r1n||'',telefono:v.r1t||''},{nombre:v.r2n||'',telefono:v.r2t||''}]};
+}
+function tvKw(a){
+  const m=[[/ine/i,'INE'],[/tel\u00e9fono/i,'tel\u00e9fono'],[/correo/i,'correo'],[/precio real/i,'precio'],[/enganche real/i,'enganche'],[/financiera/i,'financiera'],[/origen/i,'origen'],[/usar la moto/i,'uso']];
+  const o=[];(a||[]).forEach(x=>{if(!/^Falta/i.test(x))return;const h=m.find(y=>y[0].test(x));if(h&&o.indexOf(h[1])<0)o.push(h[1])});return o;
 }
 function tvGuia(){
   const st=(n,t,sub,c)=>'<div class="gst '+(c||'')+'"><div class="gn">'+n+'</div><div><div class="gt">'+t+'</div>'+(sub?'<div class="gs">'+sub+'</div>':'')+'</div></div>';
-  return '<div style="margin-top:12px;font-weight:800">Ahora sigue esto:</div>'+
-    st('\u2713','Venta enviada','Ya qued\u00f3 guardada con todos sus archivos','ok')+
-    st(2,'Pon hojas BLANCAS en la impresora','')+
-    st(3,'Dile a Claude \u00abventa nueva\u00bb','Chat nuevo. Ya tiene todo lo que mandaste, no env\u00edes nada m\u00e1s')+
-    st(4,'Imprime el archivo 1','Claude te lo env\u00eda \u00b7 todo en hoja blanca')+
+  return st(4,'Imprime el archivo 1','hoja blanca')+
     st(5,'Cambia a hoja VERDE','','v')+
     st(6,'Imprime el archivo 2','La factura real \u00b7 <b class="r">NO se entrega al cliente</b>','v')+
-    '<div class="gst a"><div class="gn">7</div><div><div class="gt">FIRMAS</div><div class="gck">\u2610 Factura verde<br>\u2610 Contrato de compraventa (todo firmado)<br>\u2610 Carta de no aceptaci\u00f3n de seguros<br>\u2610 Check list de entrega (revisi\u00f3n: frenos, etc.)</div></div></div>'+
-    '<div class="gst" style="border-color:#555;background:rgba(128,128,128,.1)"><div class="gn" style="background:#444">8</div><div style="flex:1"><div class="gdl" style="margin-top:0"><div class="c"><b>SE ENTREGA AL CLIENTE</b>09-C Carta factura<br>11-C P\u00f3liza de garant\u00eda<br>08-C Copia sin valor de la factura</div><div class="q"><b>SE QUEDA EN LA AGENCIA</b>Todo lo dem\u00e1s (letra A)<br>Factura verde: nunca al cliente<br>07-S Copia de factura: para Sergio</div></div></div></div>'+
-    '<div class="note" style="margin-top:8px">Al engrapar: mismo N\u00daMERO = mismo documento \u00b7 Letra: C cliente \u00b7 A agencia \u00b7 S Sergio</div>';
+    '<div class="gst a"><div class="gn">7</div><div><div class="gt">FIRMAS</div><div class="gck">\u2610 Factura verde<br>\u2610 Contrato de compraventa<br>\u2610 Carta de no aceptaci\u00f3n de seguros<br>\u2610 Check list de entrega</div></div></div>'+
+    '<div class="gst" style="border-color:#555;background:rgba(128,128,128,.1)"><div class="gn" style="background:#444">8</div><div style="flex:1"><div class="gdl" style="margin-top:0"><div class="c"><b>AL CLIENTE</b>09-C Carta factura<br>11-C P\u00f3liza de garant\u00eda<br>08-C Copia sin valor</div><div class="q"><b>AGENCIA</b>Todo lo dem\u00e1s (A)<br>07-S Sergio</div></div></div></div>';
 }
 async function tvSend(){
   if(TV.busy)return;
   const er=document.getElementById('tvE'),bt=document.getElementById('tvGo');
-  if(!TV.f.factura){er.innerHTML='<div class="sgerr">Falta subir la factura (PDF). Es lo \u00fanico obligatorio.</div>';return}
+  if(!TV.f.factura){er.innerHTML='<div class="sgerr">Falta la factura (PDF)</div>';return}
   TV.busy=true;bt.disabled=true;bt.textContent='Subiendo… no cierres la página';er.innerHTML='';
   try{
     const files=[];
@@ -3523,7 +3522,7 @@ async function tvSend(){
     if(r&&r.ok){
       TV.f={factura:null,ine:[],pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:TV.v.responsable||'ZAYURI CALDERON',financiera:'',origen:''};
       tvBuild();tvHist();
-      const o=document.getElementById('tvOk');if(o)o.innerHTML='<div class="sgc sgok"><b>Venta enviada ✓</b><div class="note" style="margin-top:6px">Número: <b>'+esc(r.id)+'</b>'+(r.dup?' (ya estaba guardada)':'')+'</div>'+(r.faltan&&r.faltan.length?'<div class="sgdu"><b>Qued\u00f3 pendiente:</b><br>'+r.faltan.map(x=>'\u2022 '+esc(x)).join('<br>')+'</div>':'')+tvGuia()+'</div>';
+      const o=document.getElementById('tvOk');if(o)o.innerHTML='<div class="sgc sgok"><b>Venta enviada \u2713</b> <span class="note">'+esc(r.id)+(r.dup?' (ya estaba)':'')+'</span>'+(tvKw(r.faltan).length?'<div class="sgdu"><b>Falta:</b> '+tvKw(r.faltan).join(' \u00b7 ')+'</div>':'')+'<div class="gst ok" style="margin-top:10px"><div class="gn">\u2192</div><div><div class="gt">Claude: \u00abventa nueva\u00bb</div></div></div>'+tvGuia()+'</div>';
       window.scrollTo(0,0);const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
     }else{
       er.innerHTML='<div class="sgerr"><b>Revisa:</b><br>'+((r&&r.errs)||[(r&&r.err)||'No se pudo guardar.']).map(x=>'• '+esc(x)).join('<br>')+'</div>';
