@@ -3653,13 +3653,13 @@ function navGo0(id){
   else if(id==='tvent'){tvView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
-  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda a <u>Ana general</u>: INE, correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita y pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana</a></div>';
+  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><ol><li><b>1</b><span>Manda a <u>Ana general</u>: INE, correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita y pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana</a></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
   const tt=id==='ine10'?'':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
+  m.innerHTML=`<div class="in">${id==='ine10'?'':`<div class="mh2"><b>${tt}${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div>`}${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
   let tr=null,trCb=null,adopt=null;
