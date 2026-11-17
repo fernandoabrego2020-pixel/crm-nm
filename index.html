@@ -1063,6 +1063,21 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #tvw .sgdet summary{cursor:pointer;font-size:14px;font-weight:600}
 #tvw .sgmini{text-decoration:none;display:inline-block}
 #sgw .sgdel{border:1px solid #d33;background:var(--bg);color:#d33;border-radius:8px;padding:6px 10px;font:inherit;font-size:12px}
+#menu .bk,.bk{border:0;background:none;border-radius:10px;padding:2px 10px 2px 0;margin:0 0 6px;color:var(--tx);cursor:pointer;display:inline-flex;align-items:center;font-size:0}
+.bk svg{width:30px;height:30px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#tvw .mh2,#sgw .mh2{margin-bottom:2px}
+#tvw .sgc{padding:10px 12px;margin-bottom:8px}
+#tvw .sgg{gap:6px 10px}
+#tvw label{gap:2px;font-size:11px}
+#tvw select,#tvw input[type=text],#tvw input[type=email],#tvw input[type=date],#tvw input:not([type]),#tvw input[inputmode]{padding:8px 10px}
+#tvw .sgfile{padding:10px 6px;gap:1px}
+#tvw .tvch{padding:9px 6px;font-size:14px}
+#tvw .tvchs{margin-top:2px}
+#tvw .sgbtn{margin-top:4px;padding:12px}
+#tvw .sgdet{padding:10px 12px}
+#sgw .sgfile{padding:10px 6px;gap:1px}
+#sgw .sgc{padding:10px 12px;margin-bottom:8px}
+#sgw details.tvhist>summary,#tvw details.tvhist>summary{cursor:pointer;font-size:14px;color:var(--mu);padding:8px 0}
 </style>
 </head>
 <body>
@@ -2399,14 +2414,14 @@ const sgUniq=a=>{const s={},o=[];a.forEach(x=>{const k=String(x).trim();if(!s[k]
 const sgV=id=>{const e=document.getElementById(id);return e?e.value:''};
 function segView(){
   const m=document.getElementById('menu');
-  m.innerHTML=`<div class="in" id="sgw"><div class="mh2" style="justify-content:flex-start"><button data-nv="mas">← Más</button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="sgw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
   if(SG.cat){sgBuild();return}
   api('seg_cat').then(r=>{if(!r||!r.ok)throw 0;SG.cat=r;sgBuild()}).catch(()=>{const b=document.getElementById('sgb');if(b)b.innerHTML='<div class="sgerr">No pude cargar el catálogo. Revisa tu conexión y vuelve a entrar.</div>'});
 }
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><div style="display:grid;gap:10px"><label class="sgfile"><span>Factura (PDF)</span><input type="file" id="sgIn_factura" accept="application\x2Fpdf,image\x2F*,.xls,.xlsx,.xlsm"><i id="sgFs">Elegir</i></label><label class="sgfile"><span>INE</span><input type="file" id="sgIn_ine" accept="image\x2F*,application\x2Fpdf,.xls,.xlsx,.xlsm" multiple><i id="sgIs">Frente y vuelta</i></label></div><div class="note" id="sgCs" style="margin-top:6px"></div><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label class="sgfile"><span>Factura (PDF)</span><input type="file" id="sgIn_factura" accept="application\x2Fpdf,image\x2F*,.xls,.xlsx,.xlsm"><i id="sgFs">Elegir</i></label><label class="sgfile"><span>INE</span><input type="file" id="sgIn_ine" accept="image\x2F*,application\x2Fpdf,.xls,.xlsx,.xlsm" multiple><i id="sgIs">Frente y vuelta</i></label></div><div class="note" id="sgCs" style="margin-top:6px"></div><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div id="sgPre"><button class="sgbtn" type="button" disabled style="opacity:.45">Enviar</button></div><details class="tvhist" style="margin-top:6px"><summary>Pólizas emitidas</summary><div id="sgH" class="note">Cargando…</div></details>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
   document.getElementById('sgVal').oninput=sgChg;['factura','ine'].forEach(k=>{const el=document.getElementById('sgIn_'+k);if(el)el.onchange=e=>{const fl=[...e.target.files];e.target.value='';if(fl.length)sgSlot(k,fl)}});SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
@@ -2545,10 +2560,10 @@ function sgField(id,lab,type,ph){return `<label>${lab}<input id="sg_${id}" type=
 function sgSelF(id,lab,html,w){return `<label${w?' style="grid-column:1/-1"':''}>${lab}<select id="sg_${id}">${html}</select><em id="sge_${id}"></em></label>`}
 function sgForm(){
   const f=document.getElementById('sgF');
-  if(f.dataset.built){sgSum();sgRdBtn();f.style.display='';return}
-  f.dataset.built='1';f.style.display='';
+  if(f.dataset.built){sgSum();sgRdBtn();f.style.display='';{const pr=document.getElementById('sgPre');if(pr)pr.style.display='none'}return}
+  f.dataset.built='1';f.style.display='';{const pr=document.getElementById('sgPre');if(pr)pr.style.display='none'}
   const C=SG.cat;
-  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div id="sgDocs" class="sgdocs"></div><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div id="sgDocs" class="sgdocs"></div><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Enviar</button></div>`;
   sgRegs();
   document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
   document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
@@ -2737,7 +2752,7 @@ async function sgEmit(force){
   SG.busy=true;btn.disabled=true;btn.textContent='Emitiendo…';
   let r;
   try{r=await api('seg_emit',{datos:sgDatos(),force:!!force})}catch(e){r=null}
-  SG.busy=false;btn.disabled=false;btn.textContent='Emitir póliza';
+  SG.busy=false;btn.disabled=false;btn.textContent='Enviar';
   if(!r){msg.innerHTML='<div class="sgerr">No pude comunicarme con el servidor. NO se sabe si la póliza se emitió: revisa abajo en “Pólizas emitidas” antes de volver a intentar.</div>';sgHist();return}
   if(r.err){msg.innerHTML=`<div class="sgerr">${r.err==='auth'?'Tu sesión venció, entra otra vez.':esc(r.err)}</div>`;return}
   if(!r.ok&&r.errs&&r.errs.length){
@@ -3269,7 +3284,7 @@ function ubDraw(){
 function ubicView(){
   const m=document.getElementById('menu');
   const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
-  m.innerHTML='<div class="in" id="ubw"><div class="mh2" style="justify-content:flex-start"><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div><div class="pfva" style="margin-top:12px"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div></div>';
+  m.innerHTML='<div class="in" id="ubw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div><div class="pfva" style="margin-top:12px"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div></div>';
   m.style.display='block';m.scrollTop=0;
   const w=document.getElementById('ubw');
   w.onclick=vsClick;
@@ -3286,7 +3301,7 @@ function vtodDraw(){
 function vtodView(){
   const m=document.getElementById('menu');
   UBS.k=UBS.k||mSucKey(S.ag)||'lerma';
-  m.innerHTML='<div class="in" id="vtw"><div class="mh2"><b>Videos<small>Uno por sucursal</small></b><button data-nv="mas">← Más</button></div><div class="sg"><div id="vtc" class="vtcs"></div><div id="vtv" style="margin-top:12px"></div></div></div>';
+  m.innerHTML='<div class="in" id="vtw"><div class="mh2"><b>Videos<small>Uno por sucursal</small></b><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div><div class="sg"><div id="vtc" class="vtcs"></div><div id="vtv" style="margin-top:12px"></div></div></div>';
   m.style.display='block';m.scrollTop=0;
   document.getElementById('vtw').onclick=vsClick;
   vtodDraw()
@@ -3438,7 +3453,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   else if(a==='apply'){const items=AV.ft.ch.filter(x=>x.on).map(x=>({r:x.r,n:x.n,p:x.p}));if(items.length)avCatSave(items)}}
 async function anaView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in" id="avi"><button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button>${RO?'<div class="note" style="margin-bottom:8px">Solo lectura</div>':''}<div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="avi"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>${RO?'<div class="note" style="margin-bottom:8px">Solo lectura</div>':''}<div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
   const b=document.getElementById('avb');AV.sub='';AV.ft=null;AV.ed={};
   b.onclick=avClick;
   b.onchange=e=>{const t=e.target;
@@ -3459,7 +3474,7 @@ const TVO=['Tienda','Recomendado o referido','Facebook','WhatsApp','Google','Otr
 function tvView(){
   if(TVS){clearTimeout(TVS.tm);TVS=null}
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in" id="tvw"><div class="mh2" style="justify-content:flex-start"><button data-nv="mas">\u2190 M\u00e1s</button></div><div id="tvb"></div></div>';m.style.display='block';
+  m.innerHTML='<div class="in" id="tvw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div><div id="tvb"></div></div>';m.style.display='block';
   tvBuild();tvHist();
 }
 function tvInp(id,lab,mode,full){return '<label'+(full?' style="grid-column:1\x2F-1"':'')+'>'+lab+'<input id="tv_'+id+'" type="text"'+(mode?' inputmode="'+mode+'"':'')+' autocomplete="off" value="'+esc(TV.v[id]||'')+'"></label>'}
@@ -3477,7 +3492,7 @@ function tvBuild(){
     document.getElementById('tvNew').onclick=()=>{if(TVS){clearTimeout(TVS.tm);TVS=null}tvBuild();tvHist();window.scrollTo(0,0)};
     return;
   }
-  b.innerHTML='<div class="sgc"><div style="display:grid;gap:10px">'+tvSlot('factura','Factura (PDF)','Elegir',false,true)+tvSlot('ine','INE','Frente y vuelta',true)+'</div></div>'+
+  b.innerHTML='<div class="sgc"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+tvSlot('factura','Factura (PDF)','Elegir',false,true)+tvSlot('ine','INE','Frente y vuelta',true)+'</div></div>'+
   '<div class="sgc"><div class="sgg">'+tvInp('telefono','Teléfono','tel')+tvInp('correo','Correo','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
   '<label style="grid-column:1\x2F-1">Financiera<div class="tvchs" id="tvFin">'+tvFin()+'</div></label></div></div>'+
   '<details class="sgc sgdet"><summary>Más datos</summary><div style="margin-top:10px">'+
@@ -3654,8 +3669,8 @@ function navGo0(id){
   else if(id==='seg'){segView();return}
   else if(id==='tvent'){tvView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
-  else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
-  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><ol><li><b>1</b><span>Manda a <u>Ana general</u>: INE, correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita y pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana</a></div>';
+  else if(id==='flujo')body='<button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>'+FLOWH;
+  else if(id==='ine10')body='<button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="i10"><ol><li><b>1</b><span>Manda a <u>Ana general</u>: INE, correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita y pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana</a></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
