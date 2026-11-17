@@ -1078,6 +1078,20 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #sgw .sgfile{padding:10px 6px;gap:1px}
 #sgw .sgc{padding:10px 12px;margin-bottom:8px}
 #sgw details.tvhist>summary,#tvw details.tvhist>summary{cursor:pointer;font-size:14px;color:var(--mu);padding:8px 0}
+/* v160 tamaños: header y tarjetas grandes, pestañas y lista chicas */
+.p2sw{height:44px;padding:0 15px;font-size:18px;border-radius:12px;gap:8px}
+.p2sw .cv{font-size:12px}
+.p2h .tbq.sm{width:48px;height:48px}
+.p2h .tbq.sm svg{width:28px;height:28px}
+.p2g{gap:10px}
+.p2g button{height:96px;min-height:96px;padding:12px 14px;border-radius:16px}
+.p2g button b{font-size:28px;line-height:30px}
+.p2g button span{font-size:15px;line-height:18px}
+.p2t .p2c{min-height:36px;padding:0 6px}
+.p2t .p2c span{font-size:13px}
+.lc{padding:7px 11px;margin-bottom:6px}
+.lc .lt b{font-size:14px;line-height:18px}
+.lc .lt b.no{font-size:13px}
 </style>
 </head>
 <body>
@@ -1444,7 +1458,7 @@ function p2Card(l,c){
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
   const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA</button>'+chip+'</div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(P2.q&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small>'+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(P2.q&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span>'+(op?'<small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">\u25b4</i></small>':'')+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -1700,8 +1714,9 @@ const regEmpty=r=>!String(r.name||'').trim()&&!norm(r.tel)&&!String(r.tx||'').tr
 const regOk=(r,i)=>r.on&&!regDup(r,i)&&!regEmpty(r);
 function regFocusKey(){const a=document.activeElement;if(!a||!a.closest||!a.closest('#p2reg'))return null;let k='';if(a.id)k='#'+a.id;else if(a.dataset&&a.dataset.k!==undefined&&a.dataset.i!==undefined)k='[data-i="'+a.dataset.i+'"][data-k="'+a.dataset.k+'"]';if(!k)return null;let p=0;try{p=a.selectionStart}catch(e){}return {k:k,p:p}}
 function regStat(t){REG.prog=t;const x=document.getElementById('rgst');if(x)x.textContent=t}
+function regSync(){document.querySelectorAll('#p2reg [data-k]').forEach(t=>{const r=REG.rows[+t.dataset.i],k=t.dataset.k;if(!r||k==='on'||k==='lk'||typeof t.value!=='string')return;if(r[k]!==t.value){r[k]=t.value;REG.conf=0;if(k==='tel')r.du=[]}});const l=document.getElementById('rgl');if(l)REG.lugar=l.value}
 function regBtn(){
-  const b=document.querySelector('#p2reg [data-rg="save"]');if(!b)return;
+  regSync();const b=document.querySelector('#p2reg [data-rg="save"]');if(!b)return;
   const n=REG.rows.filter(regOk).length;
   b.textContent=REG.conf?'Guardar así de todos modos':'Guardar '+n+(n===1?' lead':' leads');
   b.disabled=!!REG.busy||!n;
@@ -1781,7 +1796,7 @@ function regAlong(ln,f){
   return ln[ln.length-1];
 }
 function regSave(){
-  const sel=REG.rows.filter(regOk);
+  regSync();const sel=REG.rows.filter(regOk);
   if(!sel.length){REG.err='Escribe al menos un dato: nombre, número o texto.';return regDraw()}
   const nd=sel.filter(r=>regDoubt(r)).length;
   if(nd&&!REG.conf){REG.conf=1;REG.err='';regDraw();const q=document.querySelector('#p2reg .rgf.warn');if(q)q.scrollIntoView({block:'center'});return}
@@ -1828,6 +1843,7 @@ document.addEventListener('change',async e=>{
   REG.prep=0;regDraw();
   if(AI)regRead();
 });
+['change','focusout','blur','keyup'].forEach(ev=>document.addEventListener(ev,e=>{const t=e.target;if(!REG.on||!t||!t.closest||!t.closest('#p2reg')||t.type==='checkbox'||t.tagName==='SELECT')return;if(ev==='keyup'&&e.key==='Enter')return;regBtn()},true));
 document.addEventListener('keydown',e=>{
   if(e.key!=='Enter'||!REG.on)return;const t=e.target;
   if(!t||t.tagName!=='INPUT'||t.type==='checkbox'||!t.closest||!t.closest('#p2reg'))return;
@@ -3272,7 +3288,7 @@ function vsPlay(b){
 function vsClick(e){
   const t=e.target,pl=t.closest&&t.closest('[data-vp]');if(pl){vsPlay(pl.closest('.pfvb'));return}
   const cp=t.closest&&t.closest('[data-vcp]');if(cp){pfCopy(cp.dataset.vcp,'Link del video copiado');return}
-  const ub=t.closest&&t.closest('[data-ub]');if(ub){if(ub.dataset.ub==='w')window.open('https:\x2F\x2Fwa.me/?text='+encodeURIComponent(ubTxt(UBS.k)),'_blank','noopener');else ubCopy();return}
+  const ub=t.closest&&t.closest('[data-ub]');if(ub){if(ub.dataset.ub==='v'){const u=(PFT.d||{})[UBS.k+'#2'];if(u)pfCopy(u,'Video de motos copiado');else toast('Aún no hay video de motos',1);}else ubCopy();return}
   const ch=t.closest&&t.closest('[data-vk]');if(ch){UBS.k=ch.dataset.vk;vtodDraw()}
 }
 function ubCopy(){const u=(PFT.d||{})[UBS.k];pfCopy(ubTxt(UBS.k),u?'Ubicación y video copiados':'Ubicación copiada')}
@@ -3284,7 +3300,7 @@ function ubDraw(){
 function ubicView(){
   const m=document.getElementById('menu');
   const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
-  m.innerHTML='<div class="in" id="ubw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div><div class="pfva" style="margin-top:12px"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div></div>';
+  m.innerHTML='<div class="in" id="ubw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div><div class="pfva" style="margin-top:12px"><button data-ub="c">Copiar ubicación</button><button data-ub="v">Copiar video de motos</button></div></div>';
   m.style.display='block';m.scrollTop=0;
   const w=document.getElementById('ubw');
   w.onclick=vsClick;
@@ -3296,7 +3312,7 @@ function vtodDraw(){
   const k=UBS.k,nm=(MSUC.find(x=>x[0]===k)||[k,k])[1],bar=document.getElementById('vtc');
   if(bar)bar.innerHTML=MSUC.map(x=>'<button type="button" class="vtcb'+(x[0]===k?' on':'')+'" data-vk="'+x[0]+'">'+x[1]+'</button>').join('');
   const w=document.getElementById('vtv');if(w)w.innerHTML='<div class="pfvn"><b>Buscando video…</b></div>';
-  pfTi().then(M=>{const w2=document.getElementById('vtv');if(w2&&UBS.k===k)w2.innerHTML=vsBox('Novamotos '+nm,M[k+'#2']||'','Video de todas las motos · ','Aún no hay video de esta sucursal','columna C')})
+  pfTi().then(M=>{const w2=document.getElementById('vtv');if(w2&&UBS.k===k)w2.innerHTML=vsBox('Novamotos '+nm,M[k+'#2']||'','Video de todas las motos · ','Aún no hay video de esta sucursal','columna C',1)})
 }
 function vtodView(){
   const m=document.getElementById('menu');
