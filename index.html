@@ -3432,14 +3432,13 @@ function tvBuild(){
   const b=document.getElementById('tvb');if(!b)return;
   const cred=TV.v.financiera&&TV.v.financiera!=='CONTADO';
   b.innerHTML='<div id="tvOk"></div>'+
-  '<div class="note" style="margin-bottom:10px">Todo es opcional: env\u00eda lo que tengas y Claude te dice qu\u00e9 qued\u00f3 pendiente.</div><div class="sgc"><h4>1. Documentos</h4><div style="display:grid;gap:10px">'+tvSlot('factura','Factura de la moto (PDF)','Toca para elegir',false,true)+tvSlot('ine','INE del cliente','Una foto con los dos lados, o frente y vuelta por separado',true)+tvSlot('pago','Comprobantes de pago','Si pag\u00f3 con tarjeta, transferencia o Mercado Pago',true)+'<div id="tvFin">'+(cred?tvSlot('financiera','Captura de la financiera pidiendo la entrega','Toca para elegir',true):'')+'</div></div></div>'+
-  '<div class="sgc"><h4>2. Datos de la venta</h4><div class="sgg">'+tvInp('cliente','Nombre del cliente (opcional)','',true)+tvInp('telefono','Teléfono del cliente','tel')+tvInp('correo','Correo del cliente','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
+  '<div class="note" style="margin-bottom:10px">Solo la <b>factura</b> es obligatoria. Todo lo dem\u00e1s es opcional: manda lo que tengas y Claude te dice qu\u00e9 qued\u00f3 pendiente.</div><div class="sgc"><h4>1. Documentos</h4><div style="display:grid;gap:10px">'+tvSlot('factura','Factura de la moto (PDF) \u00b7 obligatoria','Toca para elegir',false,true)+tvSlot('ine','INE del cliente','Una foto con los dos lados, o frente y vuelta por separado',true)+tvSlot('pago','Comprobantes de pago','Si pag\u00f3 con tarjeta, transferencia o Mercado Pago',true)+'<div id="tvFin">'+(cred?tvSlot('financiera','Captura de la financiera pidiendo la entrega','Toca para elegir',true):'')+'</div></div></div>'+
+  '<div class="sgc"><h4>2. Datos de la venta</h4><div class="sgg">'+tvInp('telefono','Teléfono del cliente','tel')+tvInp('correo','Correo del cliente','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
   '<label>Financiera<select id="tv_financiera"><option value="">Elige</option>'+['MAXIKASH','GALGO','CONTADO'].map(x=>'<option value="'+x+'"'+(TV.v.financiera===x?' selected':'')+'>'+(x==='CONTADO'?'Contado':x.charAt(0)+x.slice(1).toLowerCase())+'</option>').join('')+'</select></label>'+
   '<label>Origen del prospecto<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+
   tvInp('uso','Para qué va a usar la moto','',true)+tvInp('responsable','Responsable de la entrega','',true)+'</div></div>'+
-  '<div class="sgc"><h4>3. Medios de pago del enganche</h4><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">Agregar otro medio</button><div class="note" id="tvSum" style="margin-top:8px"></div></div>'+
-  '<div class="sgc"><h4>4. Referidos</h4><div class="sgg">'+tvInp('r1n','Referido 1 · nombre')+tvInp('r1t','Teléfono','tel')+tvInp('r2n','Referido 2 · nombre')+tvInp('r2t','Teléfono','tel')+'</div></div>'+
-  '<div id="tvE"></div><button type="button" class="sgbtn" id="tvGo">Enviar la venta</button><div class="note" style="margin-top:8px">Se guarda en la carpeta de ventas. Luego dile a Claude \u00abventa nueva\u00bb y arma las hojas para imprimir con lo que haya.</div>'+
+  '<details class="sgc sgdet"><summary>Medios de pago del enganche (opcional)</summary><div style="margin-top:10px"><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">Agregar otro medio</button><div class="note" id="tvSum" style="margin-top:8px"></div></div></details>'+
+  '<div id="tvE"></div><button type="button" class="sgbtn" id="tvGo">Enviar la venta</button><div class="note" style="margin-top:8px">Se guarda en la carpeta de ventas. Luego dile a Claude \u00abventa nueva\u00bb y arma las hojas para imprimir.</div>'+
   '<div id="tvH" style="margin-top:14px"></div>';
   ['factura','ine','pago','financiera'].forEach(k=>{
     const el=document.getElementById('tvf_'+k);if(!el)return;tvSt(k);
@@ -3448,7 +3447,7 @@ function tvBuild(){
       else if(k==='factura'&&!(/\.pdf$/i.test(fl[0].name||'')||fl[0].type==='application\x2Fpdf')){const er=document.getElementById('tvE');if(er)er.innerHTML='<div class="sgerr">La factura debe ser el PDF, no una foto.</div>';return}
       else TV.f[k]=fl[0];
       tvSt(k)}});
-  ['cliente','telefono','correo','precio_real','enganche_real','uso','responsable','r1n','r1t','r2n','r2t'].forEach(id=>{const el=document.getElementById('tv_'+id);if(el)el.oninput=()=>{TV.v[id]=el.value;if(id==='enganche_real')tvSum()}});
+  ['telefono','correo','precio_real','enganche_real','uso','responsable'].forEach(id=>{const el=document.getElementById('tv_'+id);if(el)el.oninput=()=>{TV.v[id]=el.value;if(id==='enganche_real')tvSum()}});
   document.getElementById('tv_financiera').onchange=e=>{TV.v.financiera=e.target.value;const c=e.target.value&&e.target.value!=='CONTADO',x=document.getElementById('tvFin');
     if(x){x.innerHTML=c?tvSlot('financiera','Captura de la financiera pidiendo la entrega','Toca para elegir',true):'';const el=document.getElementById('tvf_financiera');if(el){tvSt('financiera');el.onchange=ev=>{const fl=[...ev.target.files];ev.target.value='';if(fl.length){TV.f.financiera=fl;tvSt('financiera')}}}}};
   document.getElementById('tv_origen').onchange=e=>{TV.v.origen=e.target.value};
@@ -3474,12 +3473,13 @@ function tvSum(){
 }
 function tvDatos(){
   const v=TV.v;
-  return {cliente:v.cliente||'',telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',
-    medios:TV.m.map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle})),referidos:[{nombre:v.r1n||'',telefono:v.r1t||''},{nombre:v.r2n||'',telefono:v.r2t||''}]};
+  return {telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',
+    medios:TV.m.map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle}))};
 }
 async function tvSend(){
   if(TV.busy)return;
   const er=document.getElementById('tvE'),bt=document.getElementById('tvGo');
+  if(!TV.f.factura){er.innerHTML='<div class="sgerr">Falta subir la factura (PDF). Es lo \u00fanico obligatorio.</div>';return}
   TV.busy=true;bt.disabled=true;bt.textContent='Subiendo… no cierres la página';er.innerHTML='';
   try{
     const files=[];
