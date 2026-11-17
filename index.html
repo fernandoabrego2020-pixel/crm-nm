@@ -2224,9 +2224,12 @@ async function push(){
   }catch(e){toast('Sin conexión, reintento en un momento',1);setTimeout(push,5000)}
   finally{pushing=false;if(again){again=false;push()}}
 }
-async function pull(){
+function stSave(r){try{localStorage.setItem('crm-st-'+(ME||LU),JSON.stringify(r))}catch(e){}}
+function stGet(n){try{const r=JSON.parse(localStorage.getItem('crm-st-'+n)||'null');return r&&!r.err&&Array.isArray(r.leads)?r:null}catch(e){return null}}
+function stClr(){try{Object.keys(localStorage).filter(k=>k.indexOf('crm-st-')===0).forEach(k=>localStorage.removeItem(k))}catch(e){}}
+async function pull(pre){
   if(pushing)return false;
-  let r;try{r=await api('state')}catch(e){return 'err'}
+  let r;if(pre)r=pre;else{try{r=await api('state')}catch(e){return 'err'}if(r&&!r.err&&Array.isArray(r.leads))stSave(r)}
   if(r.err==='auth'){const n=ME||LU;forgetTok(n);if(n&&!PROT(n)&&!pull.retry){pull.retry=1;TOK='';try{const q=await api('login',{name:n,view:1});if(q.err==='bloq')pull.bl=1;if(!q.err){TOK=q.token;ME=q.name;lset('crm-tok',TOK);saveTok(ME,TOK);pull.retry=0;return pull()}}catch(e){}pull.retry=0}showLogin(pull.bl?(pull.bl=0,'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.'):'Entra con tu NIP');return 'auth'}
   if(r.err)return 'err';
   FULLS=r.full!==false;AI=!!r.ai;ADMIN=!!r.admin;RO=!!r.ro;PISO=r.piso||'';PCHG=r.pc||0;BLQ=r.bloq||[];pcRender();document.body.classList.toggle('ro',RO);TAKEN=new Map((r.taken||[]).map(x=>[x.tel,x.own]));let changed=false;const srv=new Map();
@@ -2272,7 +2275,7 @@ function pcClick(b){
 const DISP={Atlacomulco:['Abel','Atlacomulco'],Almoloya:['Jari','Almoloya']};
 function pname(a){if(DISP[a])return DISP[a];const w=a.split(' ');return w.length>1?[w[w.length-1],w.slice(0,-1).join(' ')]:[a,'']}
 function showLogin(msg){
-  ready=false;TOK='';lset('crm-tok','');bkpClr();if(!LU)LU=lget('crm-user');
+  ready=false;TOK='';lset('crm-tok','');bkpClr();stClr();if(!LU)LU=lget('crm-user');
   const el=document.getElementById('login'),mn=document.getElementById('menu');mn.style.display='none';navHide();
   SP='';
   if(LU&&!LR)LR=roleOf(LU);
@@ -2311,6 +2314,8 @@ async function boot(){
   TOK=lget('crm-tok');LR=lget('crm-role');ME=lget('crm-user');ME=REN[ME]||ME;LU=ME;
   if(!TOK||!ME){const b=await bkpGet();const a=b.split('|');if(a.length>=2&&a[0]){ME=REN[a[0]]||a[0];LU=ME;LR=a[1];lset('crm-user',ME);lset('crm-role',LR)}}
   if(!TOK){if(ME&&!PROT(ME)){LU=ME;LR=LR||roleOf(ME);await viewLogin(ME);return}showLogin();return}
+  const c=stGet(ME);
+  if(c){await pull(c);finishBoot();pull().then(x=>{if(x===true&&ready&&!sheet){const a=document.activeElement;if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')))render()}});return}
   const x=await pull();
   if(x==='auth')return;
   if(x==='err'){showLogin('No se pudo conectar. Intenta otra vez.');return}
