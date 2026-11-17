@@ -2790,7 +2790,7 @@ async function usoView(){
 let lastAct=Date.now();
 ['click','touchstart','keydown','scroll','mousemove'].forEach(e=>document.addEventListener(e,()=>{lastAct=Date.now()},{passive:true,capture:true}));
 let usoAcc=0;try{usoAcc=Number(lget('crm-usoacc'))||0}catch(e){}
-setInterval(()=>{if(!ready||document.hidden||Date.now()-lastAct>12e4||!TOK)return;usoAcc+=15;if(usoAcc>=60){const m=Math.min(2,Math.floor(usoAcc/60));usoAcc-=m*60;try{lset('crm-usoacc',String(usoAcc))}catch(e){}api('uso',{m:m}).catch(()=>{usoAcc+=m*60})}else{try{lset('crm-usoacc',String(usoAcc))}catch(e){}}},15e3);
+setInterval(()=>{if(!ready||document.hidden||Date.now()-lastAct>12e4||!TOK)return;usoAcc+=15;if(usoAcc>=60){const m=Math.min(2,Math.floor(usoAcc/60));usoAcc-=m*60;try{lset('crm-usoacc',String(usoAcc))}catch(e){}api('uso',{m:m,c:ME==='Fer'&&S.ag&&S.ag!==ME?S.ag:''}).catch(()=>{usoAcc+=m*60})}else{try{lset('crm-usoacc',String(usoAcc))}catch(e){}}},15e3);
 const SUCN=[['general','General'],['lerma','Lerma'],['atlacomulco','Atlacomulco'],['santiago','Santiago'],['tenancingo','Tenancingo'],['valle','Valle'],['aodes','Aodes'],['almoloya','Almoloya']];
 let CSUC='lerma';
 async function chatsView(kind,fresh){
