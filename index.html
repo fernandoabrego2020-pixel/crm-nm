@@ -3433,6 +3433,7 @@ function navGo(id){navGo0(id);torreBg(id)}
 const TV={f:{factura:null,ine:[],pago:[],financiera:[]},m:[{medio:'Efectivo',monto:'',detalle:''}],v:{responsable:'ZAYURI CALDERON',financiera:'',origen:''},busy:false,ok:null};
 const TVO=['Tienda','Recomendado o referido','Facebook','WhatsApp','Google','Otro'];
 function tvView(){
+  if(TVS){clearTimeout(TVS.tm);TVS=null}
   const m=document.getElementById('menu');
   m.innerHTML='<div class="in" id="tvw"><div id="tvb"></div></div>';m.style.display='block';
   tvBuild();tvHist();
@@ -3498,13 +3499,51 @@ function tvKw(a){
   const m=[[/ine/i,'INE'],[/tel\u00e9fono/i,'tel\u00e9fono'],[/correo/i,'correo'],[/precio real/i,'precio'],[/enganche real/i,'enganche'],[/financiera/i,'financiera'],[/origen/i,'origen'],[/usar la moto/i,'uso']];
   const o=[];(a||[]).forEach(x=>{if(!/^Falta/i.test(x))return;const h=m.find(y=>y[0].test(x));if(h&&o.indexOf(h[1])<0)o.push(h[1])});return o;
 }
+let TVS=null;
+function tvFb(n){
+  if(!TVS||TVS.st==='error')return '';
+  if(TVS.st==='lista')return '<button type="button" class="sgbtn" id="tvB'+n+'" style="margin-top:8px">Abrir archivo '+n+'</button>';
+  return '<div class="gs" style="margin-top:4px">armando\u2026</div>';
+}
 function tvGuia(){
-  const st=(n,t,sub,c)=>'<div class="gst '+(c||'')+'"><div class="gn">'+n+'</div><div><div class="gt">'+t+'</div>'+(sub?'<div class="gs">'+sub+'</div>':'')+'</div></div>';
-  return st(4,'Imprime el archivo 1','hoja blanca')+
+  const st=(n,t,sub,c,x)=>'<div class="gst '+(c||'')+'"><div class="gn">'+n+'</div><div style="flex:1"><div class="gt">'+t+'</div>'+(sub?'<div class="gs">'+sub+'</div>':'')+(x||'')+'</div></div>';
+  return st(4,'Imprime el archivo 1','hoja blanca','',tvFb(1))+
     st(5,'Cambia a hoja VERDE','','v')+
-    st(6,'Imprime el archivo 2','La factura real \u00b7 <b class="r">NO se entrega al cliente</b>','v')+
+    st(6,'Imprime el archivo 2','La factura real \u00b7 <b class="r">NO se entrega al cliente</b>','v',tvFb(2))+
     '<div class="gst a"><div class="gn">7</div><div><div class="gt">FIRMAS</div><div class="gck">\u2610 Factura verde<br>\u2610 Contrato de compraventa<br>\u2610 Carta de no aceptaci\u00f3n de seguros<br>\u2610 Check list de entrega</div></div></div>'+
     '<div class="gst" style="border-color:#555;background:rgba(128,128,128,.1)"><div class="gn" style="background:#444">8</div><div style="flex:1"><div class="gdl" style="margin-top:0"><div class="c"><b>AL CLIENTE</b>09-C Carta factura<br>11-C P\u00f3liza de garant\u00eda<br>08-C Copia sin valor</div><div class="q"><b>AGENCIA</b>Todo lo dem\u00e1s (A)<br>07-S Sergio</div></div></div></div>';
+}
+function tvOkDraw(){
+  const o=document.getElementById('tvOk');if(!o||!TVS)return;
+  const kw=tvKw(TVS.faltan);
+  o.innerHTML='<div class="sgc sgok"><b>Venta enviada \u2713</b> <span class="note">'+esc(TVS.id)+'</span>'+
+    (TVS.st==='error'?'<div class="sgerr" style="margin-top:10px">No se pudo armar'+(TVS.msg?': '+esc(TVS.msg):'')+'<br><button type="button" class="sgmini" id="tvRe" style="margin-top:6px">Reintentar</button></div>':'')+
+    (kw.length?'<div class="sgdu"><b>Falta:</b> '+kw.join(' \u00b7 ')+'</div>':'')+
+    (TVS.avisos&&TVS.avisos.length?'<div class="sgdu"><b>Aviso:</b> '+TVS.avisos.slice(0,3).map(esc).join('<br>')+'</div>':'')+
+    tvGuia()+'</div>';
+  const b1=document.getElementById('tvB1'),b2=document.getElementById('tvB2'),re=document.getElementById('tvRe');
+  if(b1)b1.onclick=()=>tvOpen(1,b1);
+  if(b2)b2.onclick=()=>tvOpen(2,b2);
+  if(re)re.onclick=()=>tvArmar();
+}
+async function tvOpen(n,b){
+  if(!TVS)return;const t=b.textContent;b.disabled=true;b.textContent='Abriendo\u2026';
+  try{const r=await api('seg_venta_pdf',{id:TVS.id,n:n});if(r&&r.ok){sgDl(r.b64,r.name,'application\x2Fpdf');b.textContent=t}else b.textContent='No disponible'}catch(e){b.textContent='Sin conexi\u00f3n'}
+  b.disabled=false;
+}
+function tvPollGo(){if(!TVS)return;clearTimeout(TVS.tm);TVS.tm=setTimeout(tvPoll,6000)}
+async function tvPoll(){
+  if(!TVS||!document.getElementById('tvOk'))return;
+  let r=null;try{r=await api('seg_venta_estado',{id:TVS.id})}catch(e){}
+  if(!TVS)return;
+  if(r&&r.ok&&r.st==='lista'){TVS.st='lista';TVS.avisos=r.avisos||[];tvOkDraw();tvHist();return}
+  if(r&&r.ok&&r.st==='error'){TVS.st='error';TVS.msg=r.msg||'';tvOkDraw();tvHist();return}
+  tvPollGo();
+}
+async function tvArmar(){
+  if(!TVS)return;const id=TVS.id;TVS.st='armando';TVS.msg='';tvOkDraw();tvPollGo();
+  let r=null;try{r=await api('seg_venta_armar',{id:id})}catch(e){}
+  if(TVS&&TVS.id===id&&r&&r.ok===false){TVS.st='error';TVS.msg=r.err||'';tvOkDraw()}
 }
 async function tvSend(){
   if(TV.busy)return;
@@ -3522,7 +3561,7 @@ async function tvSend(){
     if(r&&r.ok){
       TV.f={factura:null,ine:[],pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:TV.v.responsable||'ZAYURI CALDERON',financiera:'',origen:''};
       tvBuild();tvHist();
-      const o=document.getElementById('tvOk');if(o)o.innerHTML='<div class="sgc sgok"><b>Venta enviada \u2713</b> <span class="note">'+esc(r.id)+(r.dup?' (ya estaba)':'')+'</span>'+(tvKw(r.faltan).length?'<div class="sgdu"><b>Falta:</b> '+tvKw(r.faltan).join(' \u00b7 ')+'</div>':'')+'<div class="gst ok" style="margin-top:10px"><div class="gn">\u2192</div><div><div class="gt">Claude: \u00abventa nueva\u00bb</div></div></div>'+tvGuia()+'</div>';
+      TVS={id:r.id,faltan:r.faltan||[],st:'armando',avisos:[],msg:'',tm:0};tvOkDraw();tvArmar();
       window.scrollTo(0,0);const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
     }else{
       er.innerHTML='<div class="sgerr"><b>Revisa:</b><br>'+((r&&r.errs)||[(r&&r.err)||'No se pudo guardar.']).map(x=>'• '+esc(x)).join('<br>')+'</div>';
@@ -3530,13 +3569,26 @@ async function tvSend(){
   }catch(e){er.innerHTML='<div class="sgerr">No se pudo enviar. Revisa tu conexión y vuelve a intentar (si ya se había guardado, no se duplica).</div>'}
   TV.busy=false;const g=document.getElementById('tvGo');if(g){g.disabled=false;g.textContent='Enviar la venta'}
 }
+let TVA={};
 async function tvHist(){
   const h=document.getElementById('tvH');if(!h)return;
   let r;try{r=await api('seg_venta_list')}catch(e){r=null}
   const h2=document.getElementById('tvH');if(!h2)return;
   if(!r||!r.ok||!r.rows.length){h2.innerHTML='';return}
-  h2.innerHTML='<h4 style="margin:0 0 8px;font-size:15px">Ventas enviadas</h4>'+r.rows.map(x=>'<div class="sgc" style="padding:10px 12px;margin-bottom:8px"><b>'+esc(x.cliente||x.id)+'</b> <span style="float:right;color:var(--mu);font-size:12px">'+(x.fecha?new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+'</span><div class="note" style="margin-top:4px">'+esc(x.id)+(x.fin?' · '+esc(x.fin):'')+(DN(ME)&&x.cuenta!==ME?' · '+esc(x.cuenta):'')+'</div>'+
-    (x.estado==='lista'?'<div style="display:flex;gap:8px;margin-top:8px"><a class="sgmini" target="_blank" rel="noopener" href="'+esc(x.pdf1)+'">Hoja blanca</a>'+(x.pdf2?'<a class="sgmini" target="_blank" rel="noopener" href="'+esc(x.pdf2)+'">Factura verde</a>':'')+'</div>':'<div class="note" style="margin-top:6px">Pendiente: Claude aún no arma las hojas.</div>')+'</div>').join('');
+  const est=x=>x.estado==='lista'?'<div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="sgmini" data-tvo="'+esc(x.id)+'|1">Hoja blanca</button><button type="button" class="sgmini" data-tvo="'+esc(x.id)+'|2">Hoja verde</button></div>'
+    :x.estado==='armando'||x.estado==='pendiente'?'<div class="note" style="margin-top:6px">armando\u2026</div>'
+    :x.estado==='error'?'<div class="note" style="margin-top:6px;color:#d33">Error'+(x.msg?': '+esc(x.msg):'')+'</div><button type="button" class="sgmini" data-tvr="'+esc(x.id)+'" style="margin-top:6px">Reintentar</button>'
+    :'<div class="note" style="margin-top:6px">'+esc(x.estado)+'</div>';
+  h2.innerHTML='<h4 style="margin:0 0 8px;font-size:15px">Ventas enviadas</h4>'+r.rows.map(x=>'<div class="sgc" style="padding:10px 12px;margin-bottom:8px"><b>'+esc(x.cliente||x.id)+'</b> <span style="float:right;color:var(--mu);font-size:12px">'+(x.fecha?new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+'</span><div class="note" style="margin-top:4px">'+esc(x.id)+(x.fin?' \u00b7 '+esc(x.fin):'')+(DN(ME)&&x.cuenta!==ME?' \u00b7 '+esc(x.cuenta):'')+'</div>'+est(x)+'</div>').join('');
+  h2.onclick=async e=>{
+    const o=e.target.closest&&e.target.closest('[data-tvo]'),q=e.target.closest&&e.target.closest('[data-tvr]');
+    if(o){const p=o.dataset.tvo.split('|'),t=o.textContent;o.disabled=true;o.textContent='Abriendo\u2026';
+      try{const d=await api('seg_venta_pdf',{id:p[0],n:Number(p[1])});if(d&&d.ok)sgDl(d.b64,d.name,'application\x2Fpdf')}catch(x){}
+      o.textContent=t;o.disabled=false;return}
+    if(q){q.disabled=true;q.textContent='Armando\u2026';try{await api('seg_venta_armar',{id:q.dataset.tvr})}catch(x){}setTimeout(tvHist,4000)}
+  };
+  r.rows.forEach(x=>{if(x.estado==='pendiente'&&!TVA[x.id]){TVA[x.id]=1;api('seg_venta_armar',{id:x.id}).then(()=>setTimeout(tvHist,5000)).catch(()=>{})}});
+  if(r.rows.some(x=>x.estado==='armando'||x.estado==='pendiente'))setTimeout(()=>{if(document.getElementById('tvH'))tvHist()},9000);
 }
 function masView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
