@@ -2399,7 +2399,7 @@ function segView(){
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><label class="sgfile" id="sgfC"><span>Subir INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Elegir (Excel opcional)</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><label class="sgfile" id="sgfC"><span>Sube INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca para elegir</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
   document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{const fl=[...e.target.files];e.target.value='';sgRoute(fl)};SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
@@ -2717,7 +2717,7 @@ async function sgEmit(force){
   if(SG.busy||!SG.quote)return;
   const btn=document.getElementById('sgGo'),msg=document.getElementById('sgM');
   sgClear();msg.innerHTML='';
-  SG.busy=true;btn.disabled=true;btn.textContent='Emitiendo… (puede tardar unos segundos)';
+  SG.busy=true;btn.disabled=true;btn.textContent='Emitiendo…';
   let r;
   try{r=await api('seg_emit',{datos:sgDatos(),force:!!force})}catch(e){r=null}
   SG.busy=false;btn.disabled=false;btn.textContent='Emitir póliza';
@@ -3246,12 +3246,12 @@ function vsClick(e){
 function ubCopy(){const u=(PFT.d||{})[UBS.k];pfCopy(ubTxt(UBS.k),u?'Ubicación y video copiados':'Ubicación copiada')}
 function ubDraw(){
   const k=UBS.k,nm=(MSUC.find(x=>x[0]===k)||[k,k])[1];
-  pfTi().then(M=>{const w=document.getElementById('ubv');if(w&&UBS.k===k)w.innerHTML=vsBox('Novamotos '+nm,M[k]||'','Video de cómo llegar · ','Todavía no hay video de cómo llegar a esta tienda','columna B',1)})
+  pfTi().then(M=>{const w=document.getElementById('ubv');if(w&&UBS.k===k)w.innerHTML=vsBox('Novamotos '+nm,M[k]||'','Video de cómo llegar · ','Aún no hay video de esta tienda','columna B',1)})
 }
 function ubicView(){
   const m=document.getElementById('menu');
   const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
-  m.innerHTML='<div class="in" id="ubw"><div class="mh2"><b>Ubicación<small>Se copia con el link del video</small></b><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div><div class="pfva"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Maps, dirección, WhatsApp, horario y el video de cómo llegar, como los manda Ana. Al abrir esta pantalla o cambiar de sucursal ya queda copiado.</div></div></div>';
+  m.innerHTML='<div class="in" id="ubw"><div class="mh2"><b>Ubicación<small>Se copia sola</small></b><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div><div class="pfva"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Incluye mapa, dirección, horario y video.</div></div></div>';
   m.style.display='block';m.scrollTop=0;
   const w=document.getElementById('ubw');
   w.onclick=vsClick;
@@ -3263,12 +3263,12 @@ function vtodDraw(){
   const k=UBS.k,nm=(MSUC.find(x=>x[0]===k)||[k,k])[1],bar=document.getElementById('vtc');
   if(bar)bar.innerHTML=MSUC.map(x=>'<button type="button" class="vtcb'+(x[0]===k?' on':'')+'" data-vk="'+x[0]+'">'+x[1]+'</button>').join('');
   const w=document.getElementById('vtv');if(w)w.innerHTML='<div class="pfvn"><b>Buscando video…</b></div>';
-  pfTi().then(M=>{const w2=document.getElementById('vtv');if(w2&&UBS.k===k)w2.innerHTML=vsBox('Novamotos '+nm,M[k+'#2']||'','Video de todas las motos · ','Todavía no hay video de todas las motos de esta sucursal','columna C')})
+  pfTi().then(M=>{const w2=document.getElementById('vtv');if(w2&&UBS.k===k)w2.innerHTML=vsBox('Novamotos '+nm,M[k+'#2']||'','Video de todas las motos · ','Aún no hay video de esta sucursal','columna C')})
 }
 function vtodView(){
   const m=document.getElementById('menu');
   UBS.k=UBS.k||mSucKey(S.ag)||'lerma';
-  m.innerHTML='<div class="in" id="vtw"><div class="mh2"><b>Video de todas las motos<small>Cada sucursal tiene el suyo</small></b><button data-nv="mas">← Más</button></div><div class="sg"><div id="vtc" class="vtcs"></div><div id="vtv" style="margin-top:12px"></div></div></div>';
+  m.innerHTML='<div class="in" id="vtw"><div class="mh2"><b>Videos<small>Uno por sucursal</small></b><button data-nv="mas">← Más</button></div><div class="sg"><div id="vtc" class="vtcs"></div><div id="vtv" style="margin-top:12px"></div></div></div>';
   m.style.display='block';m.scrollTop=0;
   document.getElementById('vtw').onclick=vsClick;
   vtodDraw()
@@ -3608,7 +3608,7 @@ function masView(){
   try{pfTi()}catch(e){}
   const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G([L('Link de Maxicash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Link de Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),N('Tramitar INE en 10 segundos','ine10'),].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Video de todas las motos','vtod'),N('Tramitar venta','tvent'),N('Tramitar seguro','seg')]));
+  if(role==='vendedor')h=G([N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Videos','vtod'),L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]));
   else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
@@ -3638,12 +3638,12 @@ function navGo0(id){
   else if(id==='tvent'){tvView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
-  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda la INE por ambos lados a <u>Ana general</u>, con el correo y el n\u00famero del cliente.</span></li><li><b>2</b><span>Ana sola la tramita en las dos financieras: <u>Galgo</u> y <u>Maxicash</u>.</span></li><li><b>3</b><span>Ana sola contacta al cliente para que le pase el NIP.</span></li></ol><div class="i10f">\u00a1Todo m\u00e1s f\u00e1cil con Ana!</div></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana general</a></div>';
+  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda a <u>Ana general</u> la INE (2 lados), correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita en Galgo y Maxikash.</span></li><li><b>3</b><span>Ana le pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">Abrir WhatsApp de Ana</a></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
-  const tt=id==='ine10'?'Tramitar INE en 10 segundos':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
+  const tt=id==='ine10'?'Tramitar INE':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
   m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
