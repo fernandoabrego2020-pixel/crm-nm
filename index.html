@@ -3243,12 +3243,12 @@ function vsBox(nm,u,pre,empty,col,na){
   const play=v.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(u)+'">Abrir video</a>':'<button class="pfvp" data-vp="1" style="'+(v.th?'background-image:url('+esc(v.th)+')':'')+'"><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>';
   return '<div class="pfvb" id="vsb" data-u="'+esc(u)+'">'+play+'</div>'+(na?'':'<div class="pfva"><button data-vcp="'+esc(u)+'">Copiar link</button><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/?text='+encodeURIComponent(pre+nm+': '+u)+'">Mandar por WhatsApp</a></div>')
 }
-function vsPlay(){
-  const b=document.getElementById('vsb');if(!b)return;const v=pfVid(b.dataset.u);
+function vsPlay(b){
+  if(!b)return;const v=pfVid(b.dataset.u);
   b.innerHTML=v.k==='mp'?'<video src="'+esc(v.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(v.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
 }
 function vsClick(e){
-  const t=e.target,pl=t.closest&&t.closest('[data-vp]');if(pl){vsPlay();return}
+  const t=e.target,pl=t.closest&&t.closest('[data-vp]');if(pl){vsPlay(pl.closest('.pfvb'));return}
   const cp=t.closest&&t.closest('[data-vcp]');if(cp){pfCopy(cp.dataset.vcp,'Link del video copiado');return}
   const ub=t.closest&&t.closest('[data-ub]');if(ub){if(ub.dataset.ub==='w')window.open('https:\x2F\x2Fwa.me/?text='+encodeURIComponent(ubTxt(UBS.k)),'_blank','noopener');else ubCopy();return}
   const ch=t.closest&&t.closest('[data-vk]');if(ch){UBS.k=ch.dataset.vk;vtodDraw()}
@@ -3256,12 +3256,13 @@ function vsClick(e){
 function ubCopy(){const u=(PFT.d||{})[UBS.k];pfCopy(ubTxt(UBS.k),u?'Ubicación y video copiados':'Ubicación copiada')}
 function ubDraw(){
   const k=UBS.k,nm=(MSUC.find(x=>x[0]===k)||[k,k])[1];
-  pfTi().then(M=>{const w=document.getElementById('ubv');if(w&&UBS.k===k)w.innerHTML=vsBox('Novamotos '+nm,M[k]||'','Video de cómo llegar · ','Aún no hay video de esta tienda','columna B',1)})
+  pfTi().then(M=>{const w=document.getElementById('ubv');if(w&&UBS.k===k)w.innerHTML=vsBox('Novamotos '+nm,M[k]||'','Video de cómo llegar · ','Aún no hay video de esta tienda','columna B',1)});
+  vtodDraw()
 }
 function ubicView(){
   const m=document.getElementById('menu');
   const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
-  m.innerHTML='<div class="in" id="ubw"><div class="mh2"><b>Ubicación<small>Se copia sola</small></b><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div><div class="pfva"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Incluye mapa, dirección, horario y video.</div></div></div>';
+  m.innerHTML='<div class="in" id="ubw"><div class="mh2"><b>Ubicación<small>Se copia sola</small></b><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div><div class="pfva"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Incluye mapa, dirección, horario y video.</div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div></div>';
   m.style.display='block';m.scrollTop=0;
   const w=document.getElementById('ubw');
   w.onclick=vsClick;
@@ -3617,7 +3618,7 @@ function masView(){
   try{pfTi()}catch(e){}
   const QUIEN=N('Quién escribió','quien');
   let h='';
-  if(role==='vendedor')h=G([N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Videos','vtod'),L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]));
+  if(role==='vendedor')h=G([N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]));
   else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')].concat(ANAT,[L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G([L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
   else h=G([N('Trámites','tram'),L('Inventario disponible',NLINK.inv())]);
