@@ -1077,8 +1077,8 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 <div id="mapv">
   <div id="mtop"><button id="mback">← Clientes</button><b id="mtt">Cambaceo</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
   <div id="mwrap"><canvas id="mc"></canvas><div id="mst"></div><div id="mpt"></div><div id="mtr"><b id="mtn">Traza la calle</b><div class="mtb"><button id="mtg">Centrar en mí</button><button id="mtu">Deshacer punto</button><button id="mtx">Cancelar</button><button id="mtok" class="p">Listo</button></div></div><div id="mleg"><span><i style="background:#4338ca"></i>Enviar más fotos</span><span><i style="background:#c0283a"></i>Buscar aprobación</span><span><i style="background:#15803d"></i>Buscar visita</span></div></div>
-  <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="msave">Guardar ubicación del prospecto</button></div>
-  <div class="mfs" id="mfs"><div class="mh"><b id="mft">Ubicar un lead que no tiene ubicación</b><button id="mfx" aria-label="Cerrar">×</button></div><input id="mfq" placeholder="Buscar por nombre o teléfono" autocomplete="off"><div class="note" id="mfn">Toca el lead y se guarda tu ubicación actual para él.</div><div class="res" id="mfr"></div></div>
+  <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="msave">Guardar ubicación</button></div>
+  <div class="mfs" id="mfs"><div class="mh"><b id="mft">Lead sin ubicación</b><button id="mfx" aria-label="Cerrar">×</button></div><input id="mfq" placeholder="Buscar por nombre o teléfono" autocomplete="off"><div class="note" id="mfn">Toca un lead para guardarle tu ubicación.</div><div class="res" id="mfr"></div></div>
   <div class="mfs" id="mrs"><div class="mh"><b>Rutas de cambaceo</b><button id="mrx" aria-label="Cerrar">×</button></div><label class="note"><input type="checkbox" id="mrshow" checked style="width:auto;padding:0"> Mostrar rutas en el mapa</label><div class="note" id="mrn"></div><div class="res" id="mrr"></div></div>
 </div>
 <div id="menu" class="menu"></div>
@@ -2776,7 +2776,7 @@ async function sgHist(){
 const hm=n=>n>=60?Math.floor(n/60)+' h '+String(n%60).padStart(2,'0')+' min':n+' min';
 async function usoView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in"><div class="mh2"><b>Tiempo de uso<small>Minutos con el panel abierto y activo</small></b><button id="mlo">Salir</button></div><div id="usr" class="note">Cargando…</div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in"><div class="mh2"><b>Tiempo de uso</b><button id="mlo">Salir</button></div><div id="usr" class="note">Cargando…</div></div>`;m.style.display='block';
   let r;try{r=await api('uso_get')}catch(e){r=null}
   const box=document.getElementById('usr');if(!box)return;
   if(!r||!r.ok){box.textContent='No se pudo cargar.';return}
@@ -2785,7 +2785,7 @@ async function usoView(){
   (r.rows||[]).forEach(x=>{const o=by[x.c]=by[x.c]||{h:0,a:0,s:0,t:0,u:0};if(x.d===t0)o.h+=x.m;if(x.d===t1)o.a+=x.m;if(x.d>=t7)o.s+=x.m;o.t+=x.m;if(x.u>o.u)o.u=x.u});
   const L=Object.keys(by).sort((a,b)=>by[b].s-by[a].s);
   const ago=t=>{if(!t)return '';const k=Math.round((Date.now()-t)/6e4);return k<2?'ahora':k<60?'hace '+k+' min':k<1440?'hace '+Math.round(k/60)+' h':'hace '+Math.round(k/1440)+' d'};
-  box.outerHTML=L.length?L.map(n=>{const o=by[n];return `<div class="sg"><b>${esc(n)}</b> <span style="float:right;color:var(--mu)">${ago(o.u)}</span><table><tr><td>Hoy</td><td><b>${hm(o.h)}</b></td></tr><tr><td>Ayer</td><td>${hm(o.a)}</td></tr><tr><td>Últimos 7 días</td><td>${hm(o.s)}</td></tr><tr><td>Últimos 30 días</td><td>${hm(o.t)}</td></tr></table></div>`}).join(''):'<div class="soonp">Aún no hay datos. Se empiezan a juntar desde que se publica esta versión.</div>';
+  box.outerHTML=L.length?'<table class="sg" style="width:100%;font-size:13px"><tr style="color:var(--mu);text-align:right"><td style="text-align:left"></td><td>Hoy</td><td>Ayer</td><td>7 d</td><td>30 d</td></tr>'+L.map(n=>{const o=by[n];return `<tr style="text-align:right"><td style="text-align:left"><b>${esc(n)}</b><br><small style="color:var(--mu)">${ago(o.u)}</small></td><td><b>${hm(o.h)}</b></td><td>${hm(o.a)}</td><td>${hm(o.s)}</td><td>${hm(o.t)}</td></tr>`}).join('')+'</table>':'<div class="soonp">Sin datos todavía.</div>';
 }
 let lastAct=Date.now();
 ['click','touchstart','keydown','scroll','mousemove'].forEach(e=>document.addEventListener(e,()=>{lastAct=Date.now()},{passive:true,capture:true}));
@@ -3647,12 +3647,12 @@ function navGo0(id){
   else if(id==='tvent'){tvView();return}
   else if(id==='img')body=`<button class="mback" data-nv="moto" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Motos</button>`+IMG.map(x=>`<a class="big" style="--k:var(--g${x[2]})" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/${x[1]}">${x[0]}<small>Ver y subir fotos</small></a>`).join('');
   else if(id==='flujo')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">← Más</button>'+FLOWH;
-  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda a <u>Ana general</u> la INE (2 lados), correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita en Galgo y Maxikash.</span></li><li><b>3</b><span>Ana le pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">Abrir WhatsApp de Ana</a></div>';
+  else if(id==='ine10')body='<button class="mback" data-nv="mas" style="margin-bottom:12px;border:1px solid var(--ln);background:var(--card);border-radius:999px;padding:6px 12px;color:var(--tx)">\u2190 M\u00e1s</button><div class="i10"><span class="i10p">Pr\u00f3ximamente</span><ol><li><b>1</b><span>Manda a <u>Ana general</u>: INE, correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita y pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana</a></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
-  const tt=id==='ine10'?'Tramitar INE':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
+  const tt=id==='ine10'?'':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
   m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
