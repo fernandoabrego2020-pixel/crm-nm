@@ -1024,6 +1024,22 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #tvw .sgbtn:disabled{opacity:.5}
 #tvw .sgerr{border:1px solid #d33;background:rgba(221,51,51,.08);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
 #tvw .sgdu{border:1px solid #d69e2e;background:rgba(214,158,46,.1);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+#tvw .gst{display:flex;gap:10px;align-items:flex-start;border:2px solid #1f4e9e;background:rgba(31,78,158,.08);border-radius:14px;padding:10px 12px;margin-top:8px}
+#tvw .gst.v{border-color:#2e8b3e;background:rgba(46,139,62,.1)}
+#tvw .gst.a{border-color:#b26a00;background:rgba(178,106,0,.1)}
+#tvw .gst.ok{border-color:#2e8b3e}
+#tvw .gn{flex:0 0 28px;height:28px;border-radius:50%;background:#1f4e9e;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px}
+#tvw .gst.v .gn,#tvw .gst.ok .gn{background:#2e8b3e}
+#tvw .gst.a .gn{background:#b26a00}
+#tvw .gt{font-weight:800;font-size:15px}
+#tvw .gs{font-size:12px;opacity:.8;margin-top:2px}
+#tvw .gs b.r{color:#d0021b}
+#tvw .gck{font-size:13px;margin-top:4px}
+#tvw .gdl{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+#tvw .gdl>div{border-radius:12px;padding:8px 10px;font-size:12px}
+#tvw .gdl .c{background:#2e8b3e;color:#fff}
+#tvw .gdl .q{background:rgba(128,128,128,.18)}
+#tvw .gdl b{display:block;font-size:12px;margin-bottom:4px}
 #tvw .sgda{display:flex;gap:8px}#tvw .sgda .sgbtn{flex:1}
 #tvw .sgok{border-color:#2f9e5b}
 #tvw .sgok .bad{color:#d33}
@@ -3476,6 +3492,19 @@ function tvDatos(){
   return {telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',
     medios:TV.m.map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle}))};
 }
+function tvGuia(){
+  const st=(n,t,sub,c)=>'<div class="gst '+(c||'')+'"><div class="gn">'+n+'</div><div><div class="gt">'+t+'</div>'+(sub?'<div class="gs">'+sub+'</div>':'')+'</div></div>';
+  return '<div style="margin-top:12px;font-weight:800">Ahora sigue esto:</div>'+
+    st('\u2713','Venta enviada','Ya qued\u00f3 guardada con todos sus archivos','ok')+
+    st(2,'Pon hojas BLANCAS en la impresora','')+
+    st(3,'Dile a Claude \u00abventa nueva\u00bb','Chat nuevo. Ya tiene todo lo que mandaste, no env\u00edes nada m\u00e1s')+
+    st(4,'Imprime el archivo 1','Claude te lo env\u00eda \u00b7 todo en hoja blanca')+
+    st(5,'Cambia a hoja VERDE','','v')+
+    st(6,'Imprime el archivo 2','La factura real \u00b7 <b class="r">NO se entrega al cliente</b>','v')+
+    '<div class="gst a"><div class="gn">7</div><div><div class="gt">FIRMAS</div><div class="gck">\u2610 Factura verde<br>\u2610 Contrato de compraventa (todo firmado)<br>\u2610 Carta de no aceptaci\u00f3n de seguros<br>\u2610 Check list de entrega (revisi\u00f3n: frenos, etc.)</div></div></div>'+
+    '<div class="gst" style="border-color:#555;background:rgba(128,128,128,.1)"><div class="gn" style="background:#444">8</div><div style="flex:1"><div class="gdl" style="margin-top:0"><div class="c"><b>SE ENTREGA AL CLIENTE</b>09-C Carta factura<br>11-C P\u00f3liza de garant\u00eda<br>08-C Copia sin valor de la factura</div><div class="q"><b>SE QUEDA EN LA AGENCIA</b>Todo lo dem\u00e1s (letra A)<br>Factura verde: nunca al cliente<br>07-S Copia de factura: para Sergio</div></div></div></div>'+
+    '<div class="note" style="margin-top:8px">Al engrapar: mismo N\u00daMERO = mismo documento \u00b7 Letra: C cliente \u00b7 A agencia \u00b7 S Sergio</div>';
+}
 async function tvSend(){
   if(TV.busy)return;
   const er=document.getElementById('tvE'),bt=document.getElementById('tvGo');
@@ -3492,7 +3521,7 @@ async function tvSend(){
     if(r&&r.ok){
       TV.f={factura:null,ine:[],pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:TV.v.responsable||'ZAYURI CALDERON',financiera:'',origen:''};
       tvBuild();tvHist();
-      const o=document.getElementById('tvOk');if(o)o.innerHTML='<div class="sgc sgok"><b>Venta enviada ✓</b><div class="note" style="margin-top:6px">Número: <b>'+esc(r.id)+'</b>'+(r.dup?' (ya estaba guardada)':'')+'<br>Ahora dile a Claude: \u00abventa nueva\u00bb y te arma las hojas para imprimir.</div>'+(r.faltan&&r.faltan.length?'<div class="sgdu"><b>Qued\u00f3 pendiente:</b><br>'+r.faltan.map(x=>'\u2022 '+esc(x)).join('<br>')+'</div>':'')+'</div>';
+      const o=document.getElementById('tvOk');if(o)o.innerHTML='<div class="sgc sgok"><b>Venta enviada ✓</b><div class="note" style="margin-top:6px">Número: <b>'+esc(r.id)+'</b>'+(r.dup?' (ya estaba guardada)':'')+'</div>'+(r.faltan&&r.faltan.length?'<div class="sgdu"><b>Qued\u00f3 pendiente:</b><br>'+r.faltan.map(x=>'\u2022 '+esc(x)).join('<br>')+'</div>':'')+tvGuia()+'</div>';
       window.scrollTo(0,0);const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
     }else{
       er.innerHTML='<div class="sgerr"><b>Revisa:</b><br>'+((r&&r.errs)||[(r&&r.err)||'No se pudo guardar.']).map(x=>'• '+esc(x)).join('<br>')+'</div>';
