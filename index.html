@@ -390,7 +390,7 @@ body.hasnav .sheet{bottom:calc(64px + env(safe-area-inset-bottom,0px))}
 .avsw{position:relative;width:54px;height:30px;border-radius:999px;border:1px solid var(--ln);background:var(--ln);flex-shrink:0;cursor:pointer;padding:0}
 .avsw:after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
 .avsw.on{background:var(--wa);border-color:var(--wa)}.avsw.on:after{left:27px}.avsw:disabled{opacity:.45}
-.avh{display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,1fr) 46px;gap:6px;align-items:center;margin-top:6px;font-size:14px}
+.avh{display:grid;grid-template-columns:36px minmax(0,1fr) minmax(0,1fr);gap:6px;align-items:center;margin-top:6px;font-size:14px}
 .avh.hd{font-size:12px;color:var(--mu);margin-top:8px}
 .avh input{width:100%;box-sizing:border-box;padding:6px 4px;font-size:15px}
 .avh .z{color:var(--mu);font-size:12px;text-decoration:underline;background:none;border:0;cursor:pointer;padding:0}
@@ -3267,7 +3267,7 @@ function ubDraw(){
 function ubicView(){
   const m=document.getElementById('menu');
   const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
-  m.innerHTML='<div class="in" id="ubw"><div class="mh2"><b>Ubicación<small>Se copia sola</small></b><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div><div class="pfva"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div><div class="note" style="margin-top:8px">Incluye mapa, dirección, horario y video.</div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div></div>';
+  m.innerHTML='<div class="in" id="ubw"><div class="mh2" style="justify-content:flex-start"><button data-nv="mas">← Más</button></div><div class="sg"><label class="pfss pfls"><select id="ubs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label><div id="ubv" style="margin-top:12px"></div></div><div class="sg" style="margin-top:12px"><b>Video de motos</b><div id="vtv" style="margin-top:10px"></div></div><div class="pfva" style="margin-top:12px"><button data-ub="c">Copiar ubicación</button><button data-ub="w" class="pfwa">Mandar por WhatsApp</button></div></div>';
   m.style.display='block';m.scrollTop=0;
   const w=document.getElementById('ubw');
   w.onclick=vsClick;
@@ -3381,10 +3381,10 @@ function avSet(k,f,v){
   if(f==='bl')go();else needFull(go)}
 function avMain(){const a=avAg();if(!a)return '<div class="soonp">No hay Ana para tu cuenta.</div>';
   const w=!!a.w,chips=AV.d.ags.length>1?`<div class="chips mtc">${AV.d.ags.map(x=>`<button data-avk="${x.k}" aria-pressed="${AV.k===x.k}">${esc(x.n)}</button>`).join('')}</div>`:'';
-  const rows=a.d.map((x,i)=>{return `<div class="avh"><span>${AVD[i]}</span><input type="time" value="${esc(x[0])}" data-d="${i}" data-t="0"${w?'':' disabled'}><input type="time" value="${esc(x[1])}" data-d="${i}" data-t="1"${w?'':' disabled'}>${w?`<button class="z" data-avz="${i}">Apagar</button>`:''}</div>`}).join('');
+  const rows=a.d.map((x,i)=>{return `<div class="avh"><span>${AVD[i]}</span><input type="time" value="${esc(x[0])}" data-d="${i}" data-t="0"${w?'':' disabled'}><input type="time" value="${esc(x[1])}" data-d="${i}" data-t="1"${w?'':' disabled'}></div>`}).join('');
   const bl=a.bl.length?`<details style="margin-top:8px"${AV.dop?' open':''} ontoggle="AV.dop=this.open"><summary class="note" style="cursor:pointer">Ver lista</summary><div style="margin-top:6px">${a.bl.map(n=>`<span class="mps">${esc(n)}${w?`<button class="avx" data-avb="${esc(n)}" aria-label="Quitar">×</button>`:''}</span>`).join('')}</div></details>`:'';
-  return chips+`<div class="sg"><div class="avs"><b>Prender Ana ahorita<small>${a.on?'Contesta aunque la agencia esté abierta':'Solo en su horario'}</small></b><button class="avsw${a.on?' on':''}" data-av="tog"${w?'':' disabled'} aria-label="Prender o apagar Ana"></button></div></div>
-  <div class="sg"><b>Horario</b><div class="avh hd"><span></span><span>Prende</span><span>Apaga</span><span></span></div>${rows}${w?'<button class="avb" data-av="sch">Guardar horario</button>':''}</div>
+  return chips+`<div class="sg"><div class="avs"><b>Prender Ana ahorita</b><button class="avsw${a.on?' on':''}" data-av="tog"${w?'':' disabled'} aria-label="Prender o apagar Ana"></button></div></div>
+  <div class="sg"><b>Horario</b><div class="avh hd"><span></span><span>Prende</span><span>Apaga</span></div>${rows}${w?'<button class="avb" data-av="sch">Guardar horario</button>':''}</div>
   <div class="sg"><b>Bloqueados · ${a.bl.length}</b>${w?'<div class="avr"><input id="avn" type="tel" inputmode="numeric" maxlength="14" placeholder="10 dígitos" autocomplete="off"><button data-av="add">Agregar</button></div>':''}${bl}</div>
   <div class="sg"><b>Precios</b><button class="avb" data-av="cat" style="margin-top:8px">Cambiar precios</button>${w?'<button class="avb ft" style="margin-top:8px" data-av="foto">Actualizar con foto</button>':''}</div>
   ${ME==='Fer'?`<a class="mtl" target="_blank" rel="noopener" href="${GS(SH_PANEL)}">Abrir en Google Sheets</a>`:''}${w?'<input type="file" id="avf" accept="image/\x2A" hidden>':''}`}
@@ -3436,7 +3436,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   else if(a==='apply'){const items=AV.ft.ch.filter(x=>x.on).map(x=>({r:x.r,n:x.n,p:x.p}));if(items.length)avCatSave(items)}}
 async function anaView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in" id="avi"><button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button><div class="mh2"><b>Ana${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="avi"><button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button>${RO?'<div class="note" style="margin-bottom:8px">Solo lectura</div>':''}<div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
   const b=document.getElementById('avb');AV.sub='';AV.ft=null;AV.ed={};
   b.onclick=avClick;
   b.onchange=e=>{const t=e.target;
@@ -3457,7 +3457,7 @@ const TVO=['Tienda','Recomendado o referido','Facebook','WhatsApp','Google','Otr
 function tvView(){
   if(TVS){clearTimeout(TVS.tm);TVS=null}
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in" id="tvw"><div id="tvb"></div></div>';m.style.display='block';
+  m.innerHTML='<div class="in" id="tvw"><div class="mh2" style="justify-content:flex-start"><button data-nv="mas">\u2190 M\u00e1s</button></div><div id="tvb"></div></div>';m.style.display='block';
   tvBuild();tvHist();
 }
 function tvInp(id,lab,mode,full){return '<label'+(full?' style="grid-column:1\x2F-1"':'')+'>'+lab+'<input id="tv_'+id+'" type="text"'+(mode?' inputmode="'+mode+'"':'')+' autocomplete="off" value="'+esc(TV.v[id]||'')+'"></label>'}
