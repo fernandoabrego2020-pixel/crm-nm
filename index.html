@@ -3883,14 +3883,14 @@ const MAPM=(function(){
   function hideCard(){sel=null;armQ=false;clearTimeout(armT);$('mpt').className='';}
   function showPh(l){
     sel=l.id;armQ=false;
-    $('mpt').innerHTML=`<div class="mpn"><i style="background:#fbbf24"></i><b>Sin datos</b></div><div class="mpm">Guardado ${ago(l.c)} \u00b7 ubicaci\u00f3n \u00b1${l.loc[2]} m</div><div class="mpa"><button class="b p" id="mpf">Llenar datos con IA</button><button class="b" id="mpe">Poner un lead que ya tengo</button><button class="b" id="mpm">Mover ubicaci\u00f3n</button><button class="b dg" id="mpq">Borrar</button></div>`;
+    $('mpt').innerHTML=`<div class="mpn"><i style="background:#fbbf24"></i><b>Sin datos</b></div><div class="mpm">Guardado ${ago(l.c)}</div><div class="mpa"><button class="b p" id="mpf">Llenar con IA</button><button class="b" id="mpe">Usar un lead</button><button class="b" id="mpm">Mover</button><button class="b dg" id="mpq">Borrar</button></div>`;
     $('mpt').className='show';
     $('mpf').onclick=()=>openSheet(null,AI?'foto':'manual',l.id);
     $('mpe').onclick=()=>{hideCard();draw();openFind('adopt',l.id)};
     $('mpm').onclick=()=>free0(()=>{mv=l.id;hideCard();draw();say('Toca en el mapa el lugar correcto.')});
     $('mpq').onclick=()=>{
       const b=$('mpq');
-      if(!armQ){armQ=true;b.textContent='\u00bfSeguro? Toca otra vez';armT=setTimeout(()=>{armQ=false;b.textContent='Borrar'},4000);return}
+      if(!armQ){armQ=true;b.textContent='\u00bfSeguro?';armT=setTimeout(()=>{armQ=false;b.textContent='Borrar'},4000);return}
       const i=S.leads.indexOf(l);if(i>=0)S.leads.splice(i,1);save();hideCard();draw();render();say('Guardado borrado.');
     };
   }
@@ -3898,22 +3898,17 @@ const MAPM=(function(){
     if(l.ph)return showPh(l);
     sel=l.id;armQ=false;
     const g=baseOf(l),c0=(l.ctx||[]).filter(e=>!e.auto).slice(-1)[0],r=(c0&&c0.x)||(l.ai&&l.ai.resumen)||'';
-    $('mpt').innerHTML=`<div class="mpn"><i style="background:${PC[g]}"></i><b>${esc(l.name)}</b></div><div class="mpm">${esc(fmt(l.tel))} · ${PN[g]}${l.vz?' · Para visitar':''}</div>${r?`<div class="mpm">${esc(String(r).slice(0,160))}</div>`:''}<div class="mpa"><a class="b wa" href="https:\x2F\x2Fwa.me/52${l.tel}" target="_blank" rel="noopener">WhatsApp</a><a class="b" href="https:\x2F\x2Fwww.google.com/maps?q=${l.loc[0]},${l.loc[1]}" target="_blank" rel="noopener">Ir (Maps)</a><button class="b" id="mpo">Abrir lead</button><button class="b" id="mpv">${l.vz?'Ya lo visité':'Para visitar'}</button><button class="b" id="mpm">Mover ubicación</button><button class="b dg" id="mpq">Quitar ubicación</button><button class="b" id="mpc">Cerrar</button></div>`;
+    $('mpt').innerHTML=`<div class="mpn"><i style="background:${PC[g]}"></i><b>${esc(l.name)}</b></div><div class="mpm">${esc(fmt(l.tel))} · ${PN[g]}</div>${r?`<div class="mpm">${esc(String(r).slice(0,160))}</div>`:''}<div class="mpa"><a class="b wa" href="https:\x2F\x2Fwa.me/52${l.tel}" target="_blank" rel="noopener">WhatsApp</a><button class="b" id="mpo">Abrir lead</button><button class="b" id="mpm">Mover</button><button class="b dg" id="mpq">Quitar</button></div>`;
     $('mpt').className='show';
-    $('mpc').onclick=()=>{hideCard();draw()};
     $('mpo').onclick=()=>{
       const gid=(l.vz||g==='cartera')?'cartera':g;
       hide();S.ag=l.own;only=gid;open=gid+':'+l.id;render();
       const c=document.querySelector('.c[data-id="'+l.id+'"][data-g="'+gid+'"]');if(c)c.scrollIntoView({block:'center'});
     };
-    $('mpv').onclick=()=>free0(()=>{
-      if(l.vz){delete l.vz;touch(l);ev(l,'Ya se le visitó.')}else{delete l.sn;l.vz=1;ev(l,'Se acordó visitarlo cuando salga a cambacear.')}
-      save();render();showCard(l);draw();
-    });
     $('mpm').onclick=()=>needFull(()=>{mv=l.id;hideCard();draw();say('Toca en el mapa el lugar nuevo de '+l.name+'.')});
     $('mpq').onclick=()=>needFull(()=>{
       const b=$('mpq');
-      if(!armQ){armQ=true;b.textContent='¿Seguro? Toca otra vez';armT=setTimeout(()=>{armQ=false;b.textContent='Quitar ubicación'},4000);return}
+      if(!armQ){armQ=true;b.textContent='¿Seguro?';armT=setTimeout(()=>{armQ=false;b.textContent='Quitar'},4000);return}
       delete l.loc;save();hideCard();draw();say('Ubicación quitada de '+l.name+'. El lead sigue en tu lista.');
     });
   }
