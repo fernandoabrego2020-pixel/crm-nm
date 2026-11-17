@@ -972,6 +972,8 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #sgw .sgck{flex-direction:row;align-items:flex-start;gap:8px;font-size:13px;color:var(--tx);margin:6px 0}
 #sgw .sgck input{width:20px;height:20px;flex:none}
 #sgw .sgbtn{display:block;width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#6d5dfc,#c026d3);color:#fff;font:inherit;font-size:15px;font-weight:700;padding:14px;margin-top:10px}
+#sgPb{margin-top:8px;border:2px dashed var(--ln);border-radius:12px;min-height:54px;padding:14px 10px;text-align:center;font-size:13px;color:var(--tx);caret-color:transparent;-webkit-user-select:text;user-select:text}
+#sgPb:empty:before{content:attr(data-ph);color:var(--mu)}
 #sgw .sgbtn.sec{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
 #sgw .sgbtn:disabled{opacity:.5}
 #sgw .sgerr{border:1px solid #d33;background:rgba(221,51,51,.08);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
@@ -2325,11 +2327,14 @@ function segView(){
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><h4>1 · Sube tus archivos</h4><label class="sgfile" id="sgfC"><span>Cotización (Excel), INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca aquí y elige los 3 archivos (o suéltalos / Ctrl+V)</i></label><button type="button" class="sgbtn sec" id="sgPg" style="margin-top:8px;width:100%">Pegar desde el portapapeles</button><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>.</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><h4>1 · Sube tus archivos</h4><label class="sgfile" id="sgfC"><span>Cotización (Excel), INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca aquí y elige los 3 archivos (o suéltalos / Ctrl+V)</i></label><div id="sgPb" contenteditable="true" inputmode="none" spellcheck="false" autocapitalize="off" data-ph="Mant\u00e9n presionado aqu\u00ed y toca Pegar (archivos copiados de WhatsApp)"></div><button type="button" class="sgbtn sec" id="sgPg" style="margin-top:8px;width:100%">Pegar foto copiada</button><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>.</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
   document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{const fl=[...e.target.files];e.target.value='';sgRoute(fl)};document.getElementById('sgPg').onclick=sgPaste;SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
-  if(!SG.pasteOn){SG.pasteOn=1;document.addEventListener('paste',e=>{if(!document.getElementById('sgw'))return;const fs=e.clipboardData&&e.clipboardData.files;if(fs&&fs.length){e.preventDefault();sgRoute(fs)}})}
+  if(!SG.pasteOn){SG.pasteOn=1;document.addEventListener('paste',e=>{if(!document.getElementById('sgw'))return;const cd=e.clipboardData;if(!cd)return;let fs=[...(cd.files||[])];if(!fs.length&&cd.items)for(const it of cd.items){if(it.kind==='file'){const f=it.getAsFile();if(f)fs.push(f)}}
+    const pb=document.getElementById('sgPb');
+    if(fs.length){e.preventDefault();if(pb)pb.innerHTML='';sgRoute(fs);return}
+    if(pb&&e.target===pb){e.preventDefault();const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Tu iPhone no me pas\u00f3 los archivos al pegar (lleg\u00f3: '+esc([...(cd.types||[])].join(', ')||'nada')+'). Mejor gu\u00e1rdalos en Archivos (en WhatsApp: mant\u00e9n el archivo, Compartir, Guardar en Archivos) y s\u00fabelos con el recuadro de arriba.</div>'}})}
 }
 function sgSel(){
   const c=SG.cat.cat,q=SG.q;
