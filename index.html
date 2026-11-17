@@ -974,6 +974,13 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #sgw .sgbtn{display:block;width:100%;border:0;border-radius:12px;background:linear-gradient(135deg,#6d5dfc,#c026d3);color:#fff;font:inherit;font-size:15px;font-weight:700;padding:14px;margin-top:10px}
 #sgPb{margin-top:8px;border:2px dashed var(--ln);border-radius:12px;min-height:54px;padding:14px 10px;text-align:center;font-size:13px;color:var(--tx);caret-color:transparent;-webkit-user-select:text;user-select:text}
 #sgPb:empty:before{content:attr(data-ph);color:var(--mu)}
+#sgw .sgdocs{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+#sgw .sgdoc{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--ln);border-radius:12px;background:var(--card);color:var(--tx);font:inherit;font-size:12px;padding:8px;text-decoration:none;cursor:pointer}
+#sgw .sgdoc img{width:100%;height:auto;max-height:420px;object-fit:contain;border-radius:8px;background:#fff}
+.sgzm{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.92);display:flex;flex-direction:column}
+.sgzm button{align-self:flex-end;margin:10px;background:#fff;border:0;border-radius:50%;width:40px;height:40px;font-size:22px}
+.sgzm div{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.sgzm img{width:230%;max-width:none;display:block}
 #sgw .sgbtn.sec{background:var(--card);color:var(--tx);border:1px solid var(--ln)}
 #sgw .sgbtn:disabled{opacity:.5}
 #sgw .sgerr{border:1px solid #d33;background:rgba(221,51,51,.08);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
@@ -1996,7 +2003,8 @@ async function onFile(file){
   const s=sheet;s.file=file;s.found=null;s.err='';s.thumb='';renderSheet();
   s.thumb=await thumb(file);if(sheet===s)renderSheet();
 }
-function shrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,2000/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.85).split(',')[1])};im.onerror=()=>rej({code:'image_rejected'});im.src=fr.result};fr.onerror=()=>rej({code:'image_rejected'});fr.readAsDataURL(file)})}
+function sgTiles(file){return new Promise(res=>{try{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const W=im.width,H=im.height;if(Math.max(W,H)<1100){res([]);return}const ov=.18,tw=Math.round(W*(.5+ov/2)),th=Math.round(H*(.5+ov/2)),xs=[0,W-tw],ys=[0,H-th],out=[];for(const y of ys)for(const x of xs){const k=Math.min(1,1500/Math.max(tw,th)),c=document.createElement('canvas');c.width=Math.round(tw*k);c.height=Math.round(th*k);c.getContext('2d').drawImage(im,x,y,tw,th,0,0,c.width,c.height);out.push(c.toDataURL('image/jpeg',.88).split(',')[1])}res(out)};im.onerror=()=>res([]);im.src=fr.result};fr.onerror=()=>res([]);fr.readAsDataURL(file)}catch(e){res([])}})}
+function shrink(file,mx,qq){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,(mx||2000)/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',qq||.85).split(',')[1])};im.onerror=()=>rej({code:'image_rejected'});im.src=fr.result};fr.onerror=()=>rej({code:'image_rejected'});fr.readAsDataURL(file)})}
 async function analyze(){
   const s=sheet;if(!s||!s.file||s.busy||!AI)return;
   s.busy=true;s.err='';renderSheet();
@@ -2469,7 +2477,7 @@ function sgForm(){
   if(f.dataset.built){sgSum();sgRdBtn();f.style.display='';return}
   f.dataset.built='1';f.style.display='';
   const C=SG.cat;
-  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><div style="display:none"><i id="sgIs"></i><i id="sgFs"></i></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><div style="display:none"><i id="sgIs"></i><i id="sgFs"></i></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div id="sgDocs" class="sgdocs"></div><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
   sgRegs();
   document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
   document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
@@ -2478,7 +2486,38 @@ function sgForm(){
   sgRdBtn();
   sgSum();
 }
-function sgOpenChk(){const p=document.getElementById('sgChk');if(p){p.style.display='';const d=document.getElementById('sgDet');if(d)d.open=true;const b=document.getElementById('sgChkB');if(b)b.textContent='Ocultar datos'}}
+const sgDocU={};
+function sgDocSet(t,f){try{if(sgDocU[t]){URL.revokeObjectURL(sgDocU[t].u);if(sgDocU[t].r)URL.revokeObjectURL(sgDocU[t].r)}sgDocU[t]={u:URL.createObjectURL(f),f:f,pdf:/\.pdf$/i.test(f.name||'')||f.type==='application\x2Fpdf'}}catch(e){}sgDocsDraw()}
+function sgPdfJs(){
+  if(window.pdfjsLib)return Promise.resolve(window.pdfjsLib);
+  const B='https:\x2F\x2Fcdnjs.cloudflare.com\x2Fajax\x2Flibs\x2Fpdf.js\x2F3.11.174\x2F';
+  return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src=B+'pdf.min.js';sc.onload=()=>{try{window.pdfjsLib.GlobalWorkerOptions.workerSrc=B+'pdf.worker.min.js';res(window.pdfjsLib)}catch(e){rej(e)}};sc.onerror=()=>rej(new Error('pdfjs'));document.head.appendChild(sc)});
+}
+async function sgPdfImg(o){
+  if(o.r||o.rt)return;o.rt=1;
+  try{
+    const L=await sgPdfJs(),buf=await o.f.arrayBuffer(),pdf=await L.getDocument({data:buf}).promise,pg=await pdf.getPage(1),v0=pg.getViewport({scale:1}),k=Math.min(2.5,1600/v0.width),v=pg.getViewport({scale:k}),c=document.createElement('canvas');
+    c.width=Math.round(v.width);c.height=Math.round(v.height);
+    await pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise;
+    const bl=await new Promise(r=>c.toBlob(r,'image\x2Fjpeg',.9));o.r=URL.createObjectURL(bl);o.pages=pdf.numPages;
+  }catch(e){o.rf=1}
+  sgDocsDraw();
+}
+function sgDocsDraw(){
+  const d=document.getElementById('sgDocs');if(!d)return;
+  d.innerHTML=[['ine','INE'],['factura','Factura']].filter(x=>sgDocU[x[0]]).map(x=>{
+    const o=sgDocU[x[0]];
+    if(o.pdf&&!o.r){if(!o.rt)sgPdfImg(o);return o.rf?`<a class="sgdoc" href="${o.u}" target="_blank" rel="noopener"><b>${x[1]}</b><span>Abrir PDF</span></a>`:`<div class="sgdoc"><b>${x[1]}</b><span>Cargando imagen…</span></div>`}
+    const u=o.pdf?o.r:o.u;
+    return `<button type="button" class="sgdoc" data-z="${x[0]}"><b>${x[1]} subida · toca para ampliar</b><img src="${u}" alt=""></button>`}).join('');
+  d.querySelectorAll('[data-z]').forEach(b=>{const o=sgDocU[b.dataset.z];b.onclick=()=>sgZoom(o.pdf?o.r:o.u)});
+}
+function sgZoom(u){const o=document.createElement('div');o.className='sgzm';o.innerHTML='<button type="button">\u00d7</button><div><img src="'+u+'" alt=""></div>';o.querySelector('button').onclick=()=>o.remove();document.body.appendChild(o)}
+function sgWarn(list){
+  sgOpenChk();
+  list.forEach(x=>{const e=document.getElementById('sge_'+x.k);if(e){e.textContent='Revisa: «'+x.a+'» o «'+x.b+'»';e.className='warn'}});
+}
+function sgOpenChk(){const p=document.getElementById('sgChk');if(p){p.style.display='';sgDocsDraw();const d=document.getElementById('sgDet');if(d)d.open=true;const b=document.getElementById('sgChkB');if(b)b.textContent='Ocultar datos'}}
 function sgRdBtn(){const g=document.getElementById('sgGo');if(g)g.disabled=!!SG.rd||!SG.quote}
 function sgSet(k,v){const e=document.getElementById('sg_'+k);if(e&&v!==''&&v!=null)e.value=v}
 function sgDefs(){
@@ -2513,13 +2552,17 @@ async function sgRoute(files){
 async function sgRoute0(files){
   const L=[...files],ex=L.filter(f=>/\.xls[mx]$/i.test(f.name||'')),rest=L.filter(f=>ex.indexOf(f)<0);
   sgForm();
+  const skip=[];
   for(const f of ex)await sgCot(f);
   for(const f of rest){
     const pdf=/\.pdf$/i.test(f.name||'')||f.type==='application\x2Fpdf';
-    if(pdf)await sgFoto('factura',f);
-    else if(!SG.done.ine){if(!(await sgFoto('ine',f)))await sgFoto('factura',f)}
-    else await sgFoto('factura',f);
+    if(pdf){if(!(await sgFoto('factura',f,true)))skip.push(f)}
+    else if(!SG.done.ine){if(!(await sgFoto('ine',f,true))&&!(await sgFoto('factura',f,true)))skip.push(f)}
+    else if(!SG.done.factura){if(!(await sgFoto('factura',f,true)))skip.push(f)}
+    else skip.push(f);
   }
+  if(SG.done.ine&&!sgV('sg_nombre')&&skip.length){const z=skip.slice();skip.length=0;for(const f of z)if(!(await sgFoto('ine',f,true)))skip.push(f)}
+  if(skip.length||!SG.done.ine||!SG.done.factura){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">'+(!SG.done.ine&&!SG.done.factura?'No reconocí ni INE ni factura en los archivos.':!SG.done.ine?'Falta la INE (frente).':!SG.done.factura?'Falta la factura.':'Omití '+skip.length+' archivo'+(skip.length>1?'s':'')+' que no era INE ni factura (¿reverso de la INE?).')+'</div>'}
   const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para cambiar';
   const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
   sgSum();
@@ -2529,7 +2572,7 @@ function sgNts(){
   if(ld)ld.innerHTML=n.length?`<div class="sgdu"><b>Revisa:</b><br>${n.map(x=>'• '+esc(x)).join('<br>')}</div>`:'';
 }
 const sgRd2=file=>new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]||'');fr.onerror=rej;fr.readAsDataURL(file)});
-async function sgFoto(tipo,file){
+async function sgFoto(tipo,file,quiet){
   if(!file)return false;
   const st=document.getElementById(tipo==='ine'?'sgIs':'sgFs'),ld=document.getElementById('sgLd');
   st.textContent='Leyendo…';
@@ -2537,10 +2580,10 @@ async function sgFoto(tipo,file){
   try{
     const pdf=/\.pdf$/i.test(file.name||'')||file.type==='application\x2Fpdf';
     if(pdf){if(file.size>4e6)throw 0;r=await api('seg_leer',{pdf:await sgRd2(file),tipo:tipo})}
-    else{const img=await shrink(file);r=await api('seg_leer',{img:img,tipo:tipo})}
+    else{const img=await shrink(file,2400,.9),tl=tipo==='ine'?await sgTiles(file):[];r=await api('seg_leer',{img:img,tipo:tipo,tiles:tl})}
   }catch(e){r=null}
-  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No se pudo leer. Intenta otra foto.'}</div>`;sgOpenChk();return false}
-  SG.done[tipo]=1;
+  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';if(!quiet){ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No se pudo leer. Intenta otra foto.'}</div>`;sgOpenChk()}return false}
+  SG.done[tipo]=1;sgDocSet(tipo,file);
   const d=r.d,notes=(r.dudas||[]).slice();
   if(tipo==='ine'){
     ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia','estado'].forEach(k=>sgFill(k,d[k],notes,'INE'));
@@ -2551,6 +2594,9 @@ async function sgFoto(tipo,file){
     ['serie','motor','color'].forEach(k=>sgFill(k,d[k],notes,'Factura'));
     await sgMoto(d,notes);
   }
+  const cks=(r.chk||[]).filter(x=>document.getElementById('sg_'+x.k)),oth=(r.chk||[]).filter(x=>!document.getElementById('sg_'+x.k));
+  oth.forEach(x=>notes.push('Factura, '+x.k+': «'+x.a+'» o «'+x.b+'»'));
+  if(cks.length)sgWarn(cks);
   SG.nt[tipo]=notes;sgNts();
   const miss=['nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','colonia','serie'].some(k=>!sgV('sg_'+k));
   return true;
