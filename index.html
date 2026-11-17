@@ -2563,7 +2563,7 @@ async function sgRoute0(files){
   }
   if(SG.done.ine&&!sgV('sg_nombre')&&skip.length){const z=skip.slice();skip.length=0;for(const f of z)if(!(await sgFoto('ine',f,true)))skip.push(f)}
   if(skip.length||!SG.done.ine||!SG.done.factura){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">'+(!SG.done.ine&&!SG.done.factura?'No reconocí ni INE ni factura en los archivos.':!SG.done.ine?'Falta la INE (frente).':!SG.done.factura?'Falta la factura.':'Omití '+skip.length+' archivo'+(skip.length>1?'s':'')+' que no era INE ni factura (¿reverso de la INE?).')+'</div>'}
-  const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para cambiar';
+  const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para cambiar'+(SG.ia?' · lectura '+(SG.ia==='claude'?'Claude':'OpenAI'):'');
   const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
   sgSum();
 }
@@ -2583,7 +2583,7 @@ async function sgFoto(tipo,file,quiet){
     else{const img=await shrink(file,2400,.9),tl=tipo==='ine'?await sgTiles(file):[];r=await api('seg_leer',{img:img,tipo:tipo,tiles:tl})}
   }catch(e){r=null}
   if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';if(!quiet){ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No se pudo leer. Intenta otra foto.'}</div>`;sgOpenChk()}return false}
-  SG.done[tipo]=1;sgDocSet(tipo,file);
+  SG.done[tipo]=1;if(r.ia)SG.ia=r.ia;sgDocSet(tipo,file);
   const d=r.d,notes=(r.dudas||[]).slice();
   if(tipo==='ine'){
     ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia','estado'].forEach(k=>sgFill(k,d[k],notes,'INE'));
