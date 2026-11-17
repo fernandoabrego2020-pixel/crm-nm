@@ -1016,8 +1016,8 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 <script>
 try{document.documentElement.classList.toggle('fdv',localStorage.getItem('crm-ferdev')==='1')}catch(e){}
 const H=3600e3,D=24*H;
-const AG=['Fer','Lerma Zayuri','Lerma Mario','Lerma Leo','Santiago Katy','Santiago Maggy','Valle Andrea','Valle Carlos','Valle Aodes Karla','Atlacomulco','Almoloya','Tenancingo Alexis','Tenancingo Toño'];
-const ACC={Fer:'fer','Lerma Zayuri':'lerma','Lerma Mario':'lerma','Lerma Leo':'lerma','Santiago Katy':'santiago','Santiago Maggy':'santiago','Valle Andrea':'valle','Valle Carlos':'valle','Valle Aodes Karla':'aodes',Atlacomulco:'atlacomulco',Almoloya:'almoloya','Tenancingo Alexis':'tenancingo','Tenancingo Toño':'tenancingo'};
+const AG=['Fer','Lerma Zayuri','Lerma Mario','Lerma Leo','Santiago Katy','Santiago Maggy','Valle Andrea','Valle Carlos','Valle Aodes Karla','Valle Aodes Armando','Atlacomulco','Almoloya','Tenancingo Alexis','Tenancingo Toño'];
+const ACC={Fer:'fer','Lerma Zayuri':'lerma','Lerma Mario':'lerma','Lerma Leo':'lerma','Santiago Katy':'santiago','Santiago Maggy':'santiago','Valle Andrea':'valle','Valle Carlos':'valle','Valle Aodes Karla':'aodes','Valle Aodes Armando':'aodes',Atlacomulco:'atlacomulco',Almoloya:'almoloya','Tenancingo Alexis':'tenancingo','Tenancingo Toño':'tenancingo'};
 const REN={Zayuri:'Lerma Zayuri',Lerma:'Lerma Zayuri',Mario:'Lerma Mario',Santiago:'Santiago Katy',Tenancingo:'Tenancingo Alexis','Valle de Bravo':'Valle Andrea',Aodes:'Valle Aodes Karla',Maggy:'Santiago Maggy'};
 let SP='',LMODE='enter',LFIRST='',UNDO_ADD=false,FULL=false,FULLS=true;
 const PROT=n=>n==='Administrativo';
@@ -1227,7 +1227,7 @@ function agBar(){
   return `<div class="tabs g2"><div class="gr">${top}</div>${sub?`<div class="gp">${sub}</div>`:''}</div>`;
 }
 function portal(){
-  const ORD=['Lerma Zayuri','Lerma Mario','Lerma Leo','Fer','Santiago Maggy','Santiago Katy','Valle Carlos','Valle Aodes Karla','Valle Andrea','Almoloya','Tenancingo Alexis','Tenancingo Toño','Atlacomulco'];
+  const ORD=['Lerma Zayuri','Lerma Mario','Lerma Leo','Fer','Santiago Maggy','Santiago Katy','Valle Carlos','Valle Aodes Karla','Valle Aodes Armando','Valle Andrea','Almoloya','Tenancingo Alexis','Tenancingo Toño','Atlacomulco'];
   const tile=(a,i)=>{const w=a.split(' ').slice(1),nm=a==='Fer'?'Fer':DISP[a]?DISP[a][0]:w[w.length-1],g=a==='Fer'?'Lerma':AGG(a),extra=a==='Fer'?' data-lr="vendedor"':'',wide=i===ORD.length-1&&ORD.length%2?' wide':'';return `<button class="pt2${wide}" style="--h:${HUE[g]||200}" data-p="${a}"${extra}><small>${esc(g)}</small><span>${esc(nm)}</span></button>`};
   return `<div class="pg2">${ORD.map(tile).join('')}</div><div class="pc"><button data-p="Fer" data-lr="tecnico">Técnico</button><button data-p="Director">Director</button><button data-p="Administrativo">Gerentes</button></div>`;
 }
@@ -1853,7 +1853,7 @@ function p2Send(l){
     const e=r&&r.err;toast(e==='nosend'?'El envío todavía no está conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
   }).catch(()=>{back();toast('No se pudo enviar, intenta otra vez',1)});
 }
-const DEFRX=new Set(['Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Almoloya','Valle Andrea','Valle Carlos']);
+const DEFRX=new Set(['Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Valle Aodes Armando','Almoloya','Valle Andrea','Valle Carlos']);
 function p2Wa(l){
   copyTel(l.tel);
   if(DEFRX.has(ME))return p2Chat(l);
@@ -2278,7 +2278,7 @@ const NAVS={
  tecnico:[['conv','Chats','chat'],['quien','Escribieron','bell'],['make','Gasto','coin'],['onoff','Anas','power'],['venta','Venta','check'],['uso','Uso','clock'],['panel','Panel','grid']],
  admin:[['tram','Trámites','doc'],['inv','Inventario','box']]
 };
-const ANA_CON=['Lerma Zayuri','Santiago Katy','Valle Andrea','Valle Carlos','Valle Aodes Karla','Atlacomulco','Almoloya'];
+const ANA_CON=['Lerma Zayuri','Santiago Katy','Valle Andrea','Valle Carlos','Valle Aodes Karla','Valle Aodes Armando','Atlacomulco','Almoloya'];
 const navKey=role=>role==='vendedor'&&ANA_CON.includes(ME)?'vendana':role;
 const NLINK={panel:()=>GS(SH_PANEL),quejas:()=>GS(SH_QUEJAS),inv:()=>pisoUrl()};
 const NDEF={vendedor:'pros',director:'pros',tecnico:'conv',admin:'tram'};
