@@ -2469,15 +2469,17 @@ function sgForm(){
   if(f.dataset.built){sgSum();f.style.display='';return}
   f.dataset.built='1';f.style.display='';
   const C=SG.cat;
-  f.innerHTML=`<div class="sgc"><h4>2 · Sube INE y factura</h4><div class="note" style="margin-bottom:8px">Se leen solas y tú solo confirmas.</div><div class="sgg"><label class="sgfile" id="sgfI"><span>INE (ambos lados)</span><input type="file" accept="image/\x2A,.pdf,application\x2Fpdf" id="sgI"><i id="sgIs">Subir foto o PDF</i></label><label class="sgfile" id="sgfF"><span>Factura de la moto</span><input type="file" accept="image/\x2A,.pdf,application\x2Fpdf" id="sgFa"><i id="sgFs">Subir foto o PDF</i></label></div><div id="sgLd"></div></div><div class="sgc"><h4>3 · Confirma</h4><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet"><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div><div class="sgc"><h4>4 · Emitir</h4><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> El cliente autoriza que se le envíe la póliza a su correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><div style="display:none"><i id="sgIs"></i><i id="sgFs"></i></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc"><h4>2 · Emitir</h4><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> El cliente autoriza que se le envíe la póliza a su correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
   sgRegs();
   document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
   document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
-  document.getElementById('sgI').onchange=e=>sgFoto('ine',e.target.files[0]);
-  document.getElementById('sgFa').onchange=e=>sgFoto('factura',e.target.files[0]);
+  document.getElementById('sgChkB').onclick=()=>{const p=document.getElementById('sgChk');if(p.style.display==='none')sgOpenChk();else{p.style.display='none';document.getElementById('sgChkB').textContent='Checar datos'}};
   document.getElementById('sgGo').onclick=()=>sgEmit(false);
+  sgRdBtn();
   sgSum();
 }
+function sgOpenChk(){const p=document.getElementById('sgChk');if(p){p.style.display='';const d=document.getElementById('sgDet');if(d)d.open=true;const b=document.getElementById('sgChkB');if(b)b.textContent='Ocultar datos'}}
+function sgRdBtn(){const g=document.getElementById('sgGo');if(g)g.disabled=!!SG.rd}
 function sgSet(k,v){const e=document.getElementById('sg_'+k);if(e&&v!==''&&v!=null)e.value=v}
 function sgDefs(){
   const rfc=sgV('sg_rfc');if(rfc.length!==13)return;
@@ -2503,12 +2505,14 @@ async function sgPaste(){
   }catch(e){if(ld)ld.innerHTML='<div class="sgerr">No encontré imagen ni PDF copiados. Mejor toca el recuadro de arriba y elige los archivos (Fototeca o Archivos). El Excel solo se puede subir desde Archivos.</div>'}
 }
 async function sgRoute(files){
+  SG.rd=1;sgRdBtn();
   try{await sgRoute0(files)}catch(e){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Algo falló al leer los archivos ('+esc(String(e&&e.message||e))+'). Intenta de nuevo.</div>'}
+  SG.rd=0;sgRdBtn();
 }
 async function sgRoute0(files){
   const L=[...files],ex=L.filter(f=>/\.xls[mx]$/i.test(f.name||'')),rest=L.filter(f=>ex.indexOf(f)<0);
   for(const f of ex)await sgCot(f);
-  if(rest.length&&!document.getElementById('sgI')){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Primero sube la cotización en Excel (o elige la moto a mano) y luego la INE y la factura.</div>';return}
+  if(rest.length&&!document.getElementById('sgGo')){const ld=document.getElementById('sgCl');if(ld&&!ld.innerHTML)ld.innerHTML='<div class="sgerr">Falta la cotización en Excel. Súbela junto con la INE y la factura.</div>';return}
   for(const f of rest){
     const pdf=/\.pdf$/i.test(f.name||'')||f.type==='application\x2Fpdf';
     if(pdf)await sgFoto('factura',f);
@@ -2516,6 +2520,7 @@ async function sgRoute0(files){
     else await sgFoto('factura',f);
   }
   const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para agregar o cambiar archivos';
+  const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">Cotización '+(SG.cot?'✓':'falta')+' · INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
 }
 function sgNts(){
   const ld=document.getElementById('sgLd'),n=[].concat(SG.nt.ine||[],SG.nt.factura||[]);
@@ -2532,7 +2537,7 @@ async function sgFoto(tipo,file){
     if(pdf){if(file.size>4e6)throw 0;r=await api('seg_leer',{pdf:await sgRd2(file),tipo:tipo})}
     else{const img=await shrink(file);r=await api('seg_leer',{img:img,tipo:tipo})}
   }catch(e){r=null}
-  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No pude leer el archivo. Intenta con otro más claro o captura los datos abajo.'}</div>`;document.getElementById('sgDet').open=true;return false}
+  if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No pude leer el archivo. Intenta con otro más claro o captura los datos abajo.'}</div>`;sgOpenChk();return false}
   st.textContent='Listo ✓ (toca para cambiarla)';SG.done[tipo]=1;
   const d=r.d,notes=(r.dudas||[]).slice();
   if(tipo==='ine'){
@@ -2549,7 +2554,6 @@ async function sgFoto(tipo,file){
   if(tipo==='factura'&&d.total&&SG.quote&&Number(SG.q.anio)>=2026){const vu=Number(SG.q.valorCap)||SG.quote.valor;if(vu&&Math.abs(Number(d.total)-vu)>1)notes.push('La factura dice un total de '+sgMx(d.total)+' y la cotización usa un valor factura de '+sgMx(vu)+'.')}
   SG.nt[tipo]=notes;sgNts();
   const miss=['nombre','apP','apM','sexo','nacimiento','cp','estado','calle','numExt','colonia','serie'].some(k=>!sgV('sg_'+k));
-  if(miss||notes.length)document.getElementById('sgDet').open=true;
   return true;
 }
 function sgRegs(){
@@ -2570,7 +2574,7 @@ function sgDatos(){
 }
 function sgClear(){document.querySelectorAll('#sgF em').forEach(e=>{e.textContent=''});document.querySelectorAll('#sgF .bad').forEach(e=>e.classList.remove('bad'))}
 function sgMark(list,cls){
-  let first=null;
+  let first=null;sgOpenChk();
   list.forEach(x=>{const e=document.getElementById('sge_'+x.f),i=document.getElementById('sg_'+x.f);
     if(e){e.textContent=(e.textContent?e.textContent+' · ':'')+x.m;e.className=cls}
     if(i&&cls==='bad'){i.classList.add('bad')}
@@ -3627,7 +3631,7 @@ const MAPM=(function(){
     const q=($('mfq').value||'').trim().toLowerCase(),d=q.replace(/\D/g,'');
     const vm=fm==='visit',pm=fm==='ph',ad=fm==='adopt',dd=l=>l.loc&&me?Math.hypot(mx(l.loc[1])-mx(me[1]),my(l.loc[0])-my(me[0])):1e12;
     const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||fq(l,q)||(d&&String(l.tel).includes(d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):b.c-a.c).slice(0,40);
-    $('mfr').innerHTML=L.length?L.map(l=>l.ph?`<button class="mrow" data-id="${l.id}">Sin datos<small>Guardado ${ago(l.c)}${l.loc?' · ±'+l.loc[2]+' m':''}</small></button>`:`<button class="mrow" data-id="${l.id}">${esc(l.name)}<small>${esc(fmt(l.tel))} · ${PN[baseOf(l)]}${vm&&!l.loc?' · sin ubicación':''}</small></button>`).join(''):'<div class="note">'+(vm?'No hay leads pendientes de visita.':'No hay leads sin ubicación con esa búsqueda.')+'</div>';
+    $('mfr').innerHTML=L.length?L.map(l=>l.ph?`<button class="mrow" data-id="${l.id}">Sin datos<small>Guardado ${ago(l.c)}${l.loc?' · ±'+l.loc[2]+' m':''}</small></button>`:`<button class="mrow" data-id="${l.id}">${esc(p2Title(l))}<small>${esc(fmt(l.tel))} · ${PN[baseOf(l)]}${vm&&!l.loc?' · sin ubicación':''}</small></button>`).join(''):'<div class="note">'+(vm?'No hay leads pendientes de visita.':'No hay leads sin ubicación con esa búsqueda.')+'</div>';
   }
   function openFind(m,aid){fm=m;adopt=aid||null;mv=null;$('mft').textContent=m==='adopt'?'Poner un lead aqu\u00ed':m==='ph'?'Guardados sin datos':m==='visit'?'Por visitar':'Ubicar un lead que no tiene ubicaci\u00f3n';$('mfn').textContent=m==='adopt'?'Toca el lead que ya tienes y se queda en esta ubicaci\u00f3n.':m==='ph'?'Toca uno para verlo en el mapa y llenar sus datos.':m==='visit'?'Toca el lead para verlo en el mapa. Si ya diste Ubicarme, salen del m\u00e1s cercano al m\u00e1s lejano.':'Toca el lead y despu\u00e9s toca en el mapa donde est\u00e1.';$('mfq').value='';renderFind();$('mfs').className='mfs show'}
   function closeFind(){$('mfs').className='mfs'}
