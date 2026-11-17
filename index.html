@@ -4052,6 +4052,9 @@ const MAPM=(function(){
   return {show:show,hide:hide,refresh:refresh,saved:saved,filled:filled,trace:trace,on:()=>shown};
 })();
 boot();
+const APPV='v161';
+function chkVer(){try{if(REG.on)return;const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;fetch(location.pathname+'?c='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const APPV='(v\d+)'/);if(m&&m[1]!==APPV&&!sessionStorage.getItem('crm-rl'+m[1])){sessionStorage.setItem('crm-rl'+m[1],'1');location.replace(location.pathname+'?v='+m[1].slice(1)+location.hash)}}).catch(()=>{})}catch(e){}}
+setTimeout(chkVer,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(chkVer,500)});
 setTimeout(p2LabRun,6000);setInterval(p2LabRun,90e3);
 setInterval(()=>{if(sheet||!ready)return;const a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'))return;render()},60e3);
 setInterval(async()=>{if(!ready||document.hidden||pushing)return;const x=await pull();if(x===true)MAPM.refresh();if(x===true&&!sheet){const a=document.activeElement;if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')))render()}},20e3);
