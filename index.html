@@ -1427,7 +1427,7 @@ function p2Card(l,c){
   const chip=P2.ph===l.id?'<div class="lpw pk">'+P2OPT.map(o=>'<button class="lph pb'+(o[0]===gk?' on':'')+'" style="--k:var(--'+o[2]+')" data-p2="setph" data-v="'+o[0]+'" data-id="'+l.id+'">Siguiente paso:&nbsp;<b>'+o[1]+'</b></button>').join('')+'</div>':'<div class="lpw"><button class="lph pb'+(ph?'':' no')+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+' data-p2="ph" data-id="'+l.id+'">Siguiente paso:&nbsp;<b>'+(ph?esc(ph[0]):'elegir')+'</b> <i class="cv">\u25be</i></button></div>';
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
-  const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA sobre este cliente</button>'+chip+'</div>':'')+'</div>':'';
+  const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA</button>'+chip+'</div>':'')+'</div>':'';
   return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(P2.q&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span><small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">'+(op?'\u25b4':'\u25be')+'</i></small>'+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
@@ -2392,7 +2392,7 @@ const sgUniq=a=>{const s={},o=[];a.forEach(x=>{const k=String(x).trim();if(!s[k]
 const sgV=id=>{const e=document.getElementById(id);return e?e.value:''};
 function segView(){
   const m=document.getElementById('menu');
-  m.innerHTML=`<div class="in" id="sgw"><div class="mh2"><b>Tramitar seguro<small>Seguros Azteca</small></b><button data-nv="mas">← Más</button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="sgw"><div class="mh2" style="justify-content:flex-start"><button data-nv="mas">← Más</button></div><div id="sgb" class="note">Cargando…</div></div>`;m.style.display='block';
   if(SG.cat){sgBuild();return}
   api('seg_cat').then(r=>{if(!r||!r.ok)throw 0;SG.cat=r;sgBuild()}).catch(()=>{const b=document.getElementById('sgb');if(b)b.innerHTML='<div class="sgerr">No pude cargar el catálogo. Revisa tu conexión y vuelve a entrar.</div>'});
 }
@@ -2757,7 +2757,7 @@ async function sgHist(){
   const adm=ME==='Fer';
   const cfg=adm&&false?`<div class="sgcfg"><small>Último consecutivo real usado (la siguiente póliza será el número siguiente)</small><div style="display:flex;gap:8px"><input id="sgLast" inputmode="numeric" placeholder="Ej. 245"><button class="sgbtn sec" id="sgSave" type="button">Guardar</button></div><div id="sgCfgM" class="note"></div></div>`:'';
   h.className='';
-  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b><small>${esc(x.poliza.slice(-11,-4))} · ${new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short',timeZone:'America/Mexico_City'})} · ${esc(x.paquete.replace(/\.$/,''))}${adm?' · '+esc(x.cuenta):''}</small></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-pol="${esc(x.poliza)}" type="button">PDF</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
+  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-pol="${esc(x.poliza)}" type="button">PDF</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
   h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.pol})}catch(e){g=null}bt.disabled=false;bt.textContent='PDF';if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
   h.querySelectorAll('.sgdel').forEach(bt=>{bt.onclick=async()=>{if(!confirm('\u00bfBorrar esta p\u00f3liza? Se quita de la lista y los archivos van a la papelera. El correo que ya se mand\u00f3 no se puede recuperar.'))return;bt.disabled=true;bt.textContent='\u2026';let g;try{g=await api('seg_del',{poliza:bt.dataset.pdel})}catch(e){g=null}if(g&&g.ok)sgHist();else{bt.disabled=false;bt.textContent='Borrar';alert('No pude borrarla.')}}});
   const sv=document.getElementById('sgSave');
@@ -2925,7 +2925,7 @@ function torreView(id){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const tt={conv:'Chats',quien:'Escribieron',make:'Gasto de Make',onoff:'Anas'}[id];
   const sec={conv:['tbl','msg'],quien:['msg'],make:['din','gas'],onoff:['bot']}[id];
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} \u00B7 ${ROLEN[role]||''}</small></b><button id="mlo">Salir</button></div>${id==='onoff'&&role==='tecnico'?'<div style="margin:-4px 0 10px"><button class="mtl" data-nv="ana" style="background:none;border:0;padding:0;cursor:pointer;font-family:inherit">Horario, catálogo y números bloqueados</button></div>':''}<div id="t3" class="pane"><div class="wrap">${T3HTML}</div></div></div>`;
+  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}</b><button id="mlo">Salir</button></div>${id==='onoff'&&role==='tecnico'?'<div style="margin:-4px 0 10px"><button class="mtl" data-nv="ana" style="background:none;border:0;padding:0;cursor:pointer;font-family:inherit">Horario, catálogo y números bloqueados</button></div>':''}<div id="t3" class="pane"><div class="wrap">${T3HTML}</div></div></div>`;
   m.style.display='block';
   {const t3=document.getElementById('t3');if(t3){if(id==='quien')t3.classList.add('qm');if(role==='vendedor')t3.classList.add('vq')}}
   m.querySelectorAll('#t3 [data-sec]').forEach(s=>{s.hidden=sec.indexOf(s.dataset.sec)<0});
@@ -3366,17 +3366,16 @@ function avSet(k,f,v){
 function avMain(){const a=avAg();if(!a)return '<div class="soonp">No hay Ana para tu cuenta.</div>';
   const w=!!a.w,chips=AV.d.ags.length>1?`<div class="chips mtc">${AV.d.ags.map(x=>`<button data-avk="${x.k}" aria-pressed="${AV.k===x.k}">${esc(x.n)}</button>`).join('')}</div>`:'';
   const rows=a.d.map((x,i)=>{return `<div class="avh"><span>${AVD[i]}</span><input type="time" value="${esc(x[0])}" data-d="${i}" data-t="0"${w?'':' disabled'}><input type="time" value="${esc(x[1])}" data-d="${i}" data-t="1"${w?'':' disabled'}>${w?`<button class="z" data-avz="${i}">Apagar</button>`:''}</div>`}).join('');
-  const bl=a.bl.length?`<details style="margin-top:8px"${AV.dop?' open':''} ontoggle="AV.dop=this.open"><summary class="note" style="cursor:pointer">Ver los ${a.bl.length} números</summary><div style="margin-top:6px">${a.bl.map(n=>`<span class="mps">${esc(n)}${w?`<button class="avx" data-avb="${esc(n)}" aria-label="Quitar">×</button>`:''}</span>`).join('')}</div></details>`:'';
-  return chips+`<div class="sg"><div class="avs"><b>Prender Ana ahorita<small>${a.on?'Ana contesta ahorita aunque la agencia esté abierta':'Ana sigue solo su horario'}</small></b><button class="avsw${a.on?' on':''}" data-av="tog"${w?'':' disabled'} aria-label="Prender o apagar Ana"></button></div></div>
-  <div class="sg"><b>Horario de Ana</b><div class="note" style="margin-top:2px">Se prende a la hora de la izquierda y se apaga a la de la derecha. 00:00 y 00:00 = ese día no se prende.</div><div class="avh hd"><span></span><span>Se prende</span><span>Se apaga</span><span></span></div>${rows}${w?'<button class="avb" data-av="sch">Guardar horario</button>':''}</div>
-  <div class="sg"><b>Números bloqueados</b><div class="note" style="margin-top:2px">Ana no les contesta. ${a.bl.length} ${a.bl.length===1?'número':'números'}.</div>${w?'<div class="avr"><input id="avn" type="tel" inputmode="numeric" maxlength="14" placeholder="10 dígitos" autocomplete="off"><button data-av="add">Agregar</button></div>':''}${bl}</div>
-  <div class="sg"><b>Catálogo y precios</b><div class="note" style="margin-top:2px">Los precios que Ana da a los clientes.</div><button class="avb" data-av="cat">Ver y cambiar precios</button>${w?'<button class="avb ft" style="margin-top:8px" data-av="foto">Actualizar catálogo con foto</button>':''}</div>
-  <div class="note" style="margin:8px 0">Los cambios de horario y bloqueados llegan a Ana en máximo 15 minutos. ${AV.d.ro?'Estás en solo lectura.':''}</div>
-  <a class="mtl" target="_blank" rel="noopener" href="${GS(SH_PANEL)}">Abrir en Google Sheets</a>${w?'<input type="file" id="avf" accept="image/\x2A" hidden>':''}`}
+  const bl=a.bl.length?`<details style="margin-top:8px"${AV.dop?' open':''} ontoggle="AV.dop=this.open"><summary class="note" style="cursor:pointer">Ver lista</summary><div style="margin-top:6px">${a.bl.map(n=>`<span class="mps">${esc(n)}${w?`<button class="avx" data-avb="${esc(n)}" aria-label="Quitar">×</button>`:''}</span>`).join('')}</div></details>`:'';
+  return chips+`<div class="sg"><div class="avs"><b>Prender Ana ahorita<small>${a.on?'Contesta aunque la agencia esté abierta':'Solo en su horario'}</small></b><button class="avsw${a.on?' on':''}" data-av="tog"${w?'':' disabled'} aria-label="Prender o apagar Ana"></button></div></div>
+  <div class="sg"><b>Horario</b><div class="avh hd"><span></span><span>Prende</span><span>Apaga</span><span></span></div>${rows}${w?'<button class="avb" data-av="sch">Guardar horario</button>':''}</div>
+  <div class="sg"><b>Bloqueados · ${a.bl.length}</b>${w?'<div class="avr"><input id="avn" type="tel" inputmode="numeric" maxlength="14" placeholder="10 dígitos" autocomplete="off"><button data-av="add">Agregar</button></div>':''}${bl}</div>
+  <div class="sg"><b>Precios</b><button class="avb" data-av="cat" style="margin-top:8px">Cambiar precios</button>${w?'<button class="avb ft" style="margin-top:8px" data-av="foto">Actualizar con foto</button>':''}</div>
+  ${ME==='Fer'?`<a class="mtl" target="_blank" rel="noopener" href="${GS(SH_PANEL)}">Abrir en Google Sheets</a>`:''}${w?'<input type="file" id="avf" accept="image/\x2A" hidden>':''}`}
 function avSaveBtn(){const n=Object.keys(AV.ed).length;return n?`<button class="avb" data-av="save" style="margin:0 0 8px">Guardar ${n} ${n===1?'precio':'precios'}</button>`:''}
 function avCatDraw(){const b=document.getElementById('avb');if(!b)return;
   if(AV.ft){const f=AV.ft;const n=f.ch.filter(x=>x.on).length;
-    b.innerHTML=`<button class="mback" data-av="cback" style="margin-bottom:10px">← Catálogo</button><div class="sg"><b>Esto leí en la foto</b><div class="note" style="margin-top:2px">Revisa los precios. No se cambia nada hasta que toques Aplicar. La foto no se guarda.</div></div>`+
+    b.innerHTML=`<button class="mback" data-av="cback" style="margin-bottom:10px">← Catálogo</button><div class="sg"><b>Esto leí en la foto</b><div class="note" style="margin-top:2px">Revisa y toca Aplicar.</div></div>`+
     (f.ch.length?f.ch.map((x,i)=>`<label class="avd"><input type="checkbox" data-fi="${i}"${x.on?' checked':''}><span>${esc(x.n)}<br><i>${mxn(x.old)}</i> → <b>${mxn(x.p)}</b></span></label>`).join(''):'<div class="soonp">No encontré precios distintos a los del catálogo.</div>')+
     (f.same?`<div class="note" style="margin-top:8px">${f.same} ${f.same===1?'precio ya estaba igual':'precios ya estaban iguales'}.</div>`:'')+
     (f.nf.length?`<div class="note" style="margin-top:8px">No supe a qué moto del catálogo corresponden: ${esc(f.nf.join(', '))}</div>`:'')+
@@ -3385,7 +3384,7 @@ function avCatDraw(){const b=document.getElementById('avb');if(!b)return;
   const qs=AV.q.toLowerCase().split(/\s+/).filter(Boolean).map(mnorm);
   const L=c.m.filter(m=>!qs.length||qs.every(w=>mnorm(m.n).indexOf(w)>=0));
   const nch=Object.keys(AV.ed).length,w=!c.ro;
-  b.innerHTML=`<button class="mback" data-av="back" style="margin-bottom:10px">← Ana</button>${w?'<button class="avb ft" data-av="foto">Actualizar catálogo con foto</button>':''}<div class="sg"><b>Inventario disponible</b><div class="note" style="margin:2px 0 8px">Qué motos hay en cada sucursal (hoja Motos en piso).</div><a class="avb sec" style="display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener" href="${pisoUrl()}">Abrir inventario</a></div>
+  b.innerHTML=`<button class="mback" data-av="back" style="margin-bottom:10px">← Ana</button>${w?'<button class="avb ft" data-av="foto">Actualizar con foto</button>':''}<div class="sg"><b>Inventario</b><a class="avb sec" style="display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener" href="${pisoUrl()}">Abrir inventario</a></div>
   <div class="mtw"><svg viewBox="0 0 24 24">${IC.search}</svg><input id="avq" type="search" placeholder="Buscar moto" value="${esc(AV.q)}" autocomplete="off"></div>
   <div id="avs">${avSaveBtn()}</div>
   <div id="avl">${L.map(m=>{const e=AV.ed[m.r];return `<div class="avc${e!==undefined?' ch':''}"><span>${esc(m.n)}</span><input type="text" inputmode="numeric" data-r="${m.r}" value="${e!==undefined?e:m.p}"${w?'':' disabled'}></div>`}).join('')||'<div class="soonp">Sin resultados</div>'}</div><input type="file" id="avf" accept="image/\x2A" hidden>`}
@@ -3421,7 +3420,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   else if(a==='apply'){const items=AV.ft.ch.filter(x=>x.on).map(x=>({r:x.r,n:x.n,p:x.p}));if(items.length)avCatSave(items)}}
 async function anaView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in" id="avi">${FERDEV()?'<button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button>':''}<div class="mh2"><b>Ana<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="avi"><button class="mback" data-nv="mas" style="margin-bottom:10px">\u2190 M\u00e1s</button><div class="mh2"><b>Ana${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div><div id="avb"><div class="soonp">Cargando…</div></div></div>`;m.style.display='block';
   const b=document.getElementById('avb');AV.sub='';AV.ft=null;AV.ed={};
   b.onclick=avClick;
   b.onchange=e=>{const t=e.target;
@@ -3604,7 +3603,7 @@ function masView(){
   const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
   const TAIL=ME==='Fer'?[]:['<button class="mxt" id="mlo2"><span>Cerrar sesión</span></button>'];
   const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
-  const ANAT=[N('Ana','anam')];
+  const ANAT=[N('Ana','ana')];
   try{pfTi()}catch(e){}
   const QUIEN=N('Quién escribió','quien');
   let h='';
@@ -3644,7 +3643,7 @@ function navGo0(id){
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
   const tt=id==='ine10'?'Tramitar INE':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
+  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div>${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
   let tr=null,trCb=null,adopt=null;
