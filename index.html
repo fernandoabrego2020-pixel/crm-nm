@@ -1927,7 +1927,7 @@ function p2Send(l){
 const DEFRX=new Set(['Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Valle Aodes Armando','Almoloya','Valle Andrea','Valle Carlos']);
 function p2Wa(l){
   copyTel(l.tel);
-  if(DEFRX.has(ME))return p2Chat(l);
+  if(DEFRX.has(ME)||DEFRX.has(l.own)||DEFRX.has(S.ag))return p2Chat(l);
   const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
 }
 function p2Chat(l){
