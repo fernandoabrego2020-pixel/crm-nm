@@ -2399,10 +2399,10 @@ function segView(){
 function sgBuild(){
   const b=document.getElementById('sgb');if(!b)return;
   b.className='';
-  b.innerHTML=`<div class="sgc"><label class="sgfile" id="sgfC"><span>Sube INE y factura</span><input type="file" multiple id="sgC"><i id="sgCs">Toca para elegir</i></label><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
+  b.innerHTML=`<div class="sgc"><div style="display:grid;gap:10px"><label class="sgfile"><span>Factura (PDF)</span><input type="file" id="sgIn_factura" accept="application\x2Fpdf,image\x2F*,.xls,.xlsx,.xlsm"><i id="sgFs">Elegir</i></label><label class="sgfile"><span>INE</span><input type="file" id="sgIn_ine" accept="image\x2F*,application\x2Fpdf,.xls,.xlsx,.xlsm" multiple><i id="sgIs">Frente y vuelta</i></label></div><div class="note" id="sgCs" style="margin-top:6px"></div><div id="sgCl"></div><details id="sgMan" class="sgdet" style="display:none"><summary>Elige la moto</summary><div class="sgg" style="margin-top:10px"><label>Año<select id="sgAnio"></select></label><label>Marca<select id="sgMarca"></select></label><label>Tipo<select id="sgTipo"></select></label><label>Versión<select id="sgVer"></select></label><label>Uso<select id="sgUso"></select></label><label id="sgValL">Valor factura <small>(opcional)</small><input id="sgVal" inputmode="numeric" placeholder="Solo si cambia"></label></div></details><div id="sgQ"></div></div><div id="sgF" style="display:none"></div><div id="sgR"></div><div class="sgc"><h4>Pólizas emitidas</h4><div id="sgH" class="note">Cargando…</div></div>`;
   sgSel();sgHist();
   ['sgAnio','sgMarca','sgTipo','sgVer','sgUso'].forEach(id=>{document.getElementById(id).onchange=sgChg});
-  document.getElementById('sgVal').oninput=sgChg;document.getElementById('sgC').onchange=e=>{const fl=[...e.target.files];e.target.value='';sgRoute(fl)};SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
+  document.getElementById('sgVal').oninput=sgChg;['factura','ine'].forEach(k=>{const el=document.getElementById('sgIn_'+k);if(el)el.onchange=e=>{const fl=[...e.target.files];e.target.value='';if(fl.length)sgSlot(k,fl)}});SG.done={};SG.nt={};SG.cot=null;const w=document.getElementById('sgw');if(w){w.ondragover=e=>e.preventDefault();w.ondrop=e=>{e.preventDefault();if(e.dataTransfer&&e.dataTransfer.files.length)sgRoute(e.dataTransfer.files)}}
   if(!SG.pasteOn){SG.pasteOn=1;document.addEventListener('paste',e=>{if(!document.getElementById('sgw'))return;const cd=e.clipboardData;if(!cd)return;let fs=[...(cd.files||[])];if(!fs.length&&cd.items)for(const it of cd.items){if(it.kind==='file'){const f=it.getAsFile();if(f)fs.push(f)}}
     const pb=document.getElementById('sgPb');
     if(fs.length){e.preventDefault();if(pb)pb.innerHTML='';sgRoute(fs);return}
@@ -2517,7 +2517,7 @@ async function sgCot(file){
   q.valorCap=Number(q.anio)>=2026&&typeof c.X29==='number'?String(Math.round(c.X29)):'';
   const g=k=>c[k]==null?'':String(c[k]).trim();
   SG.cot={tot:[c.B61,c.J61,c.U61].map(x=>typeof x==='number'?x:null),serv:g('J31'),cl:{rfc:g('C9').toUpperCase(),sexo:g('J9'),nombre:g('Q9'),apP:g('F11'),apM:g('P11'),nacimiento:sgYmd(c.AA11),cp:g('C13'),calle:g('G13'),colonia:g('X13'),numExt:g('D15'),numInt:g('H15'),estado:g('Q15'),correo:g('Q22'),regimen:g('L20'),usoCfdi:g('W20'),beneficiario:g('AG20'),serie:g('S31').toUpperCase(),motor:g('G33'),placas:g('Q33'),color:g('Y33')}};
-  st.textContent='Listo ✓ (toca para cambiarla)';
+  st.textContent='Excel listo \u2713';
   const vi=document.getElementById('sgVal');if(vi)vi.value=q.valorCap;
   sgSel();await sgQuote();
 }
@@ -2541,7 +2541,7 @@ function sgForm(){
   if(f.dataset.built){sgSum();sgRdBtn();f.style.display='';return}
   f.dataset.built='1';f.style.display='';
   const C=SG.cat;
-  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><div style="display:none"><i id="sgIs"></i><i id="sgFs"></i></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div id="sgDocs" class="sgdocs"></div><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
+  f.innerHTML=`<div class="sgc"><div id="sgLd"></div><button type="button" class="sgbtn sec" id="sgChkB">Checar datos</button><div id="sgChk" style="display:none;margin-top:10px"><div id="sgDocs" class="sgdocs"></div><div class="sgg">${sgField('rfc','RFC (completo)')}${sgField('correo','Correo del cliente','email')}<div style="grid-column:1/-1">${sgField('beneficiario','Beneficiario preferente (opcional)')}</div></div><div id="sgRh" class="note" style="margin:6px 0"></div><details id="sgDet" class="sgdet" open><summary>Datos leídos: revisa o corrige</summary><div class="sgg" style="margin-top:10px">${sgField('nombre','Nombre(s)')}${sgField('apP','Apellido paterno')}${sgField('apM','Apellido materno')}${sgSelF('sexo','Sexo',sgOpt(['Femenino','Masculino'],'','Elige'))}${sgField('nacimiento','Fecha de nacimiento','date')}${sgField('cp','Código postal','text')}${sgSelF('estado','Estado de circulación',sgOpt(C.estados,'','Elige'))}${sgField('calle','Calle')}${sgField('numExt','Núm. exterior')}${sgField('numInt','Núm. interior (opcional)')}${sgField('colonia','Colonia')}${sgSelF('regimen','Régimen fiscal','',1)}${sgSelF('usoCfdi','Uso CFDI','',1)}${sgField('serie','Número de serie (17)')}${sgField('motor','Número de motor (opcional)')}${sgField('placas','Placas (opcional)')}${sgField('color','Color')}${sgSelF('servicio','Tipo de placa',sgOpt(C.servicios,'Particular'))}</div></details></div></div><div class="sgc" id="sgEm"><div id="sgS" class="sgs"></div><label class="sgck"><input type="checkbox" id="sg_autoriza"> Cliente autoriza envío al correo</label><em id="sge_autoriza"></em><div id="sgM"></div><button id="sgGo" class="sgbtn" type="button">Emitir póliza</button></div>`;
   sgRegs();
   document.getElementById('sg_rfc').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'');sgRegs();sgDefs()};
   document.getElementById('sg_serie').oninput=e=>{e.target.value=e.target.value.toUpperCase().replace(/\s/g,'')};
@@ -2608,6 +2608,17 @@ async function sgPaste(){
     await sgRoute(fs);
   }catch(e){if(ld)ld.innerHTML='<div class="sgerr">No encontré imagen ni PDF copiados. Mejor toca el recuadro de arriba y elige los archivos (Fototeca o Archivos). El Excel solo se puede subir desde Archivos.</div>'}
 }
+async function sgSlot(k,files){
+  SG.rd=1;sgRdBtn();
+  try{
+    sgForm();
+    const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='';
+    const ex=files.filter(f=>/\.xls[mx]$/i.test(f.name||'')),rest=files.filter(f=>ex.indexOf(f)<0);
+    for(const f of ex)await sgCot(f);
+    let ok=false;for(const f of rest){if(await sgFoto(k,f,false)){ok=true;break}}
+  }catch(e){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Algo fall\u00f3 al leer el archivo. Intenta de nuevo.</div>'}
+  SG.rd=0;sgRdBtn();
+}
 async function sgRoute(files){
   SG.rd=1;sgRdBtn();
   try{await sgRoute0(files)}catch(e){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">Algo falló al leer los archivos ('+esc(String(e&&e.message||e))+'). Intenta de nuevo.</div>'}
@@ -2627,8 +2638,7 @@ async function sgRoute0(files){
   }
   if(SG.done.ine&&!sgV('sg_nombre')&&skip.length){const z=skip.slice();skip.length=0;for(const f of z)if(!(await sgFoto('ine',f,true)))skip.push(f)}
   if(skip.length||!SG.done.ine||!SG.done.factura){const ld=document.getElementById('sgCl');if(ld)ld.innerHTML='<div class="sgerr">'+(!SG.done.ine&&!SG.done.factura?'No reconocí ni INE ni factura en los archivos.':!SG.done.ine?'Falta la INE (frente).':!SG.done.factura?'Falta la factura.':'Omití '+skip.length+' archivo'+(skip.length>1?'s':'')+' que no era INE ni factura (¿reverso de la INE?).')+'</div>'}
-  const st=document.getElementById('sgCs');if(st)st.textContent='Listo ✓ · toca para cambiar'+(SG.ia?' · lectura '+(SG.ia==='claude'?'Claude':'OpenAI'):'');
-  const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
+    const lc=document.getElementById('sgCl');if(lc&&!lc.innerHTML)lc.innerHTML='<div class="note">INE '+(SG.done.ine?'✓':'falta')+' · Factura '+(SG.done.factura?'✓':'falta')+'</div>';
   sgSum();
 }
 function sgNts(){
@@ -2640,14 +2650,14 @@ async function sgFoto(tipo,file,quiet){
   if(!file)return false;
   const st=document.getElementById(tipo==='ine'?'sgIs':'sgFs'),ld=document.getElementById('sgLd');
   st.textContent='Leyendo…';
-  let r;const cs=document.getElementById('sgCs');if(cs)cs.textContent='Leyendo '+(tipo==='ine'?'INE':'factura')+'…';
+  let r;
   try{
     const pdf=/\.pdf$/i.test(file.name||'')||file.type==='application\x2Fpdf';
     if(pdf){if(file.size>4e6)throw 0;r=await api('seg_leer',{pdf:await sgRd2(file),tipo:tipo})}
     else{const img=await shrink(file,2400,.9),tl=tipo==='ine'?await sgTiles(file):[];r=await api('seg_leer',{img:img,tipo:tipo,tiles:tl})}
   }catch(e){r=null}
   if(!r||r.err||!r.ok){st.textContent='No se pudo. Toca para reintentar';if(!quiet){ld.innerHTML=`<div class="sgerr">${r&&r.err?esc(r.err):'No se pudo leer. Intenta otra foto.'}</div>`;sgOpenChk()}return false}
-  SG.done[tipo]=1;if(r.ia)SG.ia=r.ia;sgDocSet(tipo,file);
+  SG.done[tipo]=1;if(r.ia)SG.ia=r.ia;sgDocSet(tipo,file);st.textContent='Listo \u2713 \u00b7 toca para cambiar';
   const d=r.d,notes=(r.dudas||[]).slice();
   if(tipo==='ine'){
     ['nombre','apP','apM','sexo','nacimiento','cp','calle','numExt','numInt','colonia','estado'].forEach(k=>sgFill(k,d[k],notes,'INE'));
