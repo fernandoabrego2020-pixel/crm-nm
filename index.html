@@ -3521,7 +3521,7 @@ function tvOkDraw(){
   const o=document.getElementById('tvOk');if(!o||!TVS)return;
   const s=TVS,kw=tvKw(s.faltan),bx='☐ ';
   o.innerHTML='<div class="tvh"><b>Descarga e imprime</b>'+(s.st==='armando'?'<span class="tvsp"></span>':'')+'</div>'+
-    (s.st==='armando'?'<div class="note" style="margin:-6px 0 6px">Armando tus hojas, tarda cerca de 1 minuto. No cierres esta pantalla.</div>':'')+
+    (s.st==='armando'?'<div class="note" style="margin:-6px 0 6px">Armando tus hojas, tarda de 1 a 2 minutos. No cierres esta pantalla.</div>':'')+
     (s.st==='error'?'<div class="sgerr">No se pudo armar'+(s.msg?': '+esc(tvMsg(s.msg)):'')+'<br><button type="button" class="sgmini" id="tvRe" style="margin-top:6px">Reintentar</button></div>':'')+
     tvStep(1,'Hoja BLANCA','Imprime todo junto',tvBtn(1))+
     tvStep(2,'Hoja VERDE','Cambia el papel antes. <b class="r">NO se entrega al cliente</b>',tvBtn(2),'v')+
