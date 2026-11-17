@@ -1043,6 +1043,13 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #tvw .sgda{display:flex;gap:8px}#tvw .sgda .sgbtn{flex:1}
 #tvw .sgok{border-color:#2f9e5b}
 #tvw .sgok .bad{color:#d33}
+#tvw .tvch{flex:1;padding:13px 6px;border-radius:12px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:700}
+#tvw .tvch.on{background:var(--tx);color:var(--card);border-color:var(--tx)}
+#tvw .tvchs{display:flex;gap:8px;margin-top:4px}
+#tvw .tvh{display:flex;align-items:center;gap:10px;font-size:20px;margin:2px 0 12px}
+#tvw .tvsp{width:18px;height:18px;border-radius:50%;border:3px solid var(--ln);border-top-color:#6d5dfc;animation:tvsp 1s linear infinite}
+@keyframes tvsp{to{transform:rotate(360deg)}}
+#tvw details.tvhist>summary{cursor:pointer;font-size:14px;color:var(--mu);padding:8px 0}
 #tvw .sgh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--ln)}
 #tvw .sgh:first-child{border-top:0}
 #tvw .sgh small{display:block;color:var(--mu);font-size:11px}
@@ -3445,18 +3452,22 @@ function tvSt(k){
   if(Array.isArray(v))e.textContent=v.length?('✓ '+v.length+(v.length===1?' archivo':' archivos')+' · toca para cambiar'):'Elegir';
   else e.textContent=v?('✓ '+(v.name||'listo')+' · toca para cambiar'):'Elegir';
 }
+function tvFin(){return ['MAXIKASH','GALGO','CONTADO'].map(x=>'<button type="button" class="tvch'+(TV.v.financiera===x?' on':'')+'" data-fin="'+x+'">'+(x==='CONTADO'?'Contado':x.charAt(0)+x.slice(1).toLowerCase())+'</button>').join('')}
 function tvBuild(){
   const b=document.getElementById('tvb');if(!b)return;
-  b.innerHTML='<div id="tvOk"></div>'+
-  '<div class="sgc"><h4>Archivos</h4><div style="display:grid;gap:10px">'+tvSlot('factura','Factura PDF \u00b7 obligatoria','Elegir',false,true)+tvSlot('ine','INE','1 foto o 2 (frente y vuelta)',true)+'</div></div>'+
-  '<div class="sgc"><h4>Datos</h4><div class="sgg">'+tvInp('telefono','Tel\u00e9fono','tel')+tvInp('correo','Correo','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
-  '<label>Financiera<select id="tv_financiera"><option value="">Elige</option>'+['MAXIKASH','GALGO','CONTADO'].map(x=>'<option value="'+x+'"'+(TV.v.financiera===x?' selected':'')+'>'+(x==='CONTADO'?'Contado':x.charAt(0)+x.slice(1).toLowerCase())+'</option>').join('')+'</select></label>'+
-  '<label>Origen<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+
-  tvInp('uso','Uso de la moto','',true)+tvInp('responsable','Responsable','',true)+'</div></div>'+
-  '<details class="sgc sgdet"><summary>Datos extra</summary><div style="margin-top:10px">'+
-  '<h4 style="margin:0 0 8px">Medios de pago \u2192 recibo + nota de cr\u00e9dito</h4><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">+ medio</button><div class="note" id="tvSum" style="margin-top:8px"></div>'+
-  '<h4 style="margin:14px 0 8px">Comprobantes \u00b7 Financiera</h4><div style="display:grid;gap:10px">'+tvSlot('pago','Comprobantes de pago','Elegir',true)+tvSlot('financiera','Captura de la financiera','Elegir',true)+'</div>'+
-  '<h4 style="margin:14px 0 8px">Referidos \u2192 hoja de referidos</h4><div class="sgg">'+tvInp('r1n','Referido 1','')+tvInp('r1t','Tel\u00e9fono','tel')+tvInp('r2n','Referido 2','')+tvInp('r2t','Tel\u00e9fono','tel')+'</div>'+
+  if(TVS&&TVS.view){
+    b.innerHTML='<div id="tvOk"></div><button type="button" class="sgbtn sec" id="tvNew">Nueva venta</button><div id="tvH" style="margin-top:6px"></div>';
+    document.getElementById('tvNew').onclick=()=>{if(TVS){clearTimeout(TVS.tm);TVS=null}tvBuild();tvHist();window.scrollTo(0,0)};
+    return;
+  }
+  b.innerHTML='<div class="sgc"><div style="display:grid;gap:10px">'+tvSlot('factura','Factura (PDF)','Elegir',false,true)+tvSlot('ine','INE','Frente y vuelta',true)+'</div></div>'+
+  '<div class="sgc"><div class="sgg">'+tvInp('telefono','Teléfono','tel')+tvInp('correo','Correo','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
+  '<label style="grid-column:1\x2F-1">Financiera<div class="tvchs" id="tvFin">'+tvFin()+'</div></label></div></div>'+
+  '<details class="sgc sgdet"><summary>Más datos</summary><div style="margin-top:10px">'+
+  '<div class="sgg"><label>Origen<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+tvInp('uso','Uso de la moto','')+tvInp('responsable','Responsable','',true)+'</div>'+
+  '<h4 style="margin:14px 0 8px">Medios de pago</h4><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">+ medio</button><div class="note" id="tvSum" style="margin-top:8px"></div>'+
+  '<h4 style="margin:14px 0 8px">Comprobantes</h4><div style="display:grid;gap:10px">'+tvSlot('pago','Pagos','Elegir',true)+tvSlot('financiera','Financiera','Elegir',true)+'</div>'+
+  '<h4 style="margin:14px 0 8px">Referidos</h4><div class="sgg">'+tvInp('r1n','Referido 1','')+tvInp('r1t','Teléfono','tel')+tvInp('r2n','Referido 2','')+tvInp('r2t','Teléfono','tel')+'</div>'+
   '</div></details>'+
   '<div id="tvE"></div><button type="button" class="sgbtn" id="tvGo">Enviar</button>'+
   '<div id="tvH" style="margin-top:14px"></div>';
@@ -3468,7 +3479,7 @@ function tvBuild(){
       else TV.f[k]=fl[0];
       tvSt(k)}});
   ['telefono','correo','precio_real','enganche_real','uso','responsable','r1n','r1t','r2n','r2t'].forEach(id=>{const el=document.getElementById('tv_'+id);if(el)el.oninput=()=>{TV.v[id]=el.value;if(id==='enganche_real')tvSum()}});
-  document.getElementById('tv_financiera').onchange=e=>{TV.v.financiera=e.target.value};
+  document.getElementById('tvFin').onclick=e=>{const c=e.target.closest&&e.target.closest('[data-fin]');if(!c)return;TV.v.financiera=TV.v.financiera===c.dataset.fin?'':c.dataset.fin;document.getElementById('tvFin').innerHTML=tvFin()};
   document.getElementById('tv_origen').onchange=e=>{TV.v.origen=e.target.value};
   document.getElementById('tvMa').onclick=()=>{TV.m.push({medio:'',monto:'',detalle:''});tvMed()};
   document.getElementById('tvGo').onclick=tvSend;
@@ -3500,30 +3511,26 @@ function tvKw(a){
   const o=[];(a||[]).forEach(x=>{if(!/^Falta/i.test(x))return;const h=m.find(y=>y[0].test(x));if(h&&o.indexOf(h[1])<0)o.push(h[1])});return o;
 }
 let TVS=null;
-function tvFb(n){
-  if(!TVS||TVS.st==='error')return '';
-  if(TVS.st==='lista')return '<button type="button" class="sgbtn" id="tvB'+n+'" style="margin-top:8px">Abrir archivo '+n+'</button>';
-  return '<div class="gs" style="margin-top:4px">armando\u2026</div>';
+function tvMsg(m){return /GH_TOKEN/.test(m||'')?'falta activar el armado (GH_TOKEN en Apps Script)':String(m||'')}
+function tvBtn(n){
+  const s=TVS,ok=s&&s.st==='lista';
+  return '<button type="button" class="sgbtn" id="tvB'+n+'"'+(ok?'':' disabled')+'>'+(ok?'Descargar e imprimir':(s&&s.st==='error'?'No disponible':'Armando…'))+'</button>';
 }
-function tvGuia(){
-  const st=(n,t,sub,c,x)=>'<div class="gst '+(c||'')+'"><div class="gn">'+n+'</div><div style="flex:1"><div class="gt">'+t+'</div>'+(sub?'<div class="gs">'+sub+'</div>':'')+(x||'')+'</div></div>';
-  return st(4,'Imprime el archivo 1','hoja blanca','',tvFb(1))+
-    st(5,'Cambia a hoja VERDE','','v')+
-    st(6,'Imprime el archivo 2','La factura real \u00b7 <b class="r">NO se entrega al cliente</b>','v',tvFb(2))+
-    '<div class="gst a"><div class="gn">7</div><div><div class="gt">FIRMAS</div><div class="gck">\u2610 Factura verde<br>\u2610 Contrato de compraventa<br>\u2610 Carta de no aceptaci\u00f3n de seguros<br>\u2610 Check list de entrega</div></div></div>'+
-    '<div class="gst" style="border-color:#555;background:rgba(128,128,128,.1)"><div class="gn" style="background:#444">8</div><div style="flex:1"><div class="gdl" style="margin-top:0"><div class="c"><b>AL CLIENTE</b>09-C Carta factura<br>11-C P\u00f3liza de garant\u00eda<br>08-C Copia sin valor</div><div class="q"><b>AGENCIA</b>Todo lo dem\u00e1s (A)<br>07-S Sergio</div></div></div></div>';
-}
+function tvStep(n,t,sub,body,c){return '<div class="gst '+(c||'')+'"><div class="gn">'+n+'</div><div style="flex:1;min-width:0"><div class="gt">'+t+'</div>'+(sub?'<div class="gs">'+sub+'</div>':'')+(body||'')+'</div></div>'}
 function tvOkDraw(){
   const o=document.getElementById('tvOk');if(!o||!TVS)return;
-  const kw=tvKw(TVS.faltan);
-  o.innerHTML='<div class="sgc sgok"><b>Venta enviada \u2713</b> <span class="note">'+esc(TVS.id)+'</span>'+
-    (TVS.st==='error'?'<div class="sgerr" style="margin-top:10px">No se pudo armar'+(TVS.msg?': '+esc(TVS.msg):'')+'<br><button type="button" class="sgmini" id="tvRe" style="margin-top:6px">Reintentar</button></div>':'')+
-    (kw.length?'<div class="sgdu"><b>Falta:</b> '+kw.join(' \u00b7 ')+'</div>':'')+
-    (TVS.avisos&&TVS.avisos.length?'<div class="sgdu"><b>Aviso:</b> '+TVS.avisos.slice(0,3).map(esc).join('<br>')+'</div>':'')+
-    tvGuia()+'</div>';
+  const s=TVS,kw=tvKw(s.faltan),bx='☐ ';
+  o.innerHTML='<div class="tvh"><b>Descarga e imprime</b>'+(s.st==='armando'?'<span class="tvsp"></span>':'')+'</div>'+
+    (s.st==='armando'?'<div class="note" style="margin:-6px 0 6px">Armando tus hojas, tarda cerca de 1 minuto. No cierres esta pantalla.</div>':'')+
+    (s.st==='error'?'<div class="sgerr">No se pudo armar'+(s.msg?': '+esc(tvMsg(s.msg)):'')+'<br><button type="button" class="sgmini" id="tvRe" style="margin-top:6px">Reintentar</button></div>':'')+
+    tvStep(1,'Hoja BLANCA','Imprime todo junto',tvBtn(1))+
+    tvStep(2,'Hoja VERDE','Cambia el papel antes. <b class="r">NO se entrega al cliente</b>',tvBtn(2),'v')+
+    tvStep(3,'FIRMAR','','<div class="gck">'+bx+'Factura verde<br>'+bx+'Contrato de compraventa<br>'+bx+'Carta de no aceptación de seguros<br>'+bx+'Check list de entrega</div>','a')+
+    tvStep(4,'ENTREGAR AL CLIENTE','Lo demás se queda en la agencia','<div class="gck">'+bx+'09-C Carta factura<br>'+bx+'11-C Póliza de garantía<br>'+bx+'08-C Copia sin valor</div>','ok')+
+    (kw.length?'<div class="note" style="margin-top:8px">Sin capturar: '+kw.join(' · ')+'</div>':'');
   const b1=document.getElementById('tvB1'),b2=document.getElementById('tvB2'),re=document.getElementById('tvRe');
-  if(b1)b1.onclick=()=>tvOpen(1,b1);
-  if(b2)b2.onclick=()=>tvOpen(2,b2);
+  if(b1&&!b1.disabled)b1.onclick=()=>tvOpen(1,b1);
+  if(b2&&!b2.disabled)b2.onclick=()=>tvOpen(2,b2);
   if(re)re.onclick=()=>tvArmar();
 }
 async function tvOpen(n,b){
@@ -3548,8 +3555,8 @@ async function tvArmar(){
 async function tvSend(){
   if(TV.busy)return;
   const er=document.getElementById('tvE'),bt=document.getElementById('tvGo');
-  if(!TV.f.factura){er.innerHTML='<div class="sgerr">Falta la factura (PDF)</div>';return}
-  TV.busy=true;bt.disabled=true;bt.textContent='Subiendo… no cierres la página';er.innerHTML='';
+  if(!TV.f.factura){er.innerHTML='<div class="sgerr">Sube la factura (PDF)</div>';return}
+  TV.busy=true;bt.disabled=true;bt.textContent='Subiendo…';er.innerHTML='';
   try{
     const files=[];
     const add=async(k,f)=>{const pdf=/\.pdf$/i.test(f.name||'')||f.type==='application\x2Fpdf';files.push({k:k,n:f.name||k,pdf:pdf,b64:pdf?await sgRd2(f):await shrink(f,1800,.82)})};
@@ -3560,14 +3567,14 @@ async function tvSend(){
     const r=await api('seg_venta_save',{datos:tvDatos(),files:files});
     if(r&&r.ok){
       TV.f={factura:null,ine:[],pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:TV.v.responsable||'ZAYURI CALDERON',financiera:'',origen:''};
-      tvBuild();tvHist();
-      TVS={id:r.id,faltan:r.faltan||[],st:'armando',avisos:[],msg:'',tm:0};tvOkDraw();tvArmar();
+      TVS={id:r.id,faltan:r.faltan||[],st:'armando',avisos:[],msg:'',tm:0,view:1};
+      tvBuild();tvHist();tvOkDraw();tvArmar();
       window.scrollTo(0,0);const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
     }else{
       er.innerHTML='<div class="sgerr"><b>Revisa:</b><br>'+((r&&r.errs)||[(r&&r.err)||'No se pudo guardar.']).map(x=>'• '+esc(x)).join('<br>')+'</div>';
     }
   }catch(e){er.innerHTML='<div class="sgerr">No se pudo enviar. Revisa tu conexión y vuelve a intentar (si ya se había guardado, no se duplica).</div>'}
-  TV.busy=false;const g=document.getElementById('tvGo');if(g){g.disabled=false;g.textContent='Enviar la venta'}
+  TV.busy=false;const g=document.getElementById('tvGo');if(g){g.disabled=false;g.textContent='Enviar'}
 }
 let TVA={};
 async function tvHist(){
@@ -3579,7 +3586,7 @@ async function tvHist(){
     :x.estado==='armando'||x.estado==='pendiente'?'<div class="note" style="margin-top:6px">armando\u2026</div>'
     :x.estado==='error'?'<div class="note" style="margin-top:6px;color:#d33">Error'+(x.msg?': '+esc(x.msg):'')+'</div><button type="button" class="sgmini" data-tvr="'+esc(x.id)+'" style="margin-top:6px">Reintentar</button>'
     :'<div class="note" style="margin-top:6px">'+esc(x.estado)+'</div>';
-  h2.innerHTML='<h4 style="margin:0 0 8px;font-size:15px">Ventas enviadas</h4>'+r.rows.map(x=>'<div class="sgc" style="padding:10px 12px;margin-bottom:8px"><b>'+esc(x.cliente||x.id)+'</b> <span style="float:right;color:var(--mu);font-size:12px">'+(x.fecha?new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+'</span><div class="note" style="margin-top:4px">'+esc(x.id)+(x.fin?' \u00b7 '+esc(x.fin):'')+(DN(ME)&&x.cuenta!==ME?' \u00b7 '+esc(x.cuenta):'')+'</div>'+est(x)+'</div>').join('');
+  h2.innerHTML='<details class="tvhist"><summary>Ventas anteriores</summary>'+r.rows.map(x=>'<div class="sgc" style="padding:10px 12px;margin-bottom:8px"><b>'+esc(x.cliente||x.id)+'</b> <span style="float:right;color:var(--mu);font-size:12px">'+(x.fecha?new Date(x.fecha).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):'')+'</span><div class="note" style="margin-top:4px">'+esc(x.id)+(x.fin?' \u00b7 '+esc(x.fin):'')+(DN(ME)&&x.cuenta!==ME?' \u00b7 '+esc(x.cuenta):'')+'</div>'+est(x)+'</div>').join('')+'</details>';
   h2.onclick=async e=>{
     const o=e.target.closest&&e.target.closest('[data-tvo]'),q=e.target.closest&&e.target.closest('[data-tvr]');
     if(o){const p=o.dataset.tvo.split('|'),t=o.textContent;o.disabled=true;o.textContent='Abriendo\u2026';
