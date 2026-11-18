@@ -1964,12 +1964,17 @@ function p2Send(l){
   if(!tx||!P2.win)return toast('No disponible en este chat',1);
   const t=tx.value.trim();if(!t||P2.sending)return;
   P2.sending=1;bt.textContent='Enviando…';
-  const back=()=>{P2.sending=0;bt.textContent='Enviar'};
+  let fin=0;
+  const back=()=>{P2.sending=0;const b=document.getElementById('p2send');if(b)b.textContent='Enviar'};
+  const ok=()=>{const bd=document.getElementById('p2cb');if(bd){bd.insertAdjacentHTML('beforeend','<div class="wm out"><small>T\u00fa</small>'+esc(t)+'</div>');bd.scrollTop=bd.scrollHeight}const x=document.getElementById('p2tx');if(x&&x.value.trim()===t){x.value='';x.style.height=''}P2.act[l.tel]=Date.now();toast('Enviado',1)};
+  const tm=setTimeout(()=>{if(fin)return;fin=1;back();toast('Tard\u00f3 demasiado. Revisa el chat antes de volver a enviar',1)},35000);
   api('wa_send',{tel:l.tel,texto:t}).then(r=>{
-    back();
-    if(r&&r.ok){const bd=document.getElementById('p2cb');if(bd){bd.insertAdjacentHTML('beforeend','<div class="wm out"><small>Tú</small>'+esc(t)+'</div>');bd.scrollTop=bd.scrollHeight}tx.value='';tx.style.height='';P2.act[l.tel]=Date.now();return toast('Enviado',1)}
-    const e=r&&r.err;toast(e==='nosend'?'El envío todavía no está conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
-  }).catch(()=>{back();toast('No se pudo enviar, intenta otra vez',1)});
+    clearTimeout(tm);
+    if(fin){if(r&&r.ok)ok();return}
+    fin=1;back();
+    if(r&&r.ok)return ok();
+    const e=r&&r.err;toast(e==='nosend'?'El env\u00edo todav\u00eda no est\u00e1 conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
+  }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('No se pudo enviar, intenta otra vez',1)});
 }
 const DEFRX=new Set(['Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Valle Aodes Armando','Almoloya','Valle Andrea','Valle Carlos']);
 function p2Wa(l){
