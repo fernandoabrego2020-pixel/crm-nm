@@ -1207,6 +1207,12 @@ body.viplock{overflow:hidden}
 @keyframes vcheck{to{stroke-dashoffset:0}}
 @keyframes vshot{0%{opacity:1;transform:rotate(var(--a)) translateX(0) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--r)) scale(.2)}}
 @media (prefers-reduced-motion:reduce){#vipfs *{animation-duration:.01s!important;animation-iteration-count:1!important}}
+
+#pm{overflow-y:auto;-webkit-overflow-scrolling:touch}
+#pm .lg2,.loginov .lg2{padding:16px 0 28px}
+.pmf{display:block;position:relative;z-index:1}
+@media (max-height:760px){#pm .kp,.loginov .kp{grid-template-columns:repeat(3,64px);gap:10px;margin-top:0}#pm .kk,.loginov .kk{width:64px;height:64px;font-size:24px}#pm .lg2,.loginov .lg2{gap:10px}.pmf{margin-top:10px;padding:10px 22px}.pmn{margin-top:10px}}
+@media (max-height:620px){#pm .kp,.loginov .kp{grid-template-columns:repeat(3,54px);gap:8px}#pm .kk,.loginov .kk{width:54px;height:54px;font-size:21px}}
 </style>
 </head>
 <body>
@@ -1287,7 +1293,7 @@ async function pmKey(k){
   const i=document.getElementById('pmv'),e=document.getElementById('pme');let v=i.value;
   if(k==='del')v=v.slice(0,-1);else if(k!=='go'){if(v.length<8)v+=k}
   i.value=v;e.textContent='';pmDraw();
-  if(k!=='go'){const ex=PM.mode==='enter'?(PM.n||+lget('crm-pl-'+ME)||4):PM.mode==='repeat'?PM.first.length:0;if(k==='del'||!ex||v.length!==ex)return}
+  if(k!=='go'){const ex=PM.mode==='enter'?(PM.n||+lget('crm-pl-'+ME)||0):PM.mode==='repeat'?PM.first.length:0;if(k==='del'||!ex||v.length!==ex)return}
   if(PM.mode==='create'){if(!/^\d{4,8}$/.test(v)){e.textContent='4 a 8 números';return}PM.first=v;PM.mode='repeat';i.value='';pmDraw();pmTitle();return}
   if(PM.mode==='repeat'){if(v!==PM.first){PM.mode='create';PM.first='';i.value='';pmDraw();pmTitle();e.textContent='No coinciden, elige otra vez';return}}
   if(!v){e.textContent='Escribe tu NIP';return}
@@ -1799,7 +1805,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v173';
+const APPV='v175';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -1827,12 +1833,28 @@ function regLkSel(r,i){
 function regDup(r,i){const t=norm(r.tel);if(t.length!==10)return '';const d=findDup(t);if(d)return dupMsg(d);if(REG.rows.some((o,j)=>j<i&&norm(o.tel)===t))return 'Repetido en esta lista';return ''}
 function regDoubt(r){const t=norm(r.tel);return r.du.length>0||(t.length>0&&t.length!==10)}
 const regEmpty=r=>!String(r.name||'').trim()&&!norm(r.tel)&&!String(r.tx||'').trim()&&!String(r.idf||'').trim()&&!String(r.mt||'').trim();
-const regOk=(r,i)=>r.on&&!regDup(r,i)&&!regEmpty(r);
+const regOk=(r,i)=>r.on&&!regEmpty(r);
 function regFocusKey(){const a=document.activeElement;if(!a||!a.closest||!a.closest('#p2reg'))return null;let k='';if(a.id)k='#'+a.id;else if(a.dataset&&a.dataset.k!==undefined&&a.dataset.i!==undefined)k='[data-i="'+a.dataset.i+'"][data-k="'+a.dataset.k+'"]';if(!k)return null;let p=0;try{p=a.selectionStart}catch(e){}return {k:k,p:p}}
 function regStat(t){REG.prog=t;const x=document.getElementById('rgst');if(x)x.textContent=t}
 function regSync(){document.querySelectorAll('#p2reg [data-k]').forEach(t=>{const r=REG.rows[+t.dataset.i],k=t.dataset.k;if(!r||k==='on'||k==='lk'||typeof t.value!=='string')return;if(r[k]!==t.value){r[k]=t.value;REG.conf=0;if(k==='tel')r.du=[]}});const l=document.getElementById('rgl');if(l)REG.lugar=l.value}
+function regFlags(){
+  document.querySelectorAll('#p2reg .rgr').forEach((el,i)=>{const r=REG.rows[i];if(!r)return;
+    const dp=regDup(r,i),t=norm(r.tel),fl=[];
+    if(dp)fl.push(['warn',dp+' \u00b7 se guarda igual, sin n\u00famero (queda anotado en el lead)']);
+    else{
+      if(!t&&(r.name||r.tx))fl.push(['info','Sin n\u00famero: se guarda igual y le agregas el n\u00famero despu\u00e9s']);
+      else if(t&&t.length!==10)fl.push(['warn','N\u00famero incompleto ('+t.length+' d\u00edgitos)']);
+      r.du.forEach(d=>fl.push(['warn',d]));
+    }
+    el.classList.remove('dup');el.classList.toggle('dbt',regDoubt(r));
+    el.querySelectorAll('.rgf').forEach(x=>x.remove());
+    fl.forEach(f=>{const d=document.createElement('div');d.className='rgf '+f[0];d.textContent=f[1];el.appendChild(d)});
+    const cb=el.querySelector('input[type=checkbox]');if(cb){cb.disabled=false;cb.checked=!!r.on}
+    const ti=el.querySelector('[data-k="tel"]');if(ti)ti.className=((t&&t.length!==10)||r.du.length?'warn':'');
+  });
+}
 function regBtn(){
-  regSync();const b=document.querySelector('#p2reg [data-rg="save"]');if(!b)return;
+  regSync();regFlags();const b=document.querySelector('#p2reg [data-rg="save"]');if(!b)return;
   const n=REG.rows.filter(regOk).length;
   b.textContent=REG.conf?'Guardar así de todos modos':'Guardar '+n+(n===1?' lead':' leads');
   b.disabled=!!REG.busy||!n;
@@ -1849,14 +1871,14 @@ function regDraw(){
   const pl=regPlaces().map(x=>'<option value="'+esc(x)+'">').join('');
   const rows=REG.rows.map((r,i)=>{
     const dp=regDup(r,i),t=norm(r.tel),fl=[];
-    if(dp)fl.push(['bad',dp]);
+    if(dp)fl.push(['warn',dp+' \u00b7 se guarda igual, sin n\u00famero (queda anotado en el lead)']);
     else{
       if(!t&&(r.name||r.tx))fl.push(['info','Sin número: se guarda igual y le agregas el número después']);
       else if(t&&t.length!==10)fl.push(['warn','Número incompleto ('+t.length+' dígitos)']);
       r.du.forEach(d=>fl.push(['warn',d]));
     }
-    const cls=dp?' dup':(regDoubt(r)?' dbt':'');
-    return '<div class="rgr'+cls+'"><div class="rgrh"><label><input type="checkbox" data-i="'+i+'" data-k="on"'+(r.on&&!dp?' checked':'')+(dp?' disabled':'')+'> <b>'+(i+1)+'</b></label><button data-rg="rmr" data-i="'+i+'" aria-label="Quitar">×</button></div>'+
+    const cls=regDoubt(r)?' dbt':'';
+    return '<div class="rgr'+cls+'"><div class="rgrh"><label><input type="checkbox" data-i="'+i+'" data-k="on"'+(r.on?' checked':'')+'> <b>'+(i+1)+'</b></label><button data-rg="rmr" data-i="'+i+'" aria-label="Quitar">×</button></div>'+
       '<textarea rows="2" data-i="'+i+'" data-k="tx" placeholder="Texto tal cual (opcional)">'+esc(r.tx)+'</textarea>'+
       '<div class="rgg"><input data-i="'+i+'" data-k="name" enterkeyhint="next" value="'+esc(r.name)+'" placeholder="Nombre (opcional)" autocomplete="off"><input class="'+((t&&t.length!==10)||r.du.length?'warn':'')+'" data-i="'+i+'" data-k="tel" enterkeyhint="next" inputmode="tel" value="'+esc(r.tel)+'" placeholder="WhatsApp (opcional)" autocomplete="off"></div>'+
       '<div class="rgg"><input data-i="'+i+'" data-k="idf" enterkeyhint="next" value="'+esc(r.idf)+'" placeholder="Cómo identificarlo (opcional)" autocomplete="off"><input data-i="'+i+'" data-k="ub" enterkeyhint="done" value="'+esc(r.ub)+'" placeholder="Lugar (opcional)" autocomplete="off"></div>'+
@@ -1912,14 +1934,14 @@ function regAlong(ln,f){
   return ln[ln.length-1];
 }
 function regSave(){
-  regSync();const sel=REG.rows.filter(regOk);
+  regSync();const sel=REG.rows.filter(regOk),dmap=new Map();REG.rows.forEach((r,i)=>{if(regOk(r,i)){const m=regDup(r,i);if(m)dmap.set(r,m)}});
   if(!sel.length){REG.err='Escribe al menos un dato: nombre, número o texto.';return regDraw()}
   const nd=sel.filter(r=>regDoubt(r)).length;
   if(nd&&!REG.conf){REG.conf=1;REG.err='';regDraw();const q=document.querySelector('#p2reg .rgf.warn');if(q)q.scrollIntoView({block:'center'});return}
   const t0=Date.now();let np=0;const gone=[];
   undo=JSON.stringify(S);UNDO_ADD=true;
   sel.forEach((r,i)=>{
-    const tel=norm(r.tel),ok=tel.length===10,id=uid();
+    const tel=norm(r.tel),dm=dmap.get(r)||'',ok=tel.length===10&&!dm,id=uid();
     const nl={id:id,own:S.ag,src:ACC[S.ag]||null,name:r.name.trim(),moto:r.mt||'',tel:ok?tel:('ph'+id.toLowerCase()),c:t0+i,s:0,f:0,r:0,note:'',done:false,ctx:[],st:{empezar:t0,referidos:t0}};
     if(r.tx.trim())nl.ctx.push({t:t0+i,x:r.tx.trim(),pend:true});
     if(r.idf.trim()){nl.idf=r.idf.trim();if(r.hand)nl.idfm=1;else nl.labv=LABV}
@@ -1928,7 +1950,7 @@ function regSave(){
     const pl=r.lk?S.leads.find(x=>x.id===r.lk&&x.ph&&!x.fld&&x.loc):null;
     if(pl){nl.loc=[pl.loc[0],pl.loc[1],pl.loc[2],t0];gone.push(pl.id)}
     setStage(nl,r.stg);
-    if(!ok){nl.ph=1;nl.fld=1;np++;if(tel)nl.ctx.push({t:t0+i,x:'Número incompleto anotado: '+tel,auto:true,pend:false})}
+    if(!ok){nl.ph=1;nl.fld=1;np++;if(dm)nl.ctx.push({t:t0+i,x:'Número repetido anotado: '+tel+' ('+dm+')',auto:true,pend:false});else if(tel)nl.ctx.push({t:t0+i,x:'Número incompleto anotado: '+tel,auto:true,pend:false})}
     S.leads.push(nl);
   });
   if(gone.length)S.leads=S.leads.filter(x=>gone.indexOf(x.id)<0);
@@ -2432,7 +2454,7 @@ function showLogin(msg){
   el.style.display='flex';
 }
 function lgDraw(){const pi=document.getElementById('pin'),d=document.getElementById('dots');if(!pi||!d)return;const v=pi.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<v?'f':''}"></i>`).join('')}
-function lgKey(k){const pi=document.getElementById('pin');if(!pi)return;if(k==='go')return doLogin();let v=pi.value;if(k==='del')v=v.slice(0,-1);else if(v.length<8)v+=k;pi.value=v;document.getElementById('le').textContent='';lgDraw();if(k!=='del'){const ex=LMODE==='enter'?(+lget('crm-pl-'+LU)||LPL||4):LMODE==='repeat'?LFIRST.length:0;if(ex&&v.length===ex)doLogin()}}
+function lgKey(k){const pi=document.getElementById('pin');if(!pi)return;if(k==='go')return doLogin();let v=pi.value;if(k==='del')v=v.slice(0,-1);else if(v.length<8)v+=k;pi.value=v;document.getElementById('le').textContent='';lgDraw();if(k!=='del'){const ex=LMODE==='enter'?(+lget('crm-pl-'+LU)||LPL||0):LMODE==='repeat'?LFIRST.length:0;if(ex&&v.length===ex)doLogin()}}
 document.addEventListener('keydown',ev=>{const L=document.getElementById('login');if(!L||L.style.display==='none'||!document.getElementById('pin'))return;if(/^\d$/.test(ev.key))lgKey(ev.key);else if(ev.key==='Backspace')lgKey('del');else if(ev.key==='Enter')lgKey('go')});
 function finishBoot(){document.getElementById('login').style.display='none';ready=true;pcRender();if(ME==='Fer')lset('crm-ferdev','1');ROLE=ME==='Fer'&&LR==='vendedor'?'vendedor':roleOf(ME);LR=ROLE;lset('crm-role',LR);bkpSet();document.body.classList.toggle('ro',RO);if(AG.includes(ME))S.ag=ME;if(ROLE==='director'&&S.ag==='Fer')S.ag='Lerma Zayuri';render();navInit()}
 async function doLogin(){
@@ -3756,7 +3778,7 @@ async function tvHist(){
 }
 /* ===== v165: videos por moto, Herramientas completas, Clientes selectos ===== */
 const PFVD={};
-const PFVI={"aodespathcross300":"d71Q8UoistQ","aodespathcross550lluxdefensaalta":"xXOy2_3uLgA","aodespathcross550lpro":"xXOy2_3uLgA","aodespathcross550lstandard":"xXOy2_3uLgA","aodespathcross650l":"0lR3Gqb6ARM","aodespathcrosslmudpro1000":"XWKHg5xkLT8","aodesworcross650sencillo":"aTLaGdk8nUc","aodesworcross650x3puertasywinch":"vzxvdJGD300","aodesworkcross1000x3hvac":"HPB1DpW4p-Q","aodesworkcross1000x6hvac":"_PzMKFsWuec","lifank29":"l78ZPctaPBM","lifankpm250":"3XVB1F30snE","lifankpr250":"O4g8dqbOwiI","lifankpt200":"HY9bCdoh8Oo","lifankpt400":"6N06yOvRZFk","lifanlf1102g":"CzW5U4Xg-Mw","lifanstarship4":"lbkdw49eOL8","lifanv16s":"WvlBNEH7ifU","lifanv400":"TcJQVRdd6qw","segwayfuglemanut10crewpremium":"LTxeWvYANxk","segwayfuglemanut1000x":"rTtxbalPJW4","segwaysnarlerat1000wmud":"wvrRqrElc6g","segwaysnarlerat1000wpremium":"wvrRqrElc6g","segwaysnarlerat5sstandard":"4ACisSRRvG0","segwaysnarlerat5lluxury":"4ACisSRRvG0","segwaysnarlerat5lpremium":"4ACisSRRvG0","segwaysnarlerat6lpremiumcamo":"vvjk1SIoPxA","segwaysnarlerat6lpremium":"gqlhZrYjfH4","segwaysupervillainsx2000t":"17e5ekozNxY","segwayvillainsx1000w":"EXHQVgzCLzQ","treckacorazada150cc":"Gt3fLSl14lA","treckchopperkrathos250":"HsglT5VhHi4","treckjin150cc":"QAvW3-XIv5M","treckkrathos200cc":"gU7Fjt578dA","treckmatt150cc":"hW505hk6ix8","treckmatt250cc":"YcRXMyw9KaM","treckminimotokb60cc":"2J4PgE-4nUo","treckmotocarrorampante250ccplus":"0vFCJuwtOCU","treckmt125cc":"jIv_V6wLupA","treckraven300cc":"s-ktBmLA1qI","treckscala50":"oPdgvgEV3cQ","trecktigercat300cc":"P3B0-CT1SDg","trecktitan300cc":"8NHF2E2jIX8","trecktrapper150":"mlQ_WIiGAjU","treckwarrior200cc":"5SoX1thKdKo","winmex250mh250cc":"c2BqRM80n0c","winmexmotocarrowm200":"NllvrzD8y1c","winmexmotocarrowm250":"3HzBRz_vRJE"};
+const PFVI={"aodespathcross300":"d71Q8UoistQ","aodespathcross550lluxdefensaalta":"xXOy2_3uLgA","aodespathcross550lpro":"xXOy2_3uLgA","aodespathcross550lstandard":"xXOy2_3uLgA","aodespathcross650l":"0lR3Gqb6ARM","aodespathcrosslmudpro1000":"XWKHg5xkLT8","aodesworcross650sencillo":"aTLaGdk8nUc","aodesworcross650x3puertasywinch":"vzxvdJGD300","aodesworkcross1000x3hvac":"HPB1DpW4p-Q","aodesworkcross1000x6hvac":"_PzMKFsWuec","lifank29":"l78ZPctaPBM","lifankpm250":"3XVB1F30snE","lifankpr250":"O4g8dqbOwiI","lifankpt200":"HY9bCdoh8Oo","lifankpt400":"6N06yOvRZFk","lifanlf1102g":"CzW5U4Xg-Mw","lifanstarship4":"lbkdw49eOL8","lifanv16s":"WvlBNEH7ifU","lifanv400":"TcJQVRdd6qw","segwayfuglemanut10crewpremium":"LTxeWvYANxk","segwayfuglemanut1000x":"rTtxbalPJW4","segwaysnarlerat1000wmud":"wvrRqrElc6g","segwaysnarlerat1000wpremium":"wvrRqrElc6g","segwaysnarlerat5sstandard":"4ACisSRRvG0","segwaysnarlerat5lluxury":"4ACisSRRvG0","segwaysnarlerat5lpremium":"4ACisSRRvG0","segwaysnarlerat6lpremiumcamo":"vvjk1SIoPxA","segwaysnarlerat6lpremium":"gqlhZrYjfH4","segwaysupervillainsx2000t":"17e5ekozNxY","segwayvillainsx1000w":"EXHQVgzCLzQ","treckacorazada150cc":"Gt3fLSl14lA","treckchopperkrathos250":"HsglT5VhHi4","treckjin150cc":"QAvW3-XIv5M","treckkrathos200cc":"gU7Fjt578dA","treckmatt150cc":"hW505hk6ix8","treckmatt250cc":"YcRXMyw9KaM","treckminimotokb60cc":"2J4PgE-4nUo","treckmotocarrorampante250ccplus":"0vFCJuwtOCU","treckmt125cc":"jIv_V6wLupA","treckraven300cc":"s-ktBmLA1qI","treckscala50":"oPdgvgEV3cQ","trecktigercat300cc":"P3B0-CT1SDg","trecktitan300cc":"8NHF2E2jIX8","trecktrapper150":"mlQ_WIiGAjU","treckwarrior200cc":"5SoX1thKdKo","winmexmotocarrowm200":"NllvrzD8y1c"};
 Object.keys(PFVI).forEach(k=>{PFVD[k]='https:\x2F\x2Fwww.youtube.com/watch?v='+PFVI[k]});
 const TLG=[['frase','Frases'],['link','Mis videos y links'],['ubic','Ubicación de sucursales'],['vtd','Videos de la tienda'],['vid','Video de cada moto'],['ficha','Ficha y precio de cada moto'],['foto','Foto de cada moto']];
 function p2FichaTxt(m){
