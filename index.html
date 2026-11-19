@@ -7,7 +7,7 @@ var EX="https://script.google.com/macros/s/AKfycbwSnmGi3-HdNg8AXigUZjpg-gmk5oiy2
 function mk(ok,fail){return{
 withSuccessHandler:function(f){return mk(f,fail)},
 withFailureHandler:function(f){return mk(ok,f)},
-api:function(req){var op=(req&&req.op)||"",ac=window.AbortController?new AbortController():null,noab=op==="seg_emit"||!ac,ms=/^(ai|ia_|mk|ventas_|seg_venta_|seg_leer)/.test(op)?90000:20000,tm=0,dn=0;
+api:function(req){var op=(req&&req.op)||"",ac=window.AbortController?new AbortController():null,noab=op==="seg_emit"||!ac,ms=/^(ai|ia_|mk|ventas?_|seg_venta_|seg_leer)/.test(op)?90000:/^(lead_chat|ficha|wa_send|tools_|doc_|chats|folder_imgs)/.test(op)?60000:20000,tm=0,dn=0;
 if(!noab)tm=setTimeout(function(){dn=1;try{ac.abort()}catch(x){}var er=new Error("timeout");er.sinCon=1;er.timeout=1;if(fail)fail(er)},ms);
 fetch(EX,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({crm:1,req:req}),signal:noab?undefined:ac.signal}).then(function(r){return r.text()}).then(function(t){clearTimeout(tm);if(dn)return;if(ok)ok(t)}).catch(function(e){clearTimeout(tm);if(dn)return;try{e.sinCon=1}catch(x){}if(fail)fail(e)})
 }}}
@@ -1224,6 +1224,23 @@ body.viplock{overflow:hidden}
 #askyn button.y{background:var(--tx);color:var(--bg);border-color:var(--tx)}
 .rgda{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 .rgda .p2a{padding:7px 12px;font-size:13px}
+body{--nb:0px}body.hasnav{--nb:66px}
+#nipbar{bottom:calc(var(--nb) + env(safe-area-inset-bottom,0px) + var(--ob,0px))}
+#offbar{position:fixed;left:0;right:0;bottom:calc(var(--nb) + env(safe-area-inset-bottom,0px));z-index:58;display:flex;gap:10px;align-items:center;justify-content:center;padding:7px 10px;background:#374151;color:#fff;font:600 13px/1.2 system-ui,sans-serif}
+#offbar button{border:0;border-radius:999px;padding:6px 14px;background:#fff;color:#374151;font:700 13px system-ui,sans-serif}
+body.p2lock #nipbar,body.viplock #nipbar,body.p2lock #offbar,body.viplock #offbar{display:none}
+.p2fab{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 16px + var(--xb,0px))}
+.p2fm2{bottom:calc(64px + env(safe-area-inset-bottom,0px) + 76px + var(--xb,0px))}
+#pcbox{bottom:calc(74px + env(safe-area-inset-bottom,0px) + var(--xb,0px))}
+#toast{top:auto;bottom:calc(var(--nb) + 12px + env(safe-area-inset-bottom,0px) + var(--xb,0px));transform:translateX(-50%);border-radius:14px;width:max-content;max-width:calc(100% - 24px);z-index:95;box-shadow:0 6px 24px rgba(0,0,0,.28)}
+#toast:not(.show){display:none}
+body.hasnav .page{padding-bottom:calc(90px + var(--xb,0px))}
+.p2inc{background:#9a3412;color:#fff}
+#offscr{position:fixed;inset:0;z-index:9999;background:var(--bg);color:var(--tx);display:flex;align-items:center;justify-content:center;padding:24px;text-align:center}
+#offscr .osb{max-width:300px}
+#offscr h2{margin:0 0 8px;font:700 22px system-ui,sans-serif}
+#offscr p{margin:0 0 18px;font-size:15px;line-height:1.4;color:var(--mu)}
+#offscr button{border:0;border-radius:999px;padding:12px 28px;background:var(--tx);color:var(--bg);font:700 16px system-ui,sans-serif}
 </style>
 </head>
 <body>
@@ -1261,9 +1278,9 @@ async function lgProbe(){try{const r=await api('login',{name:LU,pin:''});if(r.er
 async function viewLogin(n){
   try{const r=await api('login',{name:n,view:1});if(r.err){LU=n;showLogin(r.err==='bloq'?'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.':'Entra con tu NIP');return}
     TOK=r.token;ME=r.name;LU=ME;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);
-    const x=await pull();if(x==='err'||x==='auth'){showLogin('No se pudo cargar los datos');return}
+    const x=await pull();if(x==='err'){offScreen();return}if(x==='auth'){showLogin('No se pudo cargar los datos');return}
     finishBoot();
-  }catch(e){showLogin('Sin conexión')}
+  }catch(e){offScreen()}
 }
 
 function bkpSet(){try{if(TOK&&ME)google.script.history.replace(null,null,'s='+encodeURIComponent(ME+'|'+(LR||'')))}catch(e){}}
@@ -1276,21 +1293,24 @@ function pmPad(){
   m.innerHTML=`<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct" id="pmt">Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small></div><div class="dots" id="pmd"></div><div class="lm" id="pme"></div><input type="hidden" id="pmv" value=""><div class="kp">${ks}</div>${(PM&&PM.mode==='enter')?(NOFG(ME)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-pk="forgot">Olvid\u00e9 mi NIP</button>'):''}</div>`;
   pmDraw();if(PM)pmTitle();
 }
-let NIPFORCE=0,NIPMSG='',NIPTM=0,NIPNEXT='';
+let NIPFORCE=0,NIPMSG='',NIPTM=0,NIPNEXT='',NONIP=0,OFFL=0,OFFTM=0,UEV=0;
+const canPrice=()=>ME==='Fer'||ME==='Administrativo';
+function xbSet(){const a=document.getElementById('nipbar')?1:0,o=document.getElementById('offbar')?1:0,s=document.body.style;s.setProperty('--xb',(a*40+o*36)+'px');s.setProperty('--ob',(o*36)+'px')}
 function nipNo(){try{return sessionStorage.getItem('crm-nonip-'+ME)==='1'}catch(e){return !!window.__nonip}}
 function nipNoSet(v){try{if(v)sessionStorage.setItem('crm-nonip-'+ME,'1');else sessionStorage.removeItem('crm-nonip-'+ME)}catch(e){window.__nonip=v?1:0}}
 function nipBar(){
-  let b=document.getElementById('nipbar');const on=ready&&!isFull()&&nipNo();
-  if(!on){if(b)b.remove();return}
+  let b=document.getElementById('nipbar');const on=ready&&!isFull()&&nipNo()&&(!NONIP||!!NIPMSG);
+  if(!on){if(b)b.remove();xbSet();return}
   if(!b){b=document.createElement('div');b.id='nipbar';document.body.appendChild(b)}
   b.className=NIPMSG?'warn':'';
-  b.innerHTML='<span>'+esc(NIPMSG||'Modo solo ver')+'</span><button type="button" data-nip="make">Crear NIP</button>';
+  b.innerHTML='<span>'+esc(NIPMSG||'Modo solo ver')+'</span><button type="button" data-nip="make">Crear NIP</button>';xbSet();
 }
-function nipBlocked(why){NIPMSG='No pude '+(why||'hacer ese cambio')+' sin NIP';clearTimeout(NIPTM);NIPTM=setTimeout(()=>{NIPMSG='';nipBar()},7000);nipBar()}
+function nipBlocked(why){NIPMSG=NONIP?'Esto necesita NIP: eliminar, mover o cambiar precios':'No pude '+(why||'hacer ese cambio')+' sin NIP';clearTimeout(NIPTM);NIPTM=setTimeout(()=>{NIPMSG='';nipBar()},7000);nipBar()}
 document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('[data-nip]');if(!b)return;nipNoSet(0);NIPFORCE=1;NIPMSG='';nipBar();needFull(()=>{nipBar();toast('Listo, ya puedes hacer cambios',1)},'crear tu NIP')});
 setInterval(nipBar,3000);
-function needFull(cb,why){
+function needFull(cb,why,free){
   if(isFull()){FULL=true;return cb()}
+  if(free&&NONIP){NIPNEXT='';return cb()}
   why=why||NIPNEXT;NIPNEXT='';
   if(nipNo()&&!NIPFORCE){nipBlocked(why);return}
   let m=document.getElementById('pm');
@@ -1393,7 +1413,7 @@ function wake(){let c=0;S.leads.forEach(l=>{if(l.sn&&l.sn<=Date.now()){Object.ke
 const add=(l,id)=>{if(!inG(l,id))l.st[id]=Date.now()};
 const del=(l,...ids)=>ids.forEach(id=>{delete l.st[id]});
 const touch=l=>{Object.keys(l.st).forEach(k=>{l.st[k]=Date.now()})};
-const norm=t=>{const d=String(t).replace(/\D/g,'');if(d.length===12&&d.slice(0,2)==='52')return d.slice(2);if(d.length===13&&d.slice(0,3)==='521')return d.slice(3);return d};
+const norm=t=>{const d=String(t).replace(/\D/g,'');if(d.length===13&&/^(521|044|045)/.test(d))return d.slice(3);if(d.length===12&&/^(52|01)/.test(d))return d.slice(2);return d};
 const telLong=t=>norm(t).length>10;
 const longMsg=t=>'N\u00famero muy largo ('+norm(t).length+' d\u00edgitos), rev\u00edsalo';
 const uid=()=>'L'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -1552,7 +1572,7 @@ const p2nz=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u03
 function p2Keep(l){
   if(P2.fp&&!l.pin)return false;
   if(P2.f&&P2.cat==='neu'&&!String(P2.q||'').trim()){const ph=p2Phase(l);if(!ph||P2GRP[ph[2]]!==P2.f)return false}
-  const q=p2nz(P2.q).trim();if(q){const h=p2nz([l.name,l.idf,l.ub,l.tel,p2SumFull(l),l.moto].join(' '));const qd=q.replace(/\D/g,'');let byTel=false;if(qd.length>=4&&/^[\d\s().+-]+$/.test(q)){let qn=qd;if(qn.length===13&&qn.slice(0,3)==='521')qn=qn.slice(3);else if(qn.length===12&&qn.slice(0,2)==='52')qn=qn.slice(2);else if(qn.length>10)qn=qn.slice(-10);byTel=String(l.tel||'').replace(/\D/g,'').indexOf(qn)>=0}if(!byTel&&!q.split(/\s+/).every(w=>h.indexOf(w)>=0))return false}
+  const q=p2nz(P2.q).trim();if(q){const h=p2nz([l.name,l.idf,l.ub,l.tel,p2SumFull(l),l.moto].join(' '));const qd=q.replace(/\D/g,'');let byTel=false;if(qd.length>=4&&/^[\d\s().+-]+$/.test(q)){let qn=norm(qd);if(qn.length>10)qn=qn.slice(-10);byTel=String(l.tel||'').replace(/\D/g,'').indexOf(qn)>=0}if(!byTel&&!q.split(/\s+/).every(w=>h.indexOf(w)>=0))return false}
   return true}
 function p2Btns(){
   const act=P2.fp||P2.f;
@@ -1609,7 +1629,7 @@ function p2Card(l,c){
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
   const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA</button>'+chip+'</div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(P2.q&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span>'+(op?'<small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">\u25b4</i></small>':'')+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+(P2.q&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.ph&&l.fld?'<i class="p2nw p2inc">Falta n\u00famero completo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span>'+(op?'<small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">\u25b4</i></small>':'')+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -1633,13 +1653,13 @@ function p2SetPh(l,k){
   const cur=p2Phase(l);
   if(cur&&P2GRP[cur[2]]===k)return p2Re(l.id);
   const go=()=>{undo=JSON.stringify(S);l.st=l.st||{};Object.keys(P2PH).forEach(x=>{delete l.st[x]});l.st[k]=Date.now();save();p2Re(l.id);toast('Siguiente paso: '+P2OPT.find(o=>o[0]===k)[1])};
-  p2Re(l.id);NIPNEXT='cambiar de etapa';needFull(go);
+  p2Re(l.id);NIPNEXT='cambiar de etapa';needFull(go,0,1);
 }
 function p2Pin(l){
   if(RO)return toast('Est\u00e1s en vista de solo lectura.',1);
   NIPNEXT='fijar el lead';
   const go=()=>{undo=JSON.stringify(S);if(l.pin)delete l.pin;else l.pin=Date.now();save();p2Render();toast(l.pin?'Fijado arriba':'Quitado de fijados')};
-  needFull(go);
+  needFull(go,0,1);
 }
 function p2Edit(l,el,fld){
   if(P2.ed)return;P2.ed=1;
@@ -1661,7 +1681,7 @@ function p2Edit(l,el,fld){
       else{if(v){l.rs=v;l.ctxu=v;l.rsg=p2Sig(l)}else{delete l.rs;delete l.ctxu;delete l.rsg}}
       save();p2Render();toast('Guardado')};
     p2Render();
-    NIPNEXT='guardar el cambio';needFull(go)};
+    NIPNEXT='guardar el cambio';needFull(go,0,1)};
   inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();end(1)}else if(e.key==='Escape')end(0)};
   let bt=0;
   if(fld==='moto'){
@@ -1708,7 +1728,7 @@ function p2Move(l,to){
     if(to==='ven'){const k=l.st&&l.st.referidos;l.st={};if(k!==undefined)l.st.referidos=k;l.done=true;l.cat='ven';ev(l,'Marcado como venta desde Leads.')}
     else{l.cat=to;if(cur==='ven'||cur==='eli')l.done=false}
     save();p2Render();toast(p2Name(l)+' \u2192 '+({imp:'Importantes',neu:'Neutros',bas:'Basura',ven:'Venta',eli:'Eliminados'})[to])};
-  NIPNEXT='mover de categor\u00eda';needFull(go);
+  NIPNEXT='mover de categor\u00eda';needFull(go,0,to!=='eli');
 }
 
 const P2G={t:0,on:0,card:null,sx:0,sy:0,over:'',id:null,sup:0,rr:0,raf:0,px:0,py:0,tg:[],el:null,ts:0};
@@ -1836,7 +1856,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v179';
+const APPV='v181';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -1864,7 +1884,7 @@ function regLkSel(r,i){
 function regDup(r,i){const t=norm(r.tel);if(t.length!==10)return '';const d=findDup(t);if(d)return dupMsg(d);if(REG.rows.some((o,j)=>j<i&&norm(o.tel)===t))return 'Repetido en esta lista';return ''}
 function regDupBox(r,i,dp){return esc(dp)+(r.keep?' \u00b7 se guardar\u00e1 igual, sin n\u00famero':'')+'<div class="rgda"><button type="button" class="p2a st" data-rg="opendup" data-i="'+i+'">Abrir el existente</button>'+(r.keep?'':'<button type="button" class="p2a" data-rg="keepdup" data-i="'+i+'">Guardar igual</button>')+'</div>'}
 function regOpenDup(r){const d=r&&findDup(r.tel);if(!d)return toast('Ya no est\u00e1 repetido',1);if(!d.id)return toast('Ese n\u00famero est\u00e1 en la cuenta de '+d.own,1);if(d.own!==S.ag){toast('Ese n\u00famero est\u00e1 en la cuenta de '+d.own,1);return}regClose();P2.cat=d.cat||'neu';P2.q=String(d.tel);P2.sq=1;P2.lim=50;P2.open=d.id;if(CUR!=='p2')navGo('p2');else p2Render()}
-function regDoubt(r){const t=norm(r.tel);return r.du.length>0||(t.length>0&&t.length!==10)}
+function regDoubt(r){return r.du.length>0}
 const regEmpty=r=>!String(r.name||'').trim()&&!norm(r.tel)&&!String(r.tx||'').trim()&&!String(r.idf||'').trim()&&!String(r.mt||'').trim();
 const regOk=(r,i)=>r.on&&!regEmpty(r)&&(r.keep||!regDup(r,i));
 function regFocusKey(){const a=document.activeElement;if(!a||!a.closest||!a.closest('#p2reg'))return null;let k='';if(a.id)k='#'+a.id;else if(a.dataset&&a.dataset.k!==undefined&&a.dataset.i!==undefined)k='[data-i="'+a.dataset.i+'"][data-k="'+a.dataset.k+'"]';if(!k)return null;let p=0;try{p=a.selectionStart}catch(e){}return {k:k,p:p}}
@@ -1881,8 +1901,7 @@ function regFlags(){
       r.du.forEach(d=>fl.push(['warn',d]));
     }
     el.classList.remove('dup');el.classList.toggle('dbt',regDoubt(r));
-    el.querySelectorAll('.rgf').forEach(x=>x.remove());
-    fl.forEach(f=>{const d=document.createElement('div');if(f[0]==='dup'){d.className='rgf warn';d.innerHTML=regDupBox(r,i,f[1])}else{d.className='rgf '+f[0];d.textContent=f[1]}el.appendChild(d)});
+    {const nh=fl.map(f=>'<div class=\"rgf '+(f[0]==='dup'?'warn':f[0])+'\">'+(f[0]==='dup'?regDupBox(r,i,f[1]):esc(f[1]))+'</div>').join(''),tp=document.createElement('div');tp.innerHTML=nh;const oh=[].map.call(el.querySelectorAll('.rgf'),x=>x.outerHTML).join('');if(oh!==tp.innerHTML){el.querySelectorAll('.rgf').forEach(x=>x.remove());while(tp.firstChild)el.appendChild(tp.firstChild)}}
     const cb=el.querySelector('input[type=checkbox]');if(cb){cb.disabled=false;cb.checked=!!r.on}
     const ti=el.querySelector('[data-k="tel"]');if(ti)ti.className=((t&&t.length!==10)||r.du.length?'warn':'');
   });
@@ -1986,7 +2005,7 @@ function regSave(){
     const pl=r.lk?S.leads.find(x=>x.id===r.lk&&x.ph&&!x.fld&&x.loc):null;
     if(pl){nl.loc=[pl.loc[0],pl.loc[1],pl.loc[2],t0];gone.push(pl.id)}
     setStage(nl,r.stg);
-    if(!ok){nl.ph=1;nl.fld=1;np++;if(dm)nl.ctx.push({t:t0+i,x:'Número repetido anotado: '+tel+' ('+dm+')',auto:true,pend:false});else if(tel)nl.ctx.push({t:t0+i,x:'Número incompleto anotado: '+tel,auto:true,pend:false})}
+    if(!ok){nl.ph=1;nl.fld=1;if(tel&&!dm&&tel.length<10)nl.inc=tel;np++;if(dm)nl.ctx.push({t:t0+i,x:'Número repetido anotado: '+tel+' ('+dm+')',auto:true,pend:false});else if(tel)nl.ctx.push({t:t0+i,x:'Número incompleto anotado: '+tel,auto:true,pend:false})}
     S.leads.push(nl);
   });
   if(gone.length)S.leads=S.leads.filter(x=>gone.indexOf(x.id)<0);
@@ -2025,6 +2044,7 @@ document.addEventListener('keydown',e=>{
   const i=all.indexOf(t);e.preventDefault();
   if(i>=0&&i<all.length-1)all[i+1].focus();else t.blur();
 });
+document.addEventListener('mousedown',e=>{const b=e.target&&e.target.closest&&e.target.closest('#p2reg button,#pm button,#askyn button,#nipbar button');if(b)e.preventDefault()},true);
 document.addEventListener('click',e=>{
   if(!REG.on)return;const b=e.target.closest&&e.target.closest('#p2reg [data-rg]');if(!b)return;
   const a=b.dataset.rg,i=+b.dataset.i;
@@ -2114,14 +2134,14 @@ function p2Send(l){
   let fin=0;
   const back=()=>{P2.sending=0;const b=document.getElementById('p2send');if(b)b.textContent='Enviar'};
   const ok=()=>{const bd=document.getElementById('p2cb');if(bd){bd.insertAdjacentHTML('beforeend','<div class="wm out"><small>T\u00fa</small>'+esc(t)+'</div>');bd.scrollTop=bd.scrollHeight}const x=document.getElementById('p2tx');if(x&&x.value.trim()===t){x.value='';x.style.height=''}P2.act[l.tel]=Date.now();toast('Enviado',1)};
-  const tm=setTimeout(()=>{if(fin)return;fin=1;back();toast('Tard\u00f3 demasiado. Revisa el chat antes de volver a enviar',1)},35000);
+  const tm=setTimeout(()=>{if(fin)return;fin=1;back();toast('No se sabe si se envi\u00f3. Revisa el chat antes de reintentar',1)},35000);
   api('wa_send',{tel:l.tel,texto:t}).then(r=>{
     clearTimeout(tm);
     if(fin){if(r&&r.ok)ok();return}
     fin=1;back();
     if(r&&r.ok)return ok();
     const e=r&&r.err;toast(e==='nosend'?'El env\u00edo todav\u00eda no est\u00e1 conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
-  }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('Sin conexi\u00f3n. No se pudo enviar, intenta otra vez',1)});
+  }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('Sin conexi\u00f3n. No se sabe si se envi\u00f3: revisa el chat antes de reintentar',1)});
 }
 function p2Wa(l){
   copyTel(l.tel);
@@ -2222,7 +2242,9 @@ function carteraHTML(L,g){
   const tm=l=>(l.st&&l.st[cartSec(l)])||l.c;
   return tot+CSEC.filter(x=>by[x[0]]).map(x=>'<div class="grp" style="--k:var(--'+x[2]+')"><i></i>'+x[1]+'<small>'+by[x[0]].length+'</small></div>'+by[x[0]].sort((a,b)=>tm(b)-tm(a)).map(l=>card(l,g)).join('')).join('');
 }
-function toast(m,nu){const t=document.getElementById('toast');document.getElementById('tm').textContent=m;document.getElementById('undo').style.display=nu?'none':'';t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),4500)}
+function toastLift(t){t.style.bottom='';let lim=innerHeight;['.p2fab','.p2fm2','#pcbox'].forEach(q=>{const e=document.querySelector(q);if(!e||e.hidden||getComputedStyle(e).display==='none')return;const r=e.getBoundingClientRect();if(r.height>0&&r.top<lim&&r.bottom>0)lim=r.top});const cur=innerHeight-t.getBoundingClientRect().bottom,need=innerHeight-lim+8;if(lim<innerHeight&&cur<need)t.style.bottom=(parseFloat(getComputedStyle(t).bottom)+(need-cur))+'px'}
+function devId(){try{let d=localStorage.getItem('crm-dev');if(!d||!/^[a-z0-9]{8,24}$/.test(d)){d=Math.random().toString(36).slice(2,10)+Date.now().toString(36);localStorage.setItem('crm-dev',d)}return d}catch(e){return ''}}
+function toast(m,nu){const t=document.getElementById('toast');document.getElementById('tm').textContent=m;document.getElementById('undo').style.display=nu?'none':'';t.classList.add('show');toastLift(t);clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),4500)}
 function done(m){open=null;save();render();toast(m)}
 const PROMPT='Esta imagen es una captura o foto con leads de venta de motos en México (lista de chats, contactos, mensajes o una tabla). Extrae a cada persona que aparezca con su nombre y su número de WhatsApp o teléfono. Responde SOLO con un arreglo JSON de objetos con esta forma: [{"nombre":"Juan Pérez","telefono":"7221234567"}]. El telefono va solo con dígitos, sin espacios, sin guiones y sin lada +52 (10 dígitos). Si el número no se ve completo o no aparece, pon "" en telefono. No inventes nombres ni números. Si no hay personas, responde [].';
 const aiErr=c=>({not_granted:'Necesitas permitir que Claude lea la foto para usar esta opción.',rate_limited:'Muchas lecturas seguidas, intenta en un rato.',image_rejected:'La foto no se pudo abrir, prueba con otra.',invalid_json:'No pude armar la lista, intenta de nuevo.',images_unavailable:'Aquí no se pueden leer fotos.',noai:'La lectura con IA no está activada todavía.',auth:'Tu sesión venció, entra otra vez.'}[c]||'No se pudo leer la foto, intenta de nuevo.');
@@ -2389,7 +2411,7 @@ document.addEventListener('click',e=>{
   const key=c.dataset.g+':'+c.dataset.id;
   if(b.classList.contains('row')){open=open===key?null:key;return render()}
   const l=S.leads.find(x=>x.id===c.dataset.id),a=b.dataset.a;
-  if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(!NEEDPIN.has(a)&&l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000)))go();else{NIPNEXT='hacer ese cambio';needFull(go)}}
+  if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(!NEEDPIN.has(a)&&l.own===ME&&(NONIP||l.ph||Date.now()-(l.c||0)<1800000)))go();else{NIPNEXT='hacer ese cambio';needFull(go)}}
 });
 document.addEventListener('input',e=>{
   const t=e.target;if(!sheet)return;
@@ -2414,6 +2436,19 @@ function lset(k,v){try{localStorage.setItem(k,v)}catch(e){}}
 function toks(){try{return JSON.parse(lget('crm-toks')||'{}')||{}}catch(e){return {}}}
 function saveTok(n,t){const o=toks();o[n]=t;lset('crm-toks',JSON.stringify(o))}
 function forgetTok(n){const o=toks();delete o[n];lset('crm-toks',JSON.stringify(o))}
+let PDC=0,PDLAST=0;
+const pdKey=()=>'crm-pd-'+(ME||'');
+function pdSave(ups,dels){try{localStorage.setItem(pdKey(),JSON.stringify({t:Date.now(),ups:ups,dels:dels}))}catch(e){}}
+function pdClr(){PDC=PDLAST=0;try{localStorage.removeItem(pdKey())}catch(e){}}
+function pdRestore(){
+  if(!ME)return 0;let p=null;try{p=JSON.parse(lget(pdKey())||'null')}catch(e){}
+  if(!p)return 0;
+  if(Date.now()-(p.t||0)>7*864e5){pdClr();return 0}
+  let n=0;
+  (p.ups||[]).forEach(u=>{if(!u||!u.tel)return;const i=S.leads.findIndex(l=>l.tel===u.tel);if(i<0){S.leads.push(u);n++}else if(ser(S.leads[i])!==ser(u)){S.leads[i]=u;n++}});
+  (p.dels||[]).forEach(t=>{const i=S.leads.findIndex(l=>l.tel===t);if(i>=0){S.leads.splice(i,1);n++}});
+  return n;
+}
 async function push(){
   if(!ready||RO)return;
   if(pushing){again=true;return}
@@ -2422,14 +2457,15 @@ async function push(){
     const ups=[],sent=new Map(),cur=new Set();
     S.leads.forEach(l=>{cur.add(l.tel);const j=ser(l);if(BASE.get(l.tel)!==j){ups.push(JSON.parse(JSON.stringify(l)));sent.set(l.tel,j)}});
     const dels=[...BASE.keys()].filter(t=>!cur.has(t));
-    if(!ups.length&&!dels.length)return;
-    const r=await api('sync',{upserts:ups,deletes:dels});
+    if(!ups.length&&!dels.length){pdClr();return}
+    pdSave(ups,dels);PDC=ups.length+dels.length;
+    const r=await api('sync',{upserts:ups,deletes:dels,dev:devId()});
     if(r.err==='auth'){showLogin('Tu sesión venció, entra otra vez.');return}
     if(r.err){toast('No se pudo guardar: '+r.err,1);return}
-    sent.forEach((j,t)=>{BASE.set(t,j)});dels.forEach(t=>BASE.delete(t));
+    sent.forEach((j,t)=>{BASE.set(t,j)});dels.forEach(t=>BASE.delete(t));pdClr();
     const NPT=[];(r.rejected||[]).forEach(x=>{if(x.why==='perm'){const i=S.leads.findIndex(l=>l.tel===x.tel);if(i>=0)S.leads.splice(i,1);BASE.delete(x.tel);toast('No tienes permiso para ese cambio',1);render()}else if(x.why==='needpin'){NPT.push(x.tel);BASE.set(x.tel,'')}else if(x.why==='dup'){const i=S.leads.findIndex(l=>l.tel===x.tel);if(i>=0)S.leads.splice(i,1);BASE.delete(x.tel);toast('Ese lead ya está en la cuenta de '+x.own+' ('+x.name+')',1);render()}});
     if(NPT.length){const rb=()=>{NPT.forEach(t=>{const i=S.leads.findIndex(l=>l.tel===t);if(i>=0)S.leads.splice(i,1);BASE.delete(t)});pull().then(()=>render())};FULLS=false;if(nipNo()){rb();nipBlocked('guardar ese cambio')}else{toast('Pon tu NIP para hacer cambios',1);needFull(()=>push(),'guardar ese cambio');if(PM)PM.cancel=rb}}
-  }catch(e){toast('Sin conexión. Tu cambio no se ha guardado; reintento en un momento.',1);setTimeout(push,5000)}
+  }catch(e){if(!OFFL||PDC!==PDLAST){PDLAST=PDC;toast('Sin conexión. Tu cambio quedó guardado en tu teléfono y se envía solo al volver la señal.',1)}if(!OFFL)offStart()}
   finally{pushing=false;if(again){again=false;push()}}
 }
 function stSave(r){try{localStorage.setItem('crm-st-'+(ME||LU),JSON.stringify(r))}catch(e){}}
@@ -2440,7 +2476,7 @@ async function pull(pre){
   let r;if(pre)r=pre;else{try{r=await api('state')}catch(e){return 'err'}if(r&&!r.err&&Array.isArray(r.leads))stSave(r)}
   if(r.err==='auth'){const n=ME||LU;forgetTok(n);if(n&&!PROT(n)&&!pull.retry){pull.retry=1;TOK='';try{const q=await api('login',{name:n,view:1});if(q.err==='bloq')pull.bl=1;if(!q.err){TOK=q.token;ME=q.name;lset('crm-tok',TOK);saveTok(ME,TOK);pull.retry=0;return pull()}}catch(e){}pull.retry=0}showLogin(pull.bl?(pull.bl=0,'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.'):'Entra con tu NIP');return 'auth'}
   if(r.err)return 'err';
-  FULLS=r.full!==false;AI=!!r.ai;ADMIN=!!r.admin;RO=!!r.ro;PISO=r.piso||'';PCHG=r.pc||0;BLQ=r.bloq||[];pcRender();document.body.classList.toggle('ro',RO);TAKEN=new Map((r.taken||[]).map(x=>[x.tel,x.own]));let changed=false;const srv=new Map();
+  FULLS=r.full!==false;NONIP=!!r.nonip;UEV=!!r.uev;AI=!!r.ai;ADMIN=!!r.admin;RO=!!r.ro;PISO=r.piso||'';PCHG=r.pc||0;BLQ=r.bloq||[];pcRender();document.body.classList.toggle('ro',RO);TAKEN=new Map((r.taken||[]).map(x=>[x.tel,x.own]));let changed=false;const srv=new Map();
   r.leads.forEach(sl=>srv.set(sl.tel,sl));
   srv.forEach((sl,t)=>{
     const sj=ser(sl),ll=S.leads.find(x=>x.tel===t);
@@ -2502,7 +2538,7 @@ function showLogin(msg){
 function lgDraw(){const pi=document.getElementById('pin'),d=document.getElementById('dots');if(!pi||!d)return;const v=pi.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<v?'f':''}"></i>`).join('')}
 function lgKey(k){const pi=document.getElementById('pin');if(!pi)return;if(k==='go')return doLogin();let v=pi.value;if(k==='del')v=v.slice(0,-1);else if(v.length<8)v+=k;pi.value=v;document.getElementById('le').textContent='';lgDraw();if(k!=='del'){const ex=LMODE==='enter'?(+lget('crm-pl-'+LU)||LPL||0):LMODE==='repeat'?LFIRST.length:0;if(ex&&v.length===ex)doLogin()}}
 document.addEventListener('keydown',ev=>{const L=document.getElementById('login');if(!L||L.style.display==='none'||!document.getElementById('pin'))return;if(/^\d$/.test(ev.key))lgKey(ev.key);else if(ev.key==='Backspace')lgKey('del');else if(ev.key==='Enter')lgKey('go')});
-function finishBoot(){document.getElementById('login').style.display='none';ready=true;pcRender();if(ME==='Fer')lset('crm-ferdev','1');ROLE=ME==='Fer'&&LR==='vendedor'?'vendedor':roleOf(ME);LR=ROLE;lset('crm-role',LR);bkpSet();document.body.classList.toggle('ro',RO);if(AG.includes(ME))S.ag=ME;if(ME==='Fer'&&ROLE==='vendedor'){const sv=lget('crm-p2ag');if(sv&&AG.includes(sv))S.ag=sv}if(ROLE==='director'&&S.ag==='Fer')S.ag='Lerma Zayuri';render();navInit()}
+function finishBoot(){document.getElementById('login').style.display='none';ready=true;pcRender();if(ME==='Fer')lset('crm-ferdev','1');ROLE=ME==='Fer'&&LR==='vendedor'?'vendedor':roleOf(ME);LR=ROLE;lset('crm-role',LR);bkpSet();document.body.classList.toggle('ro',RO);if(AG.includes(ME))S.ag=ME;if(ME==='Fer'&&ROLE==='vendedor'){const sv=lget('crm-p2ag');if(sv&&AG.includes(sv))S.ag=sv}if(ROLE==='director'&&S.ag==='Fer')S.ag='Lerma Zayuri';const rp=pdRestore();render();navInit();if(rp&&!RO){toast('Recuperé '+rp+(rp===1?' cambio':' cambios')+' que no se habían enviado; los mando ahora.',1);push()}}
 async function doLogin(){
   const pin=document.getElementById('pin').value.trim(),e=document.getElementById('le');if(document.getElementById('dots')&&document.getElementById('dots').dataset.busy)return;
   if(!LU){return}
@@ -2519,6 +2555,29 @@ async function doLogin(){
     finishBoot();
   }catch(err){e.textContent='Sin conexión'}
 }
+function offBar(){
+  let b=document.getElementById('offbar');
+  if(!OFFL||!ready){if(b)b.remove();xbSet();return}
+  if(!b){b=document.createElement('div');b.id='offbar';document.body.appendChild(b)}
+  b.innerHTML='<span>Sin conexión · reintentando</span><button type="button" data-off="try">Reintentar</button>';xbSet();
+}
+function offStart(){OFFL=1;offBar();clearTimeout(OFFTM);OFFTM=setTimeout(offTry,8000)}
+function offTry(){
+  if(!OFFL)return;clearTimeout(OFFTM);
+  pull().then(x=>{
+    if(x==='err'||x===false&&!ready){OFFTM=setTimeout(offTry,8000);return}
+    OFFL=0;offBar();push();if(x===true&&ready&&!sheet)render();
+  }).catch(()=>{OFFTM=setTimeout(offTry,8000)});
+}
+function offScreen(){
+  const lg=document.getElementById('login');if(lg)lg.style.display='none';
+  let o=document.getElementById('offscr');if(!o){o=document.createElement('div');o.id='offscr';document.body.appendChild(o)}
+  o.innerHTML='<div class="osb"><h2>Sin conexión</h2><p>No pude cargar tus datos. Revisa tu señal e intenta otra vez.</p><button type="button" data-off="retry">Reintentar</button></div>';
+  clearTimeout(OFFTM);OFFTM=setTimeout(()=>{if(document.getElementById('offscr'))offBoot()},10000);
+}
+function offBoot(){clearTimeout(OFFTM);const o=document.getElementById('offscr');if(o)o.remove();boot()}
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('[data-off]');if(!b)return;if(b.dataset.off==='retry')offBoot();else offTry()});
+window.addEventListener('online',()=>{if(OFFL)offTry();else if(document.getElementById('offscr'))offBoot();else push()});
 async function boot(){
   if(/[?&]fer=1\b/.test(location.search))lset('crm-ferdev','1');
   TOK=lget('crm-tok');LR=lget('crm-role');ME=lget('crm-user');ME=REN[ME]||ME;LU=ME;
@@ -2526,10 +2585,10 @@ async function boot(){
   if(!TOK||!ME){const b=await bkpGet();const a=b.split('|');if(a.length>=2&&a[0]){ME=REN[a[0]]||a[0];LU=ME;LR=a[1];lset('crm-user',ME);lset('crm-role',LR)}}
   if(!TOK){if(ME&&!PROT(ME)){LU=ME;LR=LR||roleOf(ME);await viewLogin(ME);return}showLogin();return}
   const c=stGet(ME);
-  if(c){await pull(c);finishBoot();pull().then(x=>{if(x===true&&ready&&!sheet){const a=document.activeElement;if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')))render()}});return}
+  if(c){await pull(c);finishBoot();pull().then(x=>{if(x==='err'){offStart();return}if(x===true&&ready&&!sheet){const a=document.activeElement;if(!(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA')))render()}});return}
   const x=await pull();
   if(x==='auth')return;
-  if(x==='err'){showLogin('No se pudo conectar. Intenta otra vez.');return}
+  if(x==='err'){offScreen();return}
   finishBoot();
 }
 
@@ -2578,7 +2637,7 @@ function swCur(){return ME==='Fer'?(ROLE==='tecnico'?'@tecnico':'@vendedor'):'@'
 const SWL={'@vendedor':'Vendedores','@tecnico':'T\u00e9cnico','@Director':'Director','@Administrativo':'Administrativo'};
 function swOpts(){const c=swCur();return Object.keys(SWL).filter(k=>k!==c)}
 function swSel(){return '<select class="swx"><option value="" selected disabled>'+esc(SWL[swCur()]||'Cambiar')+'</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join('')+'</select>'}
-function swGo(name,lr){LU=name;LR=lr||roleOf(name);const st=toks()[name];if(st){lset('crm-tok',st);lset('crm-user',name);lset('crm-role',LR);boot();return}if(!PROT(name)){lset('crm-user',name);lset('crm-role',LR);viewLogin(name);return}showLogin()}
+function swGo(name,lr){LU=name;LR=lr||roleOf(name);const st=toks()[name];if(st){lset('crm-tok',st);lset('crm-user',name);lset('crm-role',LR);boot();return}if(!PROT(name)){lset('crm-user',name);lset('crm-role',LR);viewLogin(name);return}if(ME==='Fer'&&isFull()&&TOK){lset('crm-user',name);lset('crm-role',LR);viewLogin(name);return}showLogin()}
 function swTo(v){if(v==='@vendedor')return swGo('Fer','vendedor');if(v==='@tecnico')return swGo('Fer','tecnico');if(v&&v.charAt(0)==='@')swGo(v.slice(1))}
 function swFix(){if(!FERDEV()||ME!=='Fer')return;document.querySelectorAll('#menu button#mlo').forEach(b=>{b.outerHTML=swSel()})}
 document.addEventListener('change',e=>{const t=e.target;if(t&&t.classList&&t.classList.contains('swx')){const v=t.value;t.value='';swTo(v)}});
@@ -2995,7 +3054,7 @@ async function sgHist(){
 const hm=n=>n>=60?Math.floor(n/60)+' h '+String(n%60).padStart(2,'0')+' min':n+' min';
 async function usoView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in"><div class="mh2"><b>Tiempo de uso</b><button id="mlo">Cerrar sesión</button></div><div id="usr" class="note">Cargando…</div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in"><div class="mh2"><b>Tiempo de uso</b><button id="mlo">Cerrar sesión</button></div>${ME==='Fer'?'<button class="b" data-act="open" style="margin:0 0 10px;width:100%">Qué botones tocan y dónde dejan de usarlo</button>':''}<div id="usr" class="note">Cargando…</div></div>`;m.style.display='block';
   let r;try{r=await api('uso_get')}catch(e){r=null}
   const box=document.getElementById('usr');if(!box)return;
   if(!r||!r.ok){box.textContent='No se pudo cargar.';return}
@@ -3006,6 +3065,53 @@ async function usoView(){
   const ago=t=>{if(!t)return '';const k=Math.round((Date.now()-t)/6e4);return k<2?'ahora':k<60?'hace '+k+' min':k<1440?'hace '+Math.round(k/60)+' h':'hace '+Math.round(k/1440)+' d'};
   box.outerHTML=L.length?'<table class="sg" style="width:100%;font-size:13px"><tr style="color:var(--mu);text-align:right"><td style="text-align:left"></td><td>Hoy</td><td>Ayer</td><td>7 d</td><td>30 d</td></tr>'+L.map(n=>{const o=by[n];return `<tr style="text-align:right"><td style="text-align:left"><b>${esc(n)}</b><br><small style="color:var(--mu)">${ago(o.u)}</small></td><td><b>${hm(o.h)}</b></td><td>${hm(o.a)}</td><td>${hm(o.s)}</td><td>${hm(o.t)}</td></tr>`}).join('')+'</table>':'<div class="soonp">Sin datos todavía.</div>';
 }
+const EVQ={};let EVA='',EVS='';
+const EVATT=['nv','p2','rg','av','a','nip','off','ay'];
+function evKey(t){
+  const el=t&&t.closest&&t.closest('[data-nv],[data-p2],[data-rg],[data-av],[data-a],[data-nip],[data-off],[data-ay],button[id]');
+  if(!el)return '';
+  for(const k of EVATT){const v=el.dataset&&el.dataset[k];if(v!==undefined&&v!==''&&/^[a-z][a-z0-9_-]{0,24}$/i.test(v)){let x=k+':'+v;const w=el.dataset.v;if(k==='p2'&&w&&/^[a-z]{2,10}$/i.test(w))x+=':'+w;return x}}
+  const i=el.id;if(i&&/^[a-z][a-z0-9_-]{1,20}$/i.test(i)&&!/\d{3,}/.test(i))return 'id:'+i;
+  return '';
+}
+function evScr(){
+  if(REG.on)return 'registro';if(document.getElementById('askyn'))return 'confirmar';
+  const m=document.getElementById('pm');if(m&&getComputedStyle(m).display!=='none')return 'nip';
+  if(document.getElementById('vipfs'))return 'invitacion';if(sheet)return 'hoja';
+  return String(CUR||ROLE||'inicio').slice(0,20);
+}
+document.addEventListener('click',e=>{if(!UEV||!ready)return;const k=evKey(e.target);if(!k)return;EVQ[k]=(EVQ[k]||0)+1;EVA=k;EVS=evScr()},true);
+function evFlush(){
+  const ks=Object.keys(EVQ);if(!UEV||!ready||!TOK||!ks.length)return;
+  const ev={};ks.slice(0,60).forEach(k=>{ev[k]=EVQ[k];});
+  api('uso_ev',{ev:ev,s:EVS,a:EVA,v:APPV}).then(r=>{if(r&&r.ok)Object.keys(ev).forEach(k=>{EVQ[k]-=ev[k];if(EVQ[k]<=0)delete EVQ[k]})}).catch(()=>{});
+}
+setInterval(evFlush,180000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)evFlush()});
+const EVLAB={'nv:p2':'Pestaña Clientes','nv:moto':'Pestaña Info','nv:mapa':'Pestaña Cambaceo','nv:mas':'Pestaña Más','nv:conv':'Pestaña Chats','nv:quien':'Pestaña Escribieron','nv:onoff':'Pestaña Anas','nv:uso':'Pestaña Uso','nv:vip':'Invitación al cliente','nv:ana':'Ana','nv:tvent':'Tramitar venta','nv:seg':'Tramitar seguro','nv:ine10':'Tramitar INE','nv:ubic':'Ubicación','p2:fab':'+ Cliente','p2:cat':'Cambiar pestaña (Basura/Neutros/Importantes)','p2:ph':'Siguiente paso','p2:setph':'Elegir siguiente paso','p2:chat':'WhatsApp del lead','p2:pin':'Fijar lead','p2:ed':'Editar un campo','p2:num':'Agregar número','p2:neu':'Pasar a Neutro','p2:bas':'Pasar a Basura','p2:imp':'Pasar a Importante','p2:eli':'Eliminar','p2:ia':'Preguntar a la IA','p2:mo':'Más opciones','rg:save':'Guardar leads (registro)','rg:add':'Escribir a mano','rg:pick':'Leer fotos con IA','rg:read':'Leer fotos','rg:keepdup':'Guardar igual (repetido)','rg:opendup':'Abrir el existente','rg:rmr':'Quitar fila','rg:x':'Cerrar registro','id:mlo':'Cerrar sesión','id:undo':'Deshacer','nip:make':'Crear NIP','off:try':'Reintentar (sin conexión)','off:retry':'Reintentar (sin conexión)','ay:yes':'Confirmar invitación'};
+const evLab=k=>EVLAB[k]||k;
+const SCRLAB={p2:'Clientes',moto:'Info',mapa:'Cambaceo',mas:'Más',conv:'Chats',quien:'Escribieron',onoff:'Anas',uso:'Uso',registro:'Registro de leads',nip:'Pantalla de NIP',hoja:'Hoja',invitacion:'Invitación al cliente',confirmar:'Confirmación',ana:'Ana',vendedor:'Inicio vendedor',tecnico:'Inicio Fer'};
+const scrLab=s=>SCRLAB[s]||s;
+let ACT={d:7,c:''};
+async function actView(){
+  const m=document.getElementById('menu');
+  m.innerHTML=`<div class="in"><div class="mh2"><b>Actividad<small>Qué tocan y dónde dejan de usarlo</small></b><button id="mlo">Cerrar sesión</button></div><button class="mback" data-act="back" style="margin-bottom:10px">← Uso</button><div class="chips">${[[1,'Hoy'],[7,'7 días'],[30,'30 días']].map(x=>`<button data-actd="${x[0]}" aria-pressed="${ACT.d===x[0]}">${x[1]}</button>`).join('')}</div><div id="act" class="note">Cargando…</div></div>`;m.style.display='block';
+  let r;try{r=await api('uso_ev_get',{d:ACT.d,c:ACT.c})}catch(e){r=null}
+  const box=document.getElementById('act');if(!box)return;
+  if(!r||!r.ok){box.textContent='No se pudo cargar.';return}
+  if(!r.on||!r.n){box.innerHTML='<div class="sg"><b>Todavía no hay datos</b><div class="note" style="margin-top:4px">'+(r.on?'Aún nadie ha tocado botones en este periodo.':'El registro de actividad está apagado en el servidor.')+'</div></div>';return}
+  const mx=Math.max(1,...r.top.map(x=>x[1])),bar=(n,m)=>'<div style="height:6px;border-radius:3px;background:var(--ln);margin-top:3px"><div style="height:6px;border-radius:3px;background:var(--tx);opacity:.7;width:'+Math.max(3,Math.round(n/m*100))+'%"></div></div>';
+  const cs=Object.keys(r.cu).sort((a,b)=>r.cu[b].taps-r.cu[a].taps);
+  const sel=`<select id="actc" class="rgi" style="margin-bottom:8px"><option value="">Todas las cuentas</option>${cs.map(c=>`<option value="${esc(c)}"${ACT.c===c?' selected':''}>${esc(c)}</option>`).join('')}</select>`;
+  const rw=(a,n)=>'<div style="display:flex;justify-content:space-between;gap:10px"><span>'+a+'</span><b style="white-space:nowrap">'+n+'</b></div>',ago=t=>{if(!t)return '';const k=Math.round((Date.now()-t)/6e4);return k<2?'ahora':k<60?'hace '+k+' min':k<1440?'hace '+Math.round(k/60)+' h':'hace '+Math.round(k/1440)+' d'};
+  box.outerHTML=sel+`<div class="sg"><b>${r.ses} ${r.ses===1?'sesión':'sesiones'} · ${r.n} toques · ${cs.length} ${cs.length===1?'cuenta':'cuentas'}</b></div>`+
+   `<div class="sg"><b>Lo que más tocan</b>${r.top.slice(0,15).map(x=>`<div style="margin-top:8px;font-size:14px">${rw(esc(evLab(x[0])),x[1])}${bar(x[1],mx)}</div>`).join('')}</div>`+
+   `<div class="sg"><b>Pantallas</b>${r.scr.slice(0,10).map(x=>`<div style="margin-top:6px;font-size:14px">${rw(esc(scrLab(x[0])),x[1])}</div>`).join('')}</div>`+
+   `<div class="sg"><b>Dónde dejan de usarlo</b><div class="note" style="margin:2px 0 6px">Último botón y pantalla antes de dejar el CRM 15 min o más</div>${r.ends.length?r.ends.slice(0,10).map(x=>`<div style="margin-top:6px;font-size:14px">${rw(esc(scrLab(x[0]))+' · '+esc(evLab(x[1])),x[2])}</div>`).join(''):'<div class="note">Todavía no hay sesiones terminadas.</div>'}</div>`+
+   `<div class="sg"><b>Por cuenta</b>${cs.map(c=>{const o=r.cu[c];return `<div style="margin-top:8px;font-size:14px">${rw('<b>'+esc(c)+'</b>',o.taps+' toques · '+o.ses+(o.ses===1?' sesión':' sesiones'))}<small style="color:var(--mu)">Último: ${esc(scrLab(o.ls))} · ${esc(evLab(o.la))} · ${ago(o.lt)}</small></div>`}).join('')}</div>`;
+}
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('[data-act],[data-actd]');if(!b||ME!=='Fer')return;if(b.dataset.act==='open')return actView();if(b.dataset.act==='back')return usoView();if(b.dataset.actd){ACT.d=+b.dataset.actd;return actView()}});
+document.addEventListener('change',e=>{const t=e.target;if(t&&t.id==='actc'&&ME==='Fer'){ACT.c=t.value;actView()}});
 let lastAct=Date.now();
 ['click','touchstart','keydown','scroll','mousemove'].forEach(e=>document.addEventListener(e,()=>{lastAct=Date.now()},{passive:true,capture:true}));
 let usoAcc=0;try{usoAcc=Number(lget('crm-usoacc'))||0}catch(e){}
@@ -3600,7 +3706,7 @@ function avMain(){const a=avAg();if(!a)return '<div class="soonp">No hay Ana par
   return chips+`<div class="sg"><div class="avs"><b>Prender Ana ahorita</b><button class="avsw${a.on?' on':''}" data-av="tog"${w?'':' disabled'} aria-label="Prender o apagar Ana"></button></div></div>
   <div class="sg"><b>Horario</b><div class="avh hd"><span></span><span>Prende</span><span>Apaga</span></div>${rows}${w?'<button class="avb" data-av="sch">Guardar horario</button>':''}</div>
   <div class="sg"><b>Bloqueados · ${a.bl.length}</b>${w?'<div class="avr"><input id="avn" type="tel" inputmode="numeric" maxlength="14" placeholder="10 dígitos" autocomplete="off"><button data-av="add">Agregar</button></div>':''}${bl}</div>
-  <div class="sg"><b>Precios</b><button class="avb" data-av="cat" style="margin-top:8px">Cambiar precios</button>${w?'<button class="avb ft" style="margin-top:8px" data-av="foto">Actualizar con foto</button>':''}</div>
+  <div class="sg"><b>Precios</b><button class="avb" data-av="cat" style="margin-top:8px">${canPrice()?'Cambiar precios':'Ver precios'}</button>${w&&canPrice()?'<button class="avb ft" style="margin-top:8px" data-av="foto">Actualizar con foto</button>':''}</div>
   ${ME==='Fer'?`<a class="mtl" target="_blank" rel="noopener" href="${GS(SH_PANEL)}">Abrir en Google Sheets</a>`:''}${w?'<input type="file" id="avf" accept="image/\x2A" hidden>':''}`}
 function avSaveBtn(){const n=Object.keys(AV.ed).length;return n?`<button class="avb" data-av="save" style="margin:0 0 8px">Guardar ${n} ${n===1?'precio':'precios'}</button>`:''}
 function avCatDraw(){const b=document.getElementById('avb');if(!b)return;
@@ -3613,7 +3719,7 @@ function avCatDraw(){const b=document.getElementById('avb');if(!b)return;
   const c=AV.cat;if(!c){b.innerHTML='<div class="soonp">Cargando catálogo…</div>';return}
   const qs=AV.q.toLowerCase().split(/\s+/).filter(Boolean).map(mnorm);
   const L=c.m.filter(m=>!qs.length||qs.every(w=>mnorm(m.n).indexOf(w)>=0));
-  const nch=Object.keys(AV.ed).length,w=!c.ro;
+  const nch=Object.keys(AV.ed).length,w=!c.ro&&canPrice();
   b.innerHTML=`<button class="mback" data-av="back" style="margin-bottom:10px">← Ana</button>${w?'<button class="avb ft" data-av="foto">Actualizar con foto</button>':''}<div class="sg"><b>Inventario</b><a class="avb sec" style="display:block;text-align:center;text-decoration:none" target="_blank" rel="noopener" href="${pisoUrl()}">Abrir inventario</a></div>
   <div class="mtw"><svg viewBox="0 0 24 24">${IC.search}</svg><input id="avq" type="search" placeholder="Buscar moto" value="${esc(AV.q)}" autocomplete="off"></div>
   <div id="avs">${avSaveBtn()}</div>
