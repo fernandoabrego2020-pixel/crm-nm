@@ -1548,7 +1548,7 @@ function p2View(){
   if(sv){P2.ed=0}else{P2.cat='neu';P2.lim=50;P2.ed=0;P2.eli=0}
   if(ADMIN){const sv=lget('crm-p2ag');if(sv&&AG.includes(sv))S.ag=sv}
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in p2"><div class="p2h">'+(ADMIN?'<div class="p2sw"><span class="p2sv" id="p2sv">'+esc(p2Sh(S.ag))+'</span><i class="cv">\u25be</i><select id="p2ag" aria-label="Cuenta">'+AG.map(a=>'<option value="'+esc(a)+'"'+(a===S.ag?' selected':'')+'>'+esc(AGL(a))+'</option>').join('')+(FERDEV()?'<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join(''):'')+'</select></div>':'<b>Clientes</b>')+p2Btns()+'</div>'+(FERDEV()&&swCur()!=='@vendedor'?'<div class="p2r">Est\u00e1s en vista '+esc(SWL[swCur()])+(RO?' (solo lectura). Para agregar o editar cambia a Lerma Fer.':'.')+'</div>':'')+'<div id="p2b"></div>'+P2FAB+'</div>';
+  m.innerHTML='<div class="in p2"><div class="p2h">'+(ADMIN?'<div class="p2sw"><span class="p2sv" id="p2sv">'+esc(p2Sh(S.ag))+'</span><i class="cv">\u25be</i><select id="p2ag" aria-label="Cuenta">'+AG.map(a=>'<option value="'+esc(a)+'"'+(a===S.ag?' selected':'')+'>'+esc(AGL(a))+'</option>').join('')+(FERDEV()?'<option disabled>\u2500\u2500\u2500\u2500\u2500\u2500</option>'+swOpts().map(k=>'<option value="'+k+'">'+esc(SWL[k])+'</option>').join(''):'')+'</select></div>':'<b>Clientes</b>')+p2Btns()+'</div>'+(FERDEV()&&swCur()!=='@vendedor'&&SWL[swCur()]?'<div class="p2r">Est\u00e1s en vista '+esc(SWL[swCur()])+(RO?' (solo lectura). Para agregar o editar cambia a Lerma Fer.':'.')+'</div>':'')+'<div id="p2b"></div>'+P2FAB+'</div>';
   m.style.display='block';p2Render();p2Act();
   if(sv){m.scrollTop=sv.sc;requestAnimationFrame(()=>{m.scrollTop=sv.sc})}
   const sel=document.getElementById('p2ag');if(sel)sel.onchange=()=>{if(sel.value.charAt(0)==='@'){const v=sel.value;sel.value=S.ag;return swTo(v)}S.ag=sel.value;lset('crm-p2ag',S.ag);const sv=document.getElementById('p2sv');if(sv)sv.textContent=p2Sh(S.ag);P2.lim=50;P2.eli=0;p2Render();p2Act()};
@@ -1557,7 +1557,7 @@ function p2Refresh(){try{if(CUR==='p2'&&!P2.ed&&document.getElementById('p2b'))p
 function p2Age(l){const t=p2Last(l);if(!t)return '';const d=(Date.now()-t)/864e5;return d>=14?'d14':d>=8?'d8':''}
 function p2Quick(l){
   if(l.ph||!l.tel)return '';
-  return '<button class="p2wq" data-p2="chat" data-id="'+l.id+'" aria-label="Abrir chat de WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.9A8 8 0 1 1 21 12z"/></svg></button>'
+  return '<button class="p2wq" data-p2="wq" data-id="'+l.id+'" aria-label="Abrir WhatsApp"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.8 7L4 20l1.1-4.9A8 8 0 1 1 21 12z"/></svg></button>'
 }
 function p2Card(l,c){
   const sm=p2Sum(l),idf=String(l.idf||'').trim();
@@ -1805,7 +1805,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v176';
+const APPV='v177';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -2085,10 +2085,13 @@ function p2Send(l){
     const e=r&&r.err;toast(e==='nosend'?'El env\u00edo todav\u00eda no est\u00e1 conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
   }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('No se pudo enviar, intenta otra vez',1)});
 }
-const DEFRX=new Set(['Lerma Zayuri','Atlacomulco','Santiago Katy','Tenancingo Alexis','Valle Aodes Karla','Valle Aodes Armando','Almoloya','Valle Andrea','Valle Carlos']);
 function p2Wa(l){
   copyTel(l.tel);
   if(DEFRX.has(ME)||DEFRX.has(l.own)||DEFRX.has(S.ag))return p2Chat(l);
+  const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+}
+function p2WaDirect(l){
+  copyTel(l.tel);
   const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
 }
 function p2Chat(l){
@@ -2148,6 +2151,7 @@ document.addEventListener('click',e=>{
   if(a==='ed'){const cd=t.closest('.lc'),zx=cd?e.clientX-cd.getBoundingClientRect().left:0;if(P2.open===id&&!P2.ed&&zx<=105)return p2Edit(l,t,t.dataset.fld);return p2Tog(id)}
   if(a==='num'){const card=t.closest('.lc');if(card){P2.ed=1;const la=card.querySelector('.la');la.innerHTML='<div class="nm"><input class="p2i" inputmode="tel" placeholder="WhatsApp, 10 d\u00edgitos" maxlength="16"><button class="p2a st" data-p2="numok">Guardar</button></div>';la.querySelector('input').focus()}return}
   if(a==='chat')return p2Wa(l);
+  if(a==='wq')return p2WaDirect(l);
   if(a==='copy')return copyTel(l.tel);
   if(a==='send')return p2Send(l);
   if(a==='imp'||a==='neu'||a==='bas'||a==='ven'||a==='eli')return p2Move(l,a);
@@ -2519,7 +2523,8 @@ const NAVS={
  tecnico:[['conv','Chats','chat'],['quien','Escribieron','bell'],['make','Gasto','coin'],['onoff','Anas','power'],['venta','Venta','check'],['uso','Uso','clock'],['panel','Panel','grid']],
  admin:[['tram','Trámites','doc'],['inv','Inventario','box']]
 };
-const ANA_CON=['Lerma Zayuri','Santiago Katy','Valle Andrea','Valle Carlos','Valle Aodes Karla','Valle Aodes Armando','Atlacomulco','Almoloya'];
+const ANA_CON=['Lerma Zayuri','Santiago Katy','Tenancingo Alexis','Valle Andrea','Valle Carlos','Valle Aodes Karla','Valle Aodes Armando','Atlacomulco','Almoloya'];
+const DEFRX=new Set(ANA_CON);
 const navKey=role=>role==='vendedor'&&ANA_CON.includes(ME)?'vendana':role;
 const NLINK={panel:()=>GS(SH_PANEL),quejas:()=>GS(SH_QUEJAS),inv:()=>pisoUrl()};
 const NDEF={vendedor:'pros',director:'pros',tecnico:'conv',admin:'tram'};
