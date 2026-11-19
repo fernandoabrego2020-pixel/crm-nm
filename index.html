@@ -1856,7 +1856,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v181';
+const APPV='v182';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -2381,6 +2381,7 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('button,a');if(!b)return;
   if(b.dataset.qs){quickSave();return}
    if(b.dataset.add){if(b.dataset.add==='ia'&&AI){pickPhoto(async f=>{openSheet(null,'foto');await onFile(f);if(sheet&&sheet.file)analyze()});return}openSheet(null,b.dataset.add==='ia'?'foto':'manual');return}
+  if(b.dataset.r==='fer'){LU='Fer';return swGo('Fer','vendedor')}
   if(b.dataset.r==='forget'){lset('crm-toks','');LR='';LU='';showLogin();return}
   if(b.dataset.r!==undefined){LR='';LU='';lset('crm-user','');showLogin();return}
   if(b.dataset.p){LU=b.dataset.p;LR=b.dataset.lr||roleOf(LU);const st=toks()[LU];if(st){lset('crm-tok',st);lset('crm-user',LU);lset('crm-role',LR);boot();return}if(!PROT(LU)){lset('crm-user',LU);lset('crm-role',LR);viewLogin(LU);return}showLogin();return}
@@ -2392,6 +2393,7 @@ document.addEventListener('click',e=>{
   if(b.dataset.nv)return navGo(b.dataset.nv);
   if(b.id==='mback')navSet('pros');
   if(b.id==='mapbtn')navSet('mapa');
+  if((b.id==='mlo'||b.id==='mlo2')&&ME&&ME!=='Fer'&&FERPH()&&toks()['Fer']){return swGo('Fer','vendedor')}
   if(b.id==='mlo'||b.id==='mlo2'){lset('crm-tok','');lset('crm-role','');lset('crm-user','');LR='';LU='';showLogin('Sesión cerrada');return}
   if(b.id==='lgo')return doLogin();
   if(b.id==='logout'){lset('crm-tok','');showLogin('Sesión cerrada');return}
@@ -2530,7 +2532,7 @@ function showLogin(msg){
     el.innerHTML=`<div class="lg2">${LOGO}${msg?`<div class="lm">${esc(msg)}</div>`:''}<div class="pgw">${t}</div></div>`;
   }else{
     const n=pname(LU),ks=['1','2','3','4','5','6','7','8','9','del','0','go'].map(k=>`<button class="kk ${k==='go'?'ok':''}" data-k="${k}" aria-label="${k}">${k==='del'?'\u232B':k==='go'?'\u2713':k}</button>`).join('');
-    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw">${FERPH()?'':'<button class="lb" data-r="" aria-label="Atrás">\u2190</button>'}<div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div>${NOFG(LU)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-fg="1">Olvid\u00e9 mi NIP</button>'}</div>`;
+    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw">${FERPH()?(LU==='Fer'?'':'<button class="lb" data-r="fer" aria-label="Volver a Fer">\u2190</button>'):'<button class="lb" data-r="" aria-label="Atrás">\u2190</button>'}<div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div>${NOFG(LU)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-fg="1">Olvid\u00e9 mi NIP</button>'}</div>`;
     lgDraw();LMODE='enter';LFIRST='';LFORGOT=0;lgProbe();
   }
   el.style.display='flex';
