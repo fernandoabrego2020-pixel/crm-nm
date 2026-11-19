@@ -1071,6 +1071,7 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #tvw .sgc{padding:10px 12px;margin-bottom:8px}
 #tvw .sgg{gap:6px 10px}
 #tvw label{gap:2px;font-size:11px}
+#tvw .tvlab{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--mu);min-width:0}
 #tvw select,#tvw input[type=text],#tvw input[type=email],#tvw input[type=date],#tvw input:not([type]),#tvw input[inputmode]{padding:8px 10px}
 #tvw .sgfile{padding:10px 6px;gap:1px}
 #tvw .tvch{padding:9px 6px;font-size:14px}
@@ -1874,7 +1875,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v186';
+const APPV='v187';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3822,10 +3823,10 @@ function tvBuild(){
     return;
   }
   if(!TV.v.sucursal){TV.v.sucursal=tvSucDef();if(TV.v.sucursal&&!TV.v.responsable){TV.v.responsable=tvResp(TV.v.sucursal);TV._ra=TV.v.responsable}}
-  b.innerHTML='<div class="sgc" id="tvSuc"><label>Sucursal que tramita<div class="tvchs tvsu" id="tvSu">'+tvSuc()+'</div></label></div>'+
+  b.innerHTML='<div class="sgc" id="tvSuc"><div class="tvlab" role="group" aria-label="Sucursal que tramita">Sucursal que tramita<div class="tvchs tvsu" id="tvSu">'+tvSuc()+'</div></div></div>'+
   '<div class="sgc"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+tvSlot('factura','Factura (PDF)','Elegir',false,true)+tvSlot('ine','INE','Frente y vuelta',true)+'</div></div>'+
   '<div class="sgc"><div class="sgg">'+tvInp('telefono','Teléfono','tel')+tvInp('correo','Correo','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
-  '<label style="grid-column:1\x2F-1">Financiera<div class="tvchs" id="tvFin">'+tvFin()+'</div></label></div></div>'+
+  '<div class="tvlab" role="group" aria-label="Financiera" style="grid-column:1\x2F-1">Financiera<div class="tvchs" id="tvFin">'+tvFin()+'</div></div></div></div>'+
   '<details class="sgc sgdet"><summary>Más datos</summary><div style="margin-top:10px">'+
   '<div class="sgg"><label>Origen<select id="tv_origen"><option value="">Elige</option>'+TVO.map(x=>'<option'+(TV.v.origen===x?' selected':'')+'>'+x+'</option>').join('')+'</select></label>'+tvInp('uso','Uso de la moto','')+tvInp('responsable','Responsable','',true)+'</div>'+
   '<h4 style="margin:14px 0 8px">Medios de pago</h4><div id="tvM"></div><button type="button" class="sgbtn sec" id="tvMa">+ medio</button><div class="note" id="tvSum" style="margin-top:8px"></div>'+
