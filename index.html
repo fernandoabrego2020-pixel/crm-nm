@@ -7,11 +7,9 @@ var EX="https://script.google.com/macros/s/AKfycbwSnmGi3-HdNg8AXigUZjpg-gmk5oiy2
 function mk(ok,fail){return{
 withSuccessHandler:function(f){return mk(f,fail)},
 withFailureHandler:function(f){return mk(ok,f)},
-api:function(req){
-fetch(EX,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({crm:1,req:req})})
-.then(function(r){return r.text()})
-.then(function(t){if(ok)ok(t)})
-.catch(function(e){if(fail)fail(e)})
+api:function(req){var op=(req&&req.op)||"",ac=window.AbortController?new AbortController():null,noab=op==="seg_emit"||!ac,ms=/^(ai|ia_|mk|ventas_|seg_venta_|seg_leer)/.test(op)?90000:20000,tm=0,dn=0;
+if(!noab)tm=setTimeout(function(){dn=1;try{ac.abort()}catch(x){}var er=new Error("timeout");er.sinCon=1;er.timeout=1;if(fail)fail(er)},ms);
+fetch(EX,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({crm:1,req:req}),signal:noab?undefined:ac.signal}).then(function(r){return r.text()}).then(function(t){clearTimeout(tm);if(dn)return;if(ok)ok(t)}).catch(function(e){clearTimeout(tm);if(dn)return;try{e.sinCon=1}catch(x){}if(fail)fail(e)})
 }}}
 window.google={script:{
 run:mk(null,null),
@@ -1213,6 +1211,19 @@ body.viplock{overflow:hidden}
 .pmf{display:block;position:relative;z-index:1}
 @media (max-height:760px){#pm .kp,.loginov .kp{grid-template-columns:repeat(3,64px);gap:10px;margin-top:0}#pm .kk,.loginov .kk{width:64px;height:64px;font-size:24px}#pm .lg2,.loginov .lg2{gap:10px}.pmf{margin-top:10px;padding:10px 22px}.pmn{margin-top:10px}}
 @media (max-height:620px){#pm .kp,.loginov .kp{grid-template-columns:repeat(3,54px);gap:8px}#pm .kk,.loginov .kk{width:54px;height:54px;font-size:21px}}
+#nipbar{position:fixed;left:0;right:0;bottom:calc(66px + env(safe-area-inset-bottom,0px));z-index:58;display:flex;gap:10px;align-items:center;justify-content:center;padding:7px 10px;background:#463712;color:#fff;font:600 13px/1.2 system-ui,sans-serif}
+#nipbar.warn{background:#9a3412}
+#nipbar button{border:0;border-radius:999px;padding:6px 14px;background:#fff;color:#463712;font:700 13px system-ui,sans-serif}
+.mxh{margin:18px 2px 0;font:700 12px/1.2 system-ui,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--mu)}
+.mxh+.mxg{margin-top:8px}
+#askyn{position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+#askyn .ayb{background:var(--card);color:var(--tx);border-radius:14px;padding:18px;max-width:340px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+#askyn p{margin:0 0 14px;font-size:15px;line-height:1.35}
+#askyn .ayb>div{display:flex;gap:10px;justify-content:flex-end}
+#askyn button{border:1px solid var(--ln);background:var(--card);color:var(--tx);border-radius:999px;padding:9px 16px;font:600 14px system-ui,sans-serif}
+#askyn button.y{background:var(--tx);color:var(--bg);border-color:var(--tx)}
+.rgda{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.rgda .p2a{padding:7px 12px;font-size:13px}
 </style>
 </head>
 <body>
@@ -1265,20 +1276,36 @@ function pmPad(){
   m.innerHTML=`<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct" id="pmt">Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small></div><div class="dots" id="pmd"></div><div class="lm" id="pme"></div><input type="hidden" id="pmv" value=""><div class="kp">${ks}</div>${(PM&&PM.mode==='enter')?(NOFG(ME)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-pk="forgot">Olvid\u00e9 mi NIP</button>'):''}</div>`;
   pmDraw();if(PM)pmTitle();
 }
-function needFull(cb){
+let NIPFORCE=0,NIPMSG='',NIPTM=0,NIPNEXT='';
+function nipNo(){try{return sessionStorage.getItem('crm-nonip-'+ME)==='1'}catch(e){return !!window.__nonip}}
+function nipNoSet(v){try{if(v)sessionStorage.setItem('crm-nonip-'+ME,'1');else sessionStorage.removeItem('crm-nonip-'+ME)}catch(e){window.__nonip=v?1:0}}
+function nipBar(){
+  let b=document.getElementById('nipbar');const on=ready&&!isFull()&&nipNo();
+  if(!on){if(b)b.remove();return}
+  if(!b){b=document.createElement('div');b.id='nipbar';document.body.appendChild(b)}
+  b.className=NIPMSG?'warn':'';
+  b.innerHTML='<span>'+esc(NIPMSG||'Modo solo ver')+'</span><button type="button" data-nip="make">Crear NIP</button>';
+}
+function nipBlocked(why){NIPMSG='No pude '+(why||'hacer ese cambio')+' sin NIP';clearTimeout(NIPTM);NIPTM=setTimeout(()=>{NIPMSG='';nipBar()},7000);nipBar()}
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('[data-nip]');if(!b)return;nipNoSet(0);NIPFORCE=1;NIPMSG='';nipBar();needFull(()=>{nipBar();toast('Listo, ya puedes hacer cambios',1)},'crear tu NIP')});
+setInterval(nipBar,3000);
+function needFull(cb,why){
   if(isFull()){FULL=true;return cb()}
+  why=why||NIPNEXT;NIPNEXT='';
+  if(nipNo()&&!NIPFORCE){nipBlocked(why);return}
   let m=document.getElementById('pm');
   if(!m){m=document.createElement('div');m.id='pm';document.body.appendChild(m)}
-  PM={cb:cb,mode:'enter',first:''};
+  PM={cb:cb,mode:'enter',first:'',why:why};
   const hk='crm-hp-'+ME,pm0=PM;
   if(lget(hk)==='1'){m.style.display='flex';pmPad();api('login',{name:ME,pin:''}).then(r=>{if(r&&r.err==='pin'&&r.pl){lset('crm-pl-'+ME,String(r.pl));if(PM===pm0)PM.n=r.pl}}).catch(()=>{});return}
   m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">Un momento\u2026</div></div>';m.style.display='flex';
   api('login',{name:ME,pin:''}).then(r=>{
     if(PM!==pm0)return;
+    if(r&&r.err==='setpin'&&NIPFORCE){NIPFORCE=0;PM.mode='create';pmPad();return}
     if(r&&r.err==='setpin'){m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">\u00bfQuieres proteger tu cuenta con un NIP?<small>Con NIP nadie m\u00e1s puede mover ni borrar tus clientes si entra a tu cuenta. Solo lo creas una vez por celular.</small></div><div class="pmq"><button class="y" data-pk="yes">S\u00ed, crear mi NIP</button><button data-pk="no">No</button></div></div>';return}
     if(r&&r.err==='pin'){lset(hk,'1');if(r.pl){lset('crm-pl-'+ME,String(r.pl));PM.n=r.pl}}
     pmPad();
-  }).catch(()=>{if(PM===pm0)pmPad()});
+  }).catch(()=>{if(PM===pm0)m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">Sin conexi\u00f3n<small>Revisa tu internet e intenta otra vez.</small></div></div>'});
 }
 function askFull(){return new Promise(res=>{needFull(()=>res(true));if(PM)PM.cancel=()=>res(false)})}
 function pmTitle(){const t=document.getElementById('pmt');if(!t||!PM)return;if(PM.forgot&&PM.mode==='create'){t.innerHTML='Crea un NIP nuevo<small>Elige 4 a 8 n\u00fameros. El due\u00f1o de la cuenta recibir\u00e1 una alerta durante dos d\u00edas.</small>';return}t.innerHTML=PM.mode==='create'?'Crear NIP<small>Elige 4 a 8 números. Solo te lo pido para mover de cuenta, borrar o prender y apagar. Una vez por celular.</small>':PM.mode==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':'Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small>'}
@@ -1286,7 +1313,7 @@ function pmDraw(){const i=document.getElementById('pmv'),d=document.getElementBy
 function pmClose(){const m=document.getElementById('pm');if(m)m.style.display='none';PM=null}
 async function pmKey(k){
   if(!PM)return;if(k==='x'){const cc=PM.cancel;pmClose();if(cc)cc();return}
-  if(k==='no'){const cc=PM.cancel;pmClose();if(cc)cc();toast('Sin NIP solo puedes ver. Para hacer cambios necesitas crear tu NIP.',1);return}
+  if(k==='no'){const cc=PM.cancel,wy=PM.why;nipNoSet(1);pmClose();if(cc)cc();nipBlocked(wy);return}
   if(k==='yes'){PM.mode='create';pmPad();return}
   if(k==='forgot'){PM.forgot=1;PM.mode='create';PM.first='';pmPad();return}
   if(PM.busy)return;
@@ -1301,7 +1328,7 @@ async function pmKey(k){
   try{
     const r=await api('login',{name:ME,pin:v,setpin:PM.mode==='repeat',forgot:!!PM.forgot});pmx.busy=0;
     if(r.err){e.textContent=r.err==='pin'?'NIP incorrecto':r.err==='lock'?'Espera 10 min':r.err==='bloq'?'Cuenta bloqueada. Habla con Fer.':r.err==='setpin'?'Primero crea tu NIP':'No se pudo';i.value='';pmDraw();if(r.err==='setpin'){lset('crm-hp-'+ME,'');PM.mode='create';pmTitle()}return}
-    TOK=r.token;FULL=true;FULLS=true;lset('crm-hp-'+ME,'1');lset('crm-pl-'+ME,String(v.length));if(r.pc)lset('crm-pcack',String(r.pc));saveTok(ME,TOK);lset('crm-tok',TOK);bkpSet();const cb=PM.cb;pmClose();cb();
+    TOK=r.token;FULL=true;FULLS=true;lset('crm-hp-'+ME,'1');lset('crm-pl-'+ME,String(v.length));if(r.pc)lset('crm-pcack',String(r.pc));saveTok(ME,TOK);lset('crm-tok',TOK);bkpSet();nipNoSet(0);NIPMSG='';nipBar();const cb=PM.cb;pmClose();cb();
   }catch(x){pmx.busy=0;e.textContent='Sin conexión'}
 }
 const G=[
@@ -1334,6 +1361,7 @@ function uhRec(){
 function p2Back(){
   if(RO)return toast('Est\u00e1s en vista de solo lectura.',1);
   if(!UH.length)return toast('No hay nada que retroceder',1);
+  NIPNEXT='retroceder el \u00faltimo cambio';
   needFull(()=>{
     const h=UH.pop();if(!h)return;
     h.ch.forEach(c=>{const i=S.leads.findIndex(l=>l.id===c.id);if(!c.b){if(i>=0)S.leads.splice(i,1)}else if(i>=0)S.leads[i]=JSON.parse(JSON.stringify(c.b));else S.leads.push(JSON.parse(JSON.stringify(c.b)))});
@@ -1365,13 +1393,15 @@ function wake(){let c=0;S.leads.forEach(l=>{if(l.sn&&l.sn<=Date.now()){Object.ke
 const add=(l,id)=>{if(!inG(l,id))l.st[id]=Date.now()};
 const del=(l,...ids)=>ids.forEach(id=>{delete l.st[id]});
 const touch=l=>{Object.keys(l.st).forEach(k=>{l.st[k]=Date.now()})};
-const norm=t=>{const d=String(t).replace(/\D/g,'');return d.length>10?d.slice(-10):d};
+const norm=t=>{const d=String(t).replace(/\D/g,'');if(d.length===12&&d.slice(0,2)==='52')return d.slice(2);if(d.length===13&&d.slice(0,3)==='521')return d.slice(3);return d};
+const telLong=t=>norm(t).length>10;
+const longMsg=t=>'N\u00famero muy largo ('+norm(t).length+' d\u00edgitos), rev\u00edsalo';
 const uid=()=>'L'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const ev=(l,x)=>{(l.ctx=l.ctx||[]).push({t:Date.now(),x,auto:true,pend:true})};
 const newLead=(own,name,moto,tel,ctx,idf)=>{const n=Date.now();const l={id:uid(),own,src:ACC[own]||null,name,moto,tel,c:n,s:0,f:0,r:0,note:'',done:false,ctx:ctx?[{t:n,x:ctx,pend:true}]:[],st:{empezar:n,referidos:n}};if(idf)l.idf=idf;return l};
 const fmt=t=>t&&t.length===10?t.slice(0,3)+' '+t.slice(3,6)+' '+t.slice(6):(t||'');
 const dupMsg=(d)=>{const n=d.name?' ('+d.name+')':'';return d.own===S.ag?'Ya lo tienes agregado'+n:'Ya está en la cuenta de '+d.own+n};
-const findDup=t=>S.leads.find(x=>x.tel===t)||(TAKEN.has(t)?{own:TAKEN.get(t),name:''}:null);
+const findDup=t0=>{const t=norm(t0);if(t.length!==10)return null;return S.leads.find(x=>x.tel===t)||(TAKEN.has(t)?{own:TAKEN.get(t),name:''}:null)};
 
 function tags(l,g){
   const t=[];
@@ -1522,7 +1552,7 @@ const p2nz=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u03
 function p2Keep(l){
   if(P2.fp&&!l.pin)return false;
   if(P2.f&&P2.cat==='neu'&&!String(P2.q||'').trim()){const ph=p2Phase(l);if(!ph||P2GRP[ph[2]]!==P2.f)return false}
-  const q=p2nz(P2.q).trim();if(q){const h=p2nz([l.name,l.idf,l.ub,l.tel,p2SumFull(l),l.moto].join(' '));if(!q.split(/\s+/).every(w=>h.indexOf(w)>=0))return false}
+  const q=p2nz(P2.q).trim();if(q){const h=p2nz([l.name,l.idf,l.ub,l.tel,p2SumFull(l),l.moto].join(' '));const qd=q.replace(/\D/g,'');let byTel=false;if(qd.length>=4&&/^[\d\s().+-]+$/.test(q)){let qn=qd;if(qn.length===13&&qn.slice(0,3)==='521')qn=qn.slice(3);else if(qn.length===12&&qn.slice(0,2)==='52')qn=qn.slice(2);else if(qn.length>10)qn=qn.slice(-10);byTel=String(l.tel||'').replace(/\D/g,'').indexOf(qn)>=0}if(!byTel&&!q.split(/\s+/).every(w=>h.indexOf(w)>=0))return false}
   return true}
 function p2Btns(){
   const act=P2.fp||P2.f;
@@ -1603,10 +1633,11 @@ function p2SetPh(l,k){
   const cur=p2Phase(l);
   if(cur&&P2GRP[cur[2]]===k)return p2Re(l.id);
   const go=()=>{undo=JSON.stringify(S);l.st=l.st||{};Object.keys(P2PH).forEach(x=>{delete l.st[x]});l.st[k]=Date.now();save();p2Re(l.id);toast('Siguiente paso: '+P2OPT.find(o=>o[0]===k)[1])};
-  p2Re(l.id);needFull(go);
+  p2Re(l.id);NIPNEXT='cambiar de etapa';needFull(go);
 }
 function p2Pin(l){
   if(RO)return toast('Est\u00e1s en vista de solo lectura.',1);
+  NIPNEXT='fijar el lead';
   const go=()=>{undo=JSON.stringify(S);if(l.pin)delete l.pin;else l.pin=Date.now();save();p2Render();toast(l.pin?'Fijado arriba':'Quitado de fijados')};
   needFull(go);
 }
@@ -1630,7 +1661,7 @@ function p2Edit(l,el,fld){
       else{if(v){l.rs=v;l.ctxu=v;l.rsg=p2Sig(l)}else{delete l.rs;delete l.ctxu;delete l.rsg}}
       save();p2Render();toast('Guardado')};
     p2Render();
-    needFull(go)};
+    NIPNEXT='guardar el cambio';needFull(go)};
   inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();end(1)}else if(e.key==='Escape')end(0)};
   let bt=0;
   if(fld==='moto'){
@@ -1645,7 +1676,7 @@ function p2Edit(l,el,fld){
 }
 function p2Num(l,v){
   const t=norm(v);
-  if(t.length!==10)return toast('El WhatsApp debe tener 10 d\u00edgitos',1);
+  if(t.length!==10)return toast(t.length>10?longMsg(t):'El WhatsApp debe tener 10 d\u00edgitos',1);
   const d=findDup(t);if(d)return toast(dupMsg(d),1);
   P2.ed=0;undo=JSON.stringify(S);const t0=Date.now();
   l.tel=t;delete l.ph;delete l.fld;delete l.pn;
@@ -1677,7 +1708,7 @@ function p2Move(l,to){
     if(to==='ven'){const k=l.st&&l.st.referidos;l.st={};if(k!==undefined)l.st.referidos=k;l.done=true;l.cat='ven';ev(l,'Marcado como venta desde Leads.')}
     else{l.cat=to;if(cur==='ven'||cur==='eli')l.done=false}
     save();p2Render();toast(p2Name(l)+' \u2192 '+({imp:'Importantes',neu:'Neutros',bas:'Basura',ven:'Venta',eli:'Eliminados'})[to])};
-  needFull(go);
+  NIPNEXT='mover de categor\u00eda';needFull(go);
 }
 
 const P2G={t:0,on:0,card:null,sx:0,sy:0,over:'',id:null,sup:0,rr:0,raf:0,px:0,py:0,tg:[],el:null,ts:0};
@@ -1805,7 +1836,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v178';
+const APPV='v179';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -1831,33 +1862,36 @@ function regLkSel(r,i){
   return '<select class="rgi'+(r.lk?'':' e')+'" data-i="'+i+'" data-k="lk"><option value=""'+(r.lk?'':' selected')+'>Enlazar con una ubicaci\u00f3n guardada (opcional)</option>'+o+'</select>';
 }
 function regDup(r,i){const t=norm(r.tel);if(t.length!==10)return '';const d=findDup(t);if(d)return dupMsg(d);if(REG.rows.some((o,j)=>j<i&&norm(o.tel)===t))return 'Repetido en esta lista';return ''}
+function regDupBox(r,i,dp){return esc(dp)+(r.keep?' \u00b7 se guardar\u00e1 igual, sin n\u00famero':'')+'<div class="rgda"><button type="button" class="p2a st" data-rg="opendup" data-i="'+i+'">Abrir el existente</button>'+(r.keep?'':'<button type="button" class="p2a" data-rg="keepdup" data-i="'+i+'">Guardar igual</button>')+'</div>'}
+function regOpenDup(r){const d=r&&findDup(r.tel);if(!d)return toast('Ya no est\u00e1 repetido',1);if(!d.id)return toast('Ese n\u00famero est\u00e1 en la cuenta de '+d.own,1);if(d.own!==S.ag){toast('Ese n\u00famero est\u00e1 en la cuenta de '+d.own,1);return}regClose();P2.cat=d.cat||'neu';P2.q=String(d.tel);P2.sq=1;P2.lim=50;P2.open=d.id;if(CUR!=='p2')navGo('p2');else p2Render()}
 function regDoubt(r){const t=norm(r.tel);return r.du.length>0||(t.length>0&&t.length!==10)}
 const regEmpty=r=>!String(r.name||'').trim()&&!norm(r.tel)&&!String(r.tx||'').trim()&&!String(r.idf||'').trim()&&!String(r.mt||'').trim();
-const regOk=(r,i)=>r.on&&!regEmpty(r);
+const regOk=(r,i)=>r.on&&!regEmpty(r)&&(r.keep||!regDup(r,i));
 function regFocusKey(){const a=document.activeElement;if(!a||!a.closest||!a.closest('#p2reg'))return null;let k='';if(a.id)k='#'+a.id;else if(a.dataset&&a.dataset.k!==undefined&&a.dataset.i!==undefined)k='[data-i="'+a.dataset.i+'"][data-k="'+a.dataset.k+'"]';if(!k)return null;let p=0;try{p=a.selectionStart}catch(e){}return {k:k,p:p}}
 function regStat(t){REG.prog=t;const x=document.getElementById('rgst');if(x)x.textContent=t}
-function regSync(){document.querySelectorAll('#p2reg [data-k]').forEach(t=>{const r=REG.rows[+t.dataset.i],k=t.dataset.k;if(!r||k==='on'||k==='lk'||typeof t.value!=='string')return;if(r[k]!==t.value){r[k]=t.value;REG.conf=0;if(k==='tel')r.du=[]}});const l=document.getElementById('rgl');if(l)REG.lugar=l.value}
+function regSync(){document.querySelectorAll('#p2reg [data-k]').forEach(t=>{const r=REG.rows[+t.dataset.i],k=t.dataset.k;if(!r||k==='on'||k==='lk'||typeof t.value!=='string')return;if(r[k]!==t.value){r[k]=t.value;REG.conf=0;if(k==='tel'){r.du=[];r.keep=0}}});const l=document.getElementById('rgl');if(l)REG.lugar=l.value}
 function regFlags(){
   document.querySelectorAll('#p2reg .rgr').forEach((el,i)=>{const r=REG.rows[i];if(!r)return;
     const dp=regDup(r,i),t=norm(r.tel),fl=[];
-    if(dp)fl.push(['warn',dp+' \u00b7 se guarda igual, sin n\u00famero (queda anotado en el lead)']);
+    if(dp)fl.push(['dup',dp]);
     else{
       if(!t&&(r.name||r.tx))fl.push(['info','Sin n\u00famero: se guarda igual y le agregas el n\u00famero despu\u00e9s']);
+      else if(t&&t.length>10)fl.push(['bad',longMsg(t)]);
       else if(t&&t.length!==10)fl.push(['warn','N\u00famero incompleto ('+t.length+' d\u00edgitos)']);
       r.du.forEach(d=>fl.push(['warn',d]));
     }
     el.classList.remove('dup');el.classList.toggle('dbt',regDoubt(r));
     el.querySelectorAll('.rgf').forEach(x=>x.remove());
-    fl.forEach(f=>{const d=document.createElement('div');d.className='rgf '+f[0];d.textContent=f[1];el.appendChild(d)});
+    fl.forEach(f=>{const d=document.createElement('div');if(f[0]==='dup'){d.className='rgf warn';d.innerHTML=regDupBox(r,i,f[1])}else{d.className='rgf '+f[0];d.textContent=f[1]}el.appendChild(d)});
     const cb=el.querySelector('input[type=checkbox]');if(cb){cb.disabled=false;cb.checked=!!r.on}
     const ti=el.querySelector('[data-k="tel"]');if(ti)ti.className=((t&&t.length!==10)||r.du.length?'warn':'');
   });
 }
 function regBtn(){
   regSync();regFlags();const b=document.querySelector('#p2reg [data-rg="save"]');if(!b)return;
-  const n=REG.rows.filter(regOk).length;
-  b.textContent=REG.conf?'Guardar así de todos modos':'Guardar '+n+(n===1?' lead':' leads');
-  b.disabled=!!REG.busy||!n;
+  const n=REG.rows.filter(regOk).length,nl=REG.rows.filter((r,i)=>regOk(r,i)&&telLong(r.tel)).length,dn=REG.rows.filter((r,i)=>r.on&&!regEmpty(r)&&!r.keep&&regDup(r,i)).length;
+  b.textContent=nl?'Corrige el n\u00famero muy largo':dn?'Resuelve el n\u00famero repetido':REG.conf?'Guardar así de todos modos':n?'Guardar '+n+(n===1?' lead':' leads'):'Escribe un dato para guardar';
+  b.disabled=!!REG.busy||!n||!!nl||!!dn;
 }
 function regAddRow(){
   const lr=REG.rows[REG.rows.length-1];
@@ -1871,9 +1905,10 @@ function regDraw(){
   const pl=regPlaces().map(x=>'<option value="'+esc(x)+'">').join('');
   const rows=REG.rows.map((r,i)=>{
     const dp=regDup(r,i),t=norm(r.tel),fl=[];
-    if(dp)fl.push(['warn',dp+' \u00b7 se guarda igual, sin n\u00famero (queda anotado en el lead)']);
+    if(dp)fl.push(['dup',dp]);
     else{
       if(!t&&(r.name||r.tx))fl.push(['info','Sin número: se guarda igual y le agregas el número después']);
+      else if(t&&t.length>10)fl.push(['bad',longMsg(t)]);
       else if(t&&t.length!==10)fl.push(['warn','Número incompleto ('+t.length+' dígitos)']);
       r.du.forEach(d=>fl.push(['warn',d]));
     }
@@ -1882,7 +1917,7 @@ function regDraw(){
       '<textarea rows="2" data-i="'+i+'" data-k="tx" placeholder="Texto tal cual (opcional)">'+esc(r.tx)+'</textarea>'+
       '<div class="rgg"><input data-i="'+i+'" data-k="name" enterkeyhint="next" value="'+esc(r.name)+'" placeholder="Nombre (opcional)" autocomplete="off"><input class="'+((t&&t.length!==10)||r.du.length?'warn':'')+'" data-i="'+i+'" data-k="tel" enterkeyhint="next" inputmode="tel" value="'+esc(r.tel)+'" placeholder="WhatsApp (opcional)" autocomplete="off"></div>'+
       '<div class="rgg"><input data-i="'+i+'" data-k="idf" enterkeyhint="next" value="'+esc(r.idf)+'" placeholder="Cómo identificarlo (opcional)" autocomplete="off"><input data-i="'+i+'" data-k="ub" enterkeyhint="done" value="'+esc(r.ub)+'" placeholder="Lugar (opcional)" autocomplete="off"></div>'+
-      regLkSel(r,i)+fl.map(f=>'<div class="rgf '+f[0]+'">'+esc(f[1])+'</div>').join('')+'</div>'}).join('');
+      regLkSel(r,i)+fl.map(f=>f[0]==='dup'?'<div class="rgf warn">'+regDupBox(r,i,f[1])+'</div>':'<div class="rgf '+f[0]+'">'+esc(f[1])+'</div>').join('')+'</div>'}).join('');
   const nd=REG.rows.filter((r,i)=>regOk(r,i)&&regDoubt(r)).length;
   e.innerHTML='<div class="rg"><div class="rgh"><b>Nuevos prospectos</b><button data-rg="x">Cerrar</button></div>'+
     '<div class="rgb">'+(AI?'<button class="p2a st" data-rg="pick">Leer fotos con IA</button>':'')+'<button class="p2a" data-rg="add">Escribir a mano</button></div>'+
@@ -1935,7 +1970,8 @@ function regAlong(ln,f){
 }
 function regSave(){
   regSync();const sel=REG.rows.filter(regOk),dmap=new Map();REG.rows.forEach((r,i)=>{if(regOk(r,i)){const m=regDup(r,i);if(m)dmap.set(r,m)}});
-  if(!sel.length){REG.err='Escribe al menos un dato: nombre, número o texto.';return regDraw()}
+  if(!sel.length){REG.err=REG.rows.some((r,i)=>r.on&&!regEmpty(r)&&!r.keep&&regDup(r,i))?'Ese número ya existe: abre el existente o toca Guardar igual.':'Escribe al menos un dato: nombre, número o texto.';return regDraw()}
+  if(sel.some(r=>telLong(r.tel))){REG.err='Hay un número muy largo. Corrígelo para poder guardar.';return regDraw()}
   const nd=sel.filter(r=>regDoubt(r)).length;
   if(nd&&!REG.conf){REG.conf=1;REG.err='';regDraw();const q=document.querySelector('#p2reg .rgf.warn');if(q)q.scrollIntoView({block:'center'});return}
   const t0=Date.now();let np=0;const gone=[];
@@ -1999,6 +2035,8 @@ document.addEventListener('click',e=>{
   if(a==='add'){lset('crm-regmode','mano');return regAddRow()}
   if(a==='read')return regRead();
   if(a==='save')return regSave();
+  if(a==='keepdup'){const r=REG.rows[i];if(r){r.keep=1;REG.conf=0}return regDraw()}
+  if(a==='opendup')return regOpenDup(REG.rows[i]);
   if(a==='nostreet'){REG.line=null;return regDraw()}
   if(a==='street'){const el=regEl();el.style.display='none';MAPM.trace(ln=>{el.style.display='';if(ln)REG.line=ln;MAPM.hide();regDraw()});return}
 });
@@ -2030,7 +2068,7 @@ function iaAsk(q){
 }
 function iaView(){
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in p2 iaw"><div class="p2h"><b>Ana</b>'+(FERDEV()&&ME==='Fer'?'':'<button class="p2s" id="mlo">Salir</button>')+'</div><div class="iam" id="iam"></div><form class="iaf" id="iaf" autocomplete="off"><input id="iaq" placeholder="Pregunta lo que sea…" enterkeyhint="send"><button type="submit">Enviar</button></form></div>';
+  m.innerHTML='<div class="in p2 iaw"><div class="p2h"><b>Ana</b>'+(FERDEV()&&ME==='Fer'?'':'<button class="p2s" id="mlo">Cerrar sesión</button>')+'</div><div class="iam" id="iam"></div><form class="iaf" id="iaf" autocomplete="off"><input id="iaq" placeholder="Pregunta lo que sea…" enterkeyhint="send"><button type="submit">Enviar</button></form></div>';
   m.style.display='block';iaDraw();
   document.getElementById('iaf').onsubmit=e=>{e.preventDefault();const i=document.getElementById('iaq'),q=i.value.trim();if(q&&!IA.busy){i.value='';iaAsk(q)}};
 }
@@ -2083,7 +2121,7 @@ function p2Send(l){
     fin=1;back();
     if(r&&r.ok)return ok();
     const e=r&&r.err;toast(e==='nosend'?'El env\u00edo todav\u00eda no est\u00e1 conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
-  }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('No se pudo enviar, intenta otra vez',1)});
+  }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('Sin conexi\u00f3n. No se pudo enviar, intenta otra vez',1)});
 }
 function p2Wa(l){
   copyTel(l.tel);
@@ -2110,7 +2148,7 @@ function p2Chat(l){
     const ms=p2Parse(r.h);
     if(!ms.length){show(r.tmo?'Make tardó demasiado buscando este número. Intenta de nuevo en un momento.':'Todavía no hay conversación guardada de este número.');return}
     show('',ms.map(x=>x.who==='nota'?'<div class="wnote">'+esc(x.text)+'</div>':'<div class="wm '+(x.who==='cliente'?'in':'out')+'">'+(x.who==='cliente'?'':'<small>'+esc(x.lab)+'</small>')+esc(x.text)+'</div>').join(''));
-  }).catch(()=>{p2Win(null,l);show('No pude cargar la conversación ahora. Abre WhatsApp con el botón de abajo.')});
+  }).catch(()=>{p2Win(null,l);show('Sin conexión: no pude cargar la conversación. Abre WhatsApp con el botón de abajo.')});
 }
 function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;if(P2.open){const l0=S.leads.find(x=>x.id===id);if(l0&&!l0.vis&&!RO){l0.vis=Date.now();save()}}if(P2.mo&&P2.mo!==P2.open)P2.mo=0;if(P2.ph&&P2.ph!==P2.open)P2.ph=null;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='p2q'){P2.q=e.target.value;P2.lim=50;p2Render()}});
@@ -2192,7 +2230,7 @@ function thumb(file){return new Promise(res=>{const fr=new FileReader();fr.onloa
 function classify(f,seen){
   f.dup=false;f.msg='';const t=norm(f.tel);
   if(t.length===10){const d=findDup(t);if(d){f.dup=true;f.msg=dupMsg(d)}else if(seen.has(t)){f.dup=true;f.msg='Repetido en la foto'}seen.add(t)}
-  else f.msg=t?'WhatsApp incompleto (10 dígitos)':'Falta el WhatsApp';
+  else f.msg=t?(t.length>10?longMsg(t):'WhatsApp incompleto (10 dígitos)'):'Falta el WhatsApp';
   if(!f.name&&!f.dup)f.msg=f.msg||'Falta el nombre';
   f.on=!f.dup&&t.length===10&&!!f.name;return f;
 }
@@ -2252,7 +2290,7 @@ async function analyze(){
 function saveManual(){
   const s=sheet,n=s.name.trim(),t=norm(s.tel);
   if(!n){s.err='Falta el nombre';return renderSheet()}
-  if(t.length!==10){s.err='El WhatsApp debe tener 10 dígitos';return renderSheet()}
+  if(t.length!==10){s.err=t.length>10?longMsg(t):'El WhatsApp debe tener 10 dígitos';return renderSheet()}
   const d=findDup(t);
   if(d){s.err=dupMsg(d);return renderSheet()}
   if(s.fill){
@@ -2269,7 +2307,7 @@ function saveFound(){
   const seen=new Set(),bad=[];
   sel.forEach(f=>{const t=norm(f.tel),n=f.name.trim();
     if(!n)bad.push('falta un nombre');
-    else if(t.length!==10)bad.push(n+': WhatsApp de 10 dígitos');
+    else if(t.length!==10)bad.push(n+': '+(t.length>10?longMsg(t):'WhatsApp de 10 dígitos'));
     else{const d=findDup(t);if(d)bad.push(n+': '+dupMsg(d));else if(seen.has(t))bad.push(n+': repetido');seen.add(t)}});
   if(bad.length){s.err=bad.join(' · ');return renderSheet()}
   UNDO_ADD=true;undo=JSON.stringify(S);
@@ -2328,7 +2366,7 @@ document.addEventListener('click',e=>{
   if(b.dataset.fg){LFORGOT=1;LMODE='create';LFIRST='';const pi=document.getElementById('pin');if(pi){pi.value='';lgDraw()}lgTitle('create');return}
   if(b.dataset.k)return lgKey(b.dataset.k);
   if(b.dataset.pk)return pmKey(b.dataset.pk);
-  if(b.dataset.nv==='vip')return vipOpen();
+  if(b.dataset.nv==='vip')return askYN('\u00bfAbrir la invitaci\u00f3n para el cliente? Ocupa toda la pantalla y solo se cierra con \u2715.','Abrir',vipOpen);
   if(b.dataset.nv)return navGo(b.dataset.nv);
   if(b.id==='mback')navSet('pros');
   if(b.id==='mapbtn')navSet('mapa');
@@ -2351,7 +2389,7 @@ document.addEventListener('click',e=>{
   const key=c.dataset.g+':'+c.dataset.id;
   if(b.classList.contains('row')){open=open===key?null:key;return render()}
   const l=S.leads.find(x=>x.id===c.dataset.id),a=b.dataset.a;
-  if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(!NEEDPIN.has(a)&&l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000)))go();else needFull(go)}
+  if(l&&A[a]){const go=()=>{undo=JSON.stringify(S);UNDO_ADD=false;A[a](l)};if(FREEA.has(a)||(!NEEDPIN.has(a)&&l.own===ME&&(l.ph||Date.now()-(l.c||0)<1800000)))go();else{NIPNEXT='hacer ese cambio';needFull(go)}}
 });
 document.addEventListener('input',e=>{
   const t=e.target;if(!sheet)return;
@@ -2368,6 +2406,8 @@ document.addEventListener('change',e=>{
 });
 const ser=l=>JSON.stringify(Object.assign({},l,{u:0}));
 function api(op,p){return new Promise((res,rej)=>{try{google.script.run.withSuccessHandler(s=>{try{res(JSON.parse(s))}catch(e){rej(e)}}).withFailureHandler(e=>rej(e)).api(Object.assign({op:op,token:TOK},p||{}))}catch(e){rej(e)}})}
+window.addEventListener('unhandledrejection',e=>{const r=e&&e.reason;if(r&&r.sinCon){try{e.preventDefault()}catch(x){}toast('Sin conexi\u00f3n. Intenta de nuevo.',1)}});
+function askYN(msg,yes,cb){const o=document.createElement('div');o.id='askyn';o.innerHTML='<div class="ayb"><p>'+esc(msg)+'</p><div><button type="button" data-ay="no">Cancelar</button><button type="button" class="y" data-ay="yes">'+esc(yes)+'</button></div></div>';document.body.appendChild(o);o.onclick=e=>{const a=e.target.dataset&&e.target.dataset.ay;if(!a&&e.target!==o)return;o.remove();if(a==='yes')cb()}}
 function lget(k){try{return localStorage.getItem(k)||''}catch(e){return ''}}
 function FERPH(){return lget('crm-ferdev')==='1'}
 function lset(k,v){try{localStorage.setItem(k,v)}catch(e){}}
@@ -2388,8 +2428,8 @@ async function push(){
     if(r.err){toast('No se pudo guardar: '+r.err,1);return}
     sent.forEach((j,t)=>{BASE.set(t,j)});dels.forEach(t=>BASE.delete(t));
     const NPT=[];(r.rejected||[]).forEach(x=>{if(x.why==='perm'){const i=S.leads.findIndex(l=>l.tel===x.tel);if(i>=0)S.leads.splice(i,1);BASE.delete(x.tel);toast('No tienes permiso para ese cambio',1);render()}else if(x.why==='needpin'){NPT.push(x.tel);BASE.set(x.tel,'')}else if(x.why==='dup'){const i=S.leads.findIndex(l=>l.tel===x.tel);if(i>=0)S.leads.splice(i,1);BASE.delete(x.tel);toast('Ese lead ya está en la cuenta de '+x.own+' ('+x.name+')',1);render()}});
-    if(NPT.length){toast('Pon tu NIP para hacer cambios',1);FULLS=false;needFull(()=>push());if(PM)PM.cancel=()=>{NPT.forEach(t=>{const i=S.leads.findIndex(l=>l.tel===t);if(i>=0)S.leads.splice(i,1);BASE.delete(t)});pull().then(()=>render())}}
-  }catch(e){toast('Sin conexión, reintento en un momento',1);setTimeout(push,5000)}
+    if(NPT.length){const rb=()=>{NPT.forEach(t=>{const i=S.leads.findIndex(l=>l.tel===t);if(i>=0)S.leads.splice(i,1);BASE.delete(t)});pull().then(()=>render())};FULLS=false;if(nipNo()){rb();nipBlocked('guardar ese cambio')}else{toast('Pon tu NIP para hacer cambios',1);needFull(()=>push(),'guardar ese cambio');if(PM)PM.cancel=rb}}
+  }catch(e){toast('Sin conexión. Tu cambio no se ha guardado; reintento en un momento.',1);setTimeout(push,5000)}
   finally{pushing=false;if(again){again=false;push()}}
 }
 function stSave(r){try{localStorage.setItem('crm-st-'+(ME||LU),JSON.stringify(r))}catch(e){}}
@@ -2617,7 +2657,7 @@ function sgQuote(){
     if(n!==SG.seq)return;
     if(!r||!r.ok||r.valor==null){SG.quote=null;box.innerHTML='<div class="sgerr">Moto fuera de catálogo.</div>';sgSum();sgRdBtn();return}
     SG.quote=r;sgQDraw();sgForm();sgCotApply();
-  }).catch(()=>{if(n===SG.seq)box.innerHTML='<div class="sgerr">No pude cotizar. Intenta de nuevo.</div>'});
+  }).catch(()=>{if(n===SG.seq)box.innerHTML='<div class="sgerr">Sin conexi\u00f3n: no pude cotizar. Intenta de nuevo.</div>'});
 }
 function sgQDraw(){
   const r=SG.quote,box=document.getElementById('sgQ'),t=[r.total.min,r.total.rec,r.total.may];
@@ -2907,9 +2947,10 @@ async function sgEmit(force){
   sgClear();msg.innerHTML='';
   SG.busy=true;btn.disabled=true;btn.textContent='Emitiendo…';
   let r;
+  const wt=setTimeout(()=>{if(SG.busy)msg.innerHTML='<div class="sgdu">Sigue sin confirmarse. NO toques Enviar otra vez: revisa abajo en \u201cP\u00f3lizas emitidas\u201d antes de reintentar.</div>'},60000);
   try{r=await api('seg_emit',{datos:sgDatos(),force:!!force})}catch(e){r=null}
-  SG.busy=false;btn.disabled=false;btn.textContent='Enviar';
-  if(!r){msg.innerHTML='<div class="sgerr">No pude comunicarme con el servidor. NO se sabe si la póliza se emitió: revisa abajo en “Pólizas emitidas” antes de volver a intentar.</div>';sgHist();return}
+  clearTimeout(wt);SG.busy=false;btn.disabled=false;btn.textContent='Enviar';
+  if(!r){msg.innerHTML='<div class="sgerr"><b>Sin confirmar.</b> No se sabe si la póliza se emitió: revisa abajo en “Pólizas emitidas” antes de reintentar.</div>';sgHist();return}
   if(r.err){msg.innerHTML=`<div class="sgerr">${r.err==='auth'?'Tu sesión venció, entra otra vez.':esc(r.err)}</div>`;return}
   if(!r.ok&&r.errs&&r.errs.length){
     msg.innerHTML=`<div class="sgerr"><b>Falta corregir:</b><br>${r.errs.map(x=>'• '+esc(x.m)).join('<br>')}</div>`;
@@ -2954,7 +2995,7 @@ async function sgHist(){
 const hm=n=>n>=60?Math.floor(n/60)+' h '+String(n%60).padStart(2,'0')+' min':n+' min';
 async function usoView(){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
-  m.innerHTML=`<div class="in"><div class="mh2"><b>Tiempo de uso</b><button id="mlo">Salir</button></div><div id="usr" class="note">Cargando…</div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in"><div class="mh2"><b>Tiempo de uso</b><button id="mlo">Cerrar sesión</button></div><div id="usr" class="note">Cargando…</div></div>`;m.style.display='block';
   let r;try{r=await api('uso_get')}catch(e){r=null}
   const box=document.getElementById('usr');if(!box)return;
   if(!r||!r.ok){box.textContent='No se pudo cargar.';return}
@@ -2974,7 +3015,7 @@ let CSUC='lerma';
 async function chatsView(kind,fresh){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME),qn=kind==='quien',multi=role!=='vendedor';
   const chips=multi?`<div class="chips">${SUCN.map(x=>`<button data-cs="${x[0]}" aria-pressed="${x[0]===CSUC}">${x[1]}</button>`).join('')}</div>`:'';
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${qn?'Escribieron':'Chats'}<small>${qn?'Para atender: esperan tu respuesta o ya avanzaron':'Conversaciones más recientes'}</small></b><button id="mlo">Salir</button></div>${chips}<div id="chr" class="note">Cargando…</div><button class="b" id="chrf" style="margin-top:10px">Actualizar</button></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in"><div class="mh2"><b>${qn?'Escribieron':'Chats'}<small>${qn?'Para atender: esperan tu respuesta o ya avanzaron':'Conversaciones más recientes'}</small></b><button id="mlo">Cerrar sesión</button></div>${chips}<div id="chr" class="note">Cargando…</div><button class="b" id="chrf" style="margin-top:10px">Actualizar</button></div>`;m.style.display='block';
   m.querySelectorAll('[data-cs]').forEach(b=>b.onclick=()=>{CSUC=b.dataset.cs;chatsView(kind)});
   document.getElementById('chrf').onclick=()=>chatsView(kind,true);
   let r;try{r=await api('chats',{suc:CSUC,kind:kind,fresh:!!fresh})}catch(e){r=null}
@@ -3113,7 +3154,7 @@ function torreView(id){
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const tt={conv:'Chats',quien:'Escribieron',make:'Gasto de Make',onoff:'Anas'}[id];
   const sec={conv:['tbl','msg'],quien:['msg'],make:['din','gas'],onoff:['bot']}[id];
-  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}</b><button id="mlo">Salir</button></div>${id==='onoff'&&role==='tecnico'?'<div style="margin:-4px 0 10px"><button class="mtl" data-nv="ana" style="background:none;border:0;padding:0;cursor:pointer;font-family:inherit">Horario, catálogo y números bloqueados</button></div>':''}<div id="t3" class="pane"><div class="wrap">${T3HTML}</div></div></div>`;
+  m.innerHTML=`<div class="in"><div class="mh2"><b>${tt}</b><button id="mlo">Cerrar sesión</button></div>${id==='onoff'&&role==='tecnico'?'<div style="margin:-4px 0 10px"><button class="mtl" data-nv="ana" style="background:none;border:0;padding:0;cursor:pointer;font-family:inherit">Horario, catálogo y números bloqueados</button></div>':''}<div id="t3" class="pane"><div class="wrap">${T3HTML}</div></div></div>`;
   m.style.display='block';
   {const t3=document.getElementById('t3');if(t3){if(id==='quien')t3.classList.add('qm');if(role==='vendedor')t3.classList.add('vq')}}
   m.querySelectorAll('#t3 [data-sec]').forEach(s=>{s.hidden=sec.indexOf(s.dataset.sec)<0});
@@ -3156,7 +3197,7 @@ function vSum(rows){const p=rows.filter(v=>Number(v.precio)>0),s=rows.length-p.l
 function vRel(ms){const m=Math.round((Date.now()-ms)/60000);if(m<1)return 'hace un momento';if(m<60)return 'hace '+m+' min';const h=Math.round(m/60);return h<24?'hace '+h+' h':'el '+vDay(vYmd(new Date(ms)))}
 function ventaView(){
   const m=document.getElementById('menu');
-  m.innerHTML=`<div class="in"><div class="mh2"><b>Venta<small>${esc(DN(ME))} · ${ROLEN[ROLE||roleOf(ME)]||''}</small></b><button id="mlo">Salir</button></div><div id="vt"><div id="vtReg"></div><div id="vtMain"><div class="note">Cargando ventas…</div></div></div></div>`;
+  m.innerHTML=`<div class="in"><div class="mh2"><b>Venta<small>${esc(DN(ME))} · ${ROLEN[ROLE||roleOf(ME)]||''}</small></b><button id="mlo">Cerrar sesión</button></div><div id="vt"><div id="vtReg"></div><div id="vtMain"><div class="note">Cargando ventas…</div></div></div></div>`;
   m.style.display='block';
   if(ROLE==='tecnico')document.getElementById('vtReg').innerHTML=`<div class="vcard"><div class="vin"><textarea id="vtIn" rows="2" placeholder="Nueva venta: modelo, sucursal o número del cliente"></textarea><button id="vtGo" class="vbtn">Validar</button></div><div id="vtOut"></div></div>`;
   VT.fN=null;VT.fD=null;vtLoad();
@@ -3526,7 +3567,7 @@ async function motosView(){
   MV.s=mSucKey(S.ag);
   const m=document.getElementById('menu'),role=ROLE||roleOf(ME);
   const FD=FERDEV()&&role==='vendedor',LK=FD?'<div class="lkx"><a target="_blank" rel="noopener" href="https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F">Maxicash<small>Tramitar INE</small></a><a target="_blank" rel="noopener" href="https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin">Galgo<small>Tramitar INE</small></a></div><div class="lkx lk2"><button data-nv="ana">Ana<small>Horario, bloqueados y precios</small></button><button data-nv="anacat">Actualizar cat\u00e1logo<small>Precios e inventario</small></button></div>':'';
-  m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Salir</button></div>`}<div id="mtb"></div></div>`;m.style.display='block';
+  m.innerHTML=`<div class="in" id="mti">${FD?'':`<div class="mh2"><b>Motos<small>${esc(DN(ME))} · ${ROLEN[role]||''}${RO?' · solo lectura':''}</small></b><button id="mlo">Cerrar sesión</button></div>`}<div id="mtb"></div></div>`;m.style.display='block';
   const b=document.getElementById('mtb');
   b.onchange=e=>{const t=e.target;if(t.id==='mtu'){MV.u=t.value;mChips();mDrawList();mStrip()}else if(t.id==='mts'){MV.s=t.value;mChips();mDrawList();mStrip()}};
   b.onclick=e=>{const t=e.target,sb=t.closest&&t.closest('#mtsb');if(sb){const w=document.getElementById('mtwr'),q=document.getElementById('mtq');if(w.style.display==='none'){MV.sq=1;w.style.display='';sb.classList.add('on');q.focus()}else{MV.sq=0;MV.q='';q.value='';w.style.display='none';sb.classList.remove('on');mDrawList();mStrip()}return}const lb=t.closest&&t.closest('[data-lb]');if(lb){mLb(lb.dataset.lb);return}const mo=t.closest&&t.closest('[data-mo]');
@@ -3600,7 +3641,7 @@ function avClick(e){const t=e.target,bt=t.closest&&t.closest('button,input');if(
   const a=bt.dataset&&bt.dataset.av;if(!a)return;const ag=avAg();
   if(a==='tog'){if(ag)avSet(ag.k,'on',!ag.on)}
   else if(a==='sch'){const d=[];for(let i=0;i<7;i++){const q=document.querySelectorAll('#avb input[data-d="'+i+'"]');d.push([q[0].value||'00:00',q[1].value||'00:00'])}avSet(ag.k,'sched',d)}
-  else if(a==='add'){const i=document.getElementById('avn'),n=(i.value||'').replace(/\D/g,'').slice(-10);if(n.length!==10){toast('Pon los 10 dígitos del número',1);return}if(ag.bl.indexOf(n)>=0){toast('Ese número ya está bloqueado',1);return}avSet(ag.k,'bl',ag.bl.concat([n]))}
+  else if(a==='add'){const i=document.getElementById('avn'),n=norm(i.value||'');if(n.length!==10){toast(n.length>10?longMsg(n):'Pon los 10 dígitos del número',1);return}if(ag.bl.indexOf(n)>=0){toast('Ese número ya está bloqueado',1);return}avSet(ag.k,'bl',ag.bl.concat([n]))}
   else if(a==='cat'){AV.q='';AV.ed={};avCatLoad()}
   else if(a==='foto'){const f=document.getElementById('avf');if(f){f.value='';f.click()}}
   else if(a==='back'){AV.sub='';AV.ft=null;avDraw()}
@@ -3930,14 +3971,15 @@ function masView(){
   const N=(t,v)=>'<button class="mxt" data-nv="'+v+'"><span>'+t+'</span></button>';
   const TAIL=ME==='Fer'?[]:['<button class="mxt" id="mlo2"><span>Cerrar sesión</span></button>'];
   const G=a=>'<div class="mxg">'+a.concat(TAIL).join('')+'</div>';
-  const ANAT=[N('Ana','ana')];
+  const ANAT=[N('Ana (mi asistente)','ana')];
   try{pfTi()}catch(e){}
-  const QUIEN=N('Quién escribió','quien');
+  const QUIEN=N('Clientes que escribieron','quien');
+  const H=t=>'<div class="mxh">'+t+'</div>',Gs=s=>s.map((x,i)=>H(x[0])+'<div class="mxg">'+(i===s.length-1?x[1].concat(TAIL):x[1]).join('')+'</div>').join('');
   let h='';
-  if(role==='vendedor')h=G([N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')].concat(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic'),N('Clientes selectos','vip'),L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]));
-  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')].concat(ANAT,[N('Clientes selectos','vip'),L('Panel de control',NLINK.panel())]));
-  else if(role==='director')h=G([N('Clientes selectos','vip'),L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
-  else h=G([N('Trámites','tram'),N('Clientes selectos','vip'),L('Inventario disponible',NLINK.inv())]);
+  if(role==='vendedor')h=Gs([['Tr\u00e1mites',[N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')]],['Mi trabajo',(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic')])],['Cliente',[N('Invitaci\u00f3n para el cliente','vip')]],['Portales',[L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]]]);
+  else if(role==='tecnico')h=G([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')].concat(ANAT,[N('Invitación para el cliente','vip'),L('Panel de control',NLINK.panel())]));
+  else if(role==='director')h=G([N('Invitación para el cliente','vip'),L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]);
+  else h=G([N('Trámites','tram'),N('Invitación para el cliente','vip'),L('Inventario disponible',NLINK.inv())]);
   m.innerHTML='<div class="in p2">'+h+'<div style="text-align:center;color:#8a99a3;font-size:12px;margin:18px 0 6px">CRM '+APPV+'</div></div>';
   m.style.display='block';
 }
@@ -3970,7 +4012,7 @@ function navGo0(id){
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
   const tt=id==='ine10'?'':id==='tvent'?'Tramitar venta':id==='seg'?'Tramitar seguro':id==='flujo'?'Flujo de venta':id==='img'?'Imágenes':id==='ana'?'Ana':id==='ine'?'Tramitar INEs':id==='moto'?'Motos':(NTIT[id]||'');
-  m.innerHTML=`<div class="in">${id==='ine10'?'':`<div class="mh2"><b>${tt}${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Salir</button></div>`}${body}</div>`;m.style.display='block';
+  m.innerHTML=`<div class="in">${id==='ine10'?'':`<div class="mh2"><b>${tt}${RO?'<small>Solo lectura</small>':''}</b><button id="mlo">Cerrar sesión</button></div>`}${body}</div>`;m.style.display='block';
 }
 const MAPM=(function(){
   let tr=null,trCb=null,adopt=null;
@@ -4244,7 +4286,7 @@ const MAPM=(function(){
   function renderFind(){
     const q=($('mfq').value||'').trim().toLowerCase(),d=q.replace(/\D/g,'');
     const vm=fm==='visit',pm=fm==='ph',ad=fm==='adopt',dd=l=>l.loc&&me?Math.hypot(mx(l.loc[1])-mx(me[1]),my(l.loc[0])-my(me[0])):1e12;
-    const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||fq(l,q)||(d&&String(l.tel).includes(d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):b.c-a.c).slice(0,40);
+    const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||fq(l,q)||(d&&String(l.tel).includes(d.length>10?norm(d):d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):b.c-a.c).slice(0,40);
     $('mfr').innerHTML=L.length?L.map(l=>l.ph?`<button class="mrow" data-id="${l.id}">Sin datos<small>Guardado ${ago(l.c)}${l.loc?' · ±'+l.loc[2]+' m':''}</small></button>`:`<button class="mrow" data-id="${l.id}">${esc(p2Title(l))}<small>${esc(fmt(l.tel))} · ${PN[baseOf(l)]}${vm&&!l.loc?' · sin ubicación':''}</small></button>`).join(''):'<div class="note">'+(vm?'No hay leads pendientes de visita.':'No hay leads sin ubicación con esa búsqueda.')+'</div>';
   }
   function openFind(m,aid){fm=m;adopt=aid||null;mv=null;$('mft').textContent=m==='adopt'?'Poner un lead aqu\u00ed':m==='ph'?'Guardados sin datos':m==='visit'?'Por visitar':'Ubicar un lead que no tiene ubicaci\u00f3n';$('mfn').textContent=m==='adopt'?'Toca el lead que ya tienes y se queda en esta ubicaci\u00f3n.':m==='ph'?'Toca uno para verlo en el mapa y llenar sus datos.':m==='visit'?'Toca el lead para verlo en el mapa. Si ya diste Ubicarme, salen del m\u00e1s cercano al m\u00e1s lejano.':'Toca el lead y despu\u00e9s toca en el mapa donde est\u00e1.';$('mfq').value='';renderFind();$('mfs').className='mfs show'}
