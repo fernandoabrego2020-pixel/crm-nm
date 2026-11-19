@@ -1047,6 +1047,8 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #tvw .tvch{flex:1;padding:13px 6px;border-radius:12px;border:1.5px solid var(--ln);background:var(--card);color:var(--tx);font:inherit;font-size:15px;font-weight:700}
 #tvw .tvch.on{background:var(--tx);color:var(--card);border-color:var(--tx)}
 #tvw .tvchs{display:flex;gap:8px;margin-top:4px}
+#tvw .tvsu{flex-wrap:wrap}
+#tvw .tvsu .tvch{flex:1 1 30%;min-width:96px}
 #tvw .tvh{display:flex;align-items:center;gap:10px;font-size:20px;margin:2px 0 12px}
 #tvw .tvsp{width:18px;height:18px;border-radius:50%;border:3px solid var(--ln);border-top-color:#39ade3;animation:tvsp 1s linear infinite}
 @keyframes tvsp{to{transform:rotate(360deg)}}
@@ -1872,7 +1874,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v185';
+const APPV='v186';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3792,7 +3794,11 @@ async function anaView(){
   if(AV.go==='cat'){AV.go='';AV.q='';AV.ed={};return avCatLoad()}
   avDraw()}
 function navGo(id){navGo0(id);torreBg(id)}
-const TV={f:{factura:null,ine:[],pago:[],financiera:[]},m:[{medio:'Efectivo',monto:'',detalle:''}],v:{responsable:'ZAYURI CALDERON',financiera:'',origen:''},busy:false,ok:null};
+const TV={f:{factura:null,ine:[],pago:[],financiera:[]},m:[{medio:'Efectivo',monto:'',detalle:''}],v:{responsable:'',financiera:'',origen:'',sucursal:''},busy:false,ok:null};
+const TVSUC=[['lerma','Lerma'],['atlacomulco','Atlacomulco'],['santiago','Santiago'],['tenancingo','Tenancingo'],['almoloya','Almoloya'],['valle','Valle de Bravo']];
+function tvSucDef(){const a=ACC[ME]||'';return a==='aodes'?'valle':(TVSUC.some(x=>x[0]===a)?a:'')}
+function tvResp(k){if(k==='lerma')return 'ZAYURI CALDERON';const a=String(ME||''),w=a.split(' ');return(w.length>1&&tvSucDef()===k)?w[w.length-1].toUpperCase():''}
+function tvSuc(){return TVSUC.map(x=>'<button type="button" class="tvch'+(TV.v.sucursal===x[0]?' on':'')+'" data-su="'+x[0]+'">'+x[1]+'</button>').join('')}
 const TVO=['Tienda','Recomendado o referido','Facebook','WhatsApp','Google','Otro'];
 function tvView(){
   if(TVS){clearTimeout(TVS.tm);TVS=null}
@@ -3815,7 +3821,9 @@ function tvBuild(){
     document.getElementById('tvNew').onclick=()=>{if(TVS){clearTimeout(TVS.tm);TVS=null}tvBuild();tvHist();window.scrollTo(0,0)};
     return;
   }
-  b.innerHTML='<div class="sgc"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+tvSlot('factura','Factura (PDF)','Elegir',false,true)+tvSlot('ine','INE','Frente y vuelta',true)+'</div></div>'+
+  if(!TV.v.sucursal){TV.v.sucursal=tvSucDef();if(TV.v.sucursal&&!TV.v.responsable){TV.v.responsable=tvResp(TV.v.sucursal);TV._ra=TV.v.responsable}}
+  b.innerHTML='<div class="sgc" id="tvSuc"><label>Sucursal que tramita<div class="tvchs tvsu" id="tvSu">'+tvSuc()+'</div></label></div>'+
+  '<div class="sgc"><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+tvSlot('factura','Factura (PDF)','Elegir',false,true)+tvSlot('ine','INE','Frente y vuelta',true)+'</div></div>'+
   '<div class="sgc"><div class="sgg">'+tvInp('telefono','Teléfono','tel')+tvInp('correo','Correo','email')+tvInp('precio_real','Precio real','decimal')+tvInp('enganche_real','Enganche real','decimal')+
   '<label style="grid-column:1\x2F-1">Financiera<div class="tvchs" id="tvFin">'+tvFin()+'</div></label></div></div>'+
   '<details class="sgc sgdet"><summary>Más datos</summary><div style="margin-top:10px">'+
@@ -3834,6 +3842,9 @@ function tvBuild(){
       else TV.f[k]=fl[0];
       tvSt(k)}});
   ['telefono','correo','precio_real','enganche_real','uso','responsable','r1n','r1t','r2n','r2t'].forEach(id=>{const el=document.getElementById('tv_'+id);if(el)el.oninput=()=>{TV.v[id]=el.value;if(id==='enganche_real')tvSum()}});
+  document.getElementById('tvSu').onclick=e=>{const c=e.target.closest&&e.target.closest('[data-su]');if(!c)return;TV.v.sucursal=c.dataset.su;
+    if(!TV.v.responsable||TV.v.responsable===TV._ra){TV.v.responsable=tvResp(c.dataset.su);TV._ra=TV.v.responsable;const r=document.getElementById('tv_responsable');if(r)r.value=TV.v.responsable}
+    document.getElementById('tvSu').innerHTML=tvSuc();const er=document.getElementById('tvE');if(er)er.innerHTML=''};
   document.getElementById('tvFin').onclick=e=>{const c=e.target.closest&&e.target.closest('[data-fin]');if(!c)return;TV.v.financiera=TV.v.financiera===c.dataset.fin?'':c.dataset.fin;document.getElementById('tvFin').innerHTML=tvFin()};
   document.getElementById('tv_origen').onchange=e=>{TV.v.origen=e.target.value};
   document.getElementById('tvMa').onclick=()=>{TV.m.push({medio:'',monto:'',detalle:''});tvMed()};
@@ -3858,7 +3869,7 @@ function tvSum(){
 }
 function tvDatos(){
   const v=TV.v;
-  return {telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',
+  return {telefono:v.telefono||'',correo:v.correo||'',precio_real:v.precio_real||'',enganche_real:v.enganche_real||'',financiera:v.financiera||'',origen:v.origen||'',uso:v.uso||'',responsable:v.responsable||'',sucursal:v.sucursal||'',
     medios:TV.m.filter(x=>String(x.monto||'').trim()).map(x=>({medio:x.medio,monto:x.monto,detalle:x.detalle})),referidos:[{nombre:v.r1n||'',telefono:v.r1t||''},{nombre:v.r2n||'',telefono:v.r2t||''}]};
 }
 function tvKw(a){
@@ -3910,6 +3921,7 @@ async function tvArmar(){
 async function tvSend(){
   if(TV.busy)return;
   const er=document.getElementById('tvE'),bt=document.getElementById('tvGo');
+  if(!TV.v.sucursal){er.innerHTML='<div class="sgerr">Elige la sucursal que tramita la venta</div>';const su=document.getElementById('tvSuc');if(su)su.scrollIntoView({block:'center'});return}
   if(!TV.f.factura){er.innerHTML='<div class="sgerr">Sube la factura (PDF)</div>';return}
   TV.busy=true;bt.disabled=true;bt.textContent='Subiendo…';er.innerHTML='';
   try{
@@ -3921,7 +3933,7 @@ async function tvSend(){
     if(TV.v.financiera&&TV.v.financiera!=='CONTADO')for(const f of TV.f.financiera)await add('financiera',f);
     const r=await api('seg_venta_save',{datos:tvDatos(),files:files});
     if(r&&r.ok){
-      TV.f={factura:null,ine:[],pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:TV.v.responsable||'ZAYURI CALDERON',financiera:'',origen:''};
+      TV.f={factura:null,ine:[],pago:[],financiera:[]};TV.m=[{medio:'Efectivo',monto:'',detalle:''}];TV.v={responsable:'',financiera:'',origen:'',sucursal:''};
       TVS={id:r.id,faltan:r.faltan||[],st:'armando',avisos:[],msg:'',tm:0,view:1};
       tvBuild();tvHist();tvOkDraw();tvArmar();
       window.scrollTo(0,0);const mm=document.getElementById('menu');if(mm)mm.scrollTop=0;
