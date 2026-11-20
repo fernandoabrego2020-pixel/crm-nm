@@ -1341,7 +1341,7 @@ function needFull(cb,why,free){
   api('login',{name:ME,pin:''}).then(r=>{
     if(PM!==pm0)return;
     if(r&&r.err==='setpin'&&NIPFORCE){NIPFORCE=0;PM.mode='create';pmPad();return}
-    if(r&&r.err==='setpin'){m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">\u00bfQuieres proteger tu cuenta con un NIP?<small>Con NIP nadie m\u00e1s puede mover ni borrar tus clientes si entra a tu cuenta. Solo lo creas una vez por celular.</small></div><div class="pmq"><button class="y" data-pk="yes">S\u00ed, crear mi NIP</button><button data-pk="no">No</button></div></div>';return}
+    if(r&&r.err==='setpin'){PM.mode='create';pmPad();return}
     if(r&&r.err==='pin'){lset(hk,'1');if(r.pl){lset('crm-pl-'+ME,String(r.pl));PM.n=r.pl}}
     pmPad();
   }).catch(()=>{if(PM===pm0)m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">Sin conexi\u00f3n<small>Revisa tu internet e intenta otra vez.</small></div></div>'});
@@ -1875,7 +1875,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v187';
+const APPV='v188';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3261,7 +3261,7 @@ window.__nbadge=n=>{window.__nb=n||0;const b=document.querySelector('#nav .bdg')
 function torreBg(id){
   if(id==='conv'||id==='quien'||id==='make'||id==='onoff')return;
   const role=ROLE||roleOf(ME);
-  if(!(NAVS[navKey(role)]||[]).some(x=>x[0]==='quien'))return;
+  if(!(NAVS[navKey(role)]||[]).some(x=>x[0]==='quien')||!document.querySelector('#nav .bdg'))return;
   if(window.__torreOn&&(document.getElementById('tbg')||document.getElementById('t3')))return;
   let b=document.getElementById('tbg');
   if(!b){b=document.createElement('div');b.id='tbg';b.style.display='none';document.body.appendChild(b)}
@@ -4612,7 +4612,7 @@ const MAPM=(function(){
   return {show:show,hide:hide,refresh:refresh,saved:saved,filled:filled,trace:trace,on:()=>shown};
 })();
 boot();
-function chkVer(){try{if(REG.on)return;const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;fetch(location.pathname+'?c='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const APPV='(v\d+)'/);if(m&&m[1]!==APPV&&!sessionStorage.getItem('crm-rl'+m[1])){sessionStorage.setItem('crm-rl'+m[1],'1');location.replace(location.pathname+'?v='+m[1].slice(1)+location.hash)}}).catch(()=>{})}catch(e){}}
+function chkVer(){try{if(REG.on||['tvent','seg','asis'].indexOf(CUR)>=0||document.getElementById('p2chat')||document.getElementById('asc')||sheet)return;{const pm=document.getElementById('pm');if(pm&&pm.style.display==='flex')return}const a=document.activeElement;if(a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName))return;fetch(location.pathname+'?c='+Date.now(),{cache:'no-store'}).then(r=>r.text()).then(t=>{const m=t.match(/const APPV='(v\d+)'/);if(m&&m[1]!==APPV&&!sessionStorage.getItem('crm-rl'+m[1])){sessionStorage.setItem('crm-rl'+m[1],'1');location.replace(location.pathname+'?v='+m[1].slice(1)+location.hash)}}).catch(()=>{})}catch(e){}}
 setTimeout(chkVer,15000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(chkVer,500)});
 setTimeout(p2LabRun,6000);setInterval(p2LabRun,90e3);
 setInterval(()=>{if(sheet||!ready)return;const a=document.activeElement;if(a&&(a.tagName==='INPUT'||a.tagName==='TEXTAREA'))return;render()},60e3);
