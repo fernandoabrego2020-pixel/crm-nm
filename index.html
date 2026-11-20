@@ -1259,6 +1259,9 @@ body.hasnav .page{padding-bottom:calc(90px + var(--xb,0px))}
 .asw .asl{display:flex;flex-direction:column;gap:8px}
 .asw .asl div,.asw .asl a{display:flex;justify-content:space-between;gap:10px;padding:12px 14px;border:1.5px solid var(--ln);border-radius:12px;background:var(--card);color:var(--tx);text-decoration:none;font-size:15px}
 .asw .asl b{font-weight:700}
+.asw .asl div a{display:inline;padding:0;border:0;background:none;font-size:18px;margin-left:8px}
+#asc .asr button.asq{display:block;width:100%;margin:0}
+#asc .asr .asqs{display:flex;flex-direction:column;gap:8px;width:min(320px,86vw);max-height:60vh;overflow:auto}
 .asw .asn{color:var(--mu);font-size:14px;margin:8px 2px}
 </style>
 </head>
@@ -1857,7 +1860,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v192';
+const APPV='v193';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -4114,8 +4117,22 @@ function asHM(h){return String(h||'').slice(0,5)}
 function asStop(){clearInterval(AS.tm);AS.tm=0;if(AS.st){try{AS.st.getTracks().forEach(t=>t.stop())}catch(e){}AS.st=null}}
 function asClose(){asStop();AS.busy=0;const o=document.getElementById('asc');if(o)o.remove()}
 function asisGo(){navGo('asis');if(!ADMIN)asisCam()}
-function asisCam(){
-  if(AS.busy)return;asClose();
+function asWho(){
+  asClose();
+  const L=['Fer'].concat(AG.filter(n=>n!=='Fer'));
+  asBox('<button type="button" class="asx" data-as="x" aria-label="Cancelar">✕</button><div class="asr"><b style="font-size:26px">¿Quién checa?</b><div class="asqs">'+L.map(n=>'<button type="button" class="asq" data-as="who" data-n="'+esc(n)+'">'+esc(n)+'</button>').join('')+'</div></div>');
+}
+function asGeo(){
+  AS.geo=undefined;
+  AS.gp=new Promise(res=>{
+    if(!navigator.geolocation){AS.geo=null;res(null);return}
+    navigator.geolocation.getCurrentPosition(p=>{AS.geo={la:+p.coords.latitude.toFixed(6),lo:+p.coords.longitude.toFixed(6),pr:Math.round(p.coords.accuracy||0)};res(AS.geo)},()=>{AS.geo=null;res(null)},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+  });
+}
+function asisCam(who){
+  if(AS.busy)return;
+  if(who===undefined&&(ADMIN||FERPH())){asWho();return}
+  AS.who=who||'';asClose();asGeo();
   const o=document.createElement('div');o.id='asc';
   o.innerHTML='<video id="asv" playsinline muted autoplay></video><div id="asm" class="t">Abriendo cámara…</div><button type="button" class="asx" data-as="x" aria-label="Cancelar">✕</button><button type="button" class="asb" data-as="shot" aria-label="Tomar foto"></button>';
   document.body.appendChild(o);
@@ -4130,7 +4147,7 @@ function asisCam(){
 }
 function asFallback(){
   asStop();const o=document.getElementById('asc');if(!o)return;
-  o.innerHTML='<button type="button" class="asx" data-as="x" aria-label="Cancelar">✕</button><div class="asr"><b>Toma tu foto</b><small>No pude abrir la cámara directa</small><input type="file" id="asf" accept="image/*" capture="user" hidden><button type="button" class="y" data-as="file">Abrir cámara</button></div>';
+  o.innerHTML='<button type="button" class="asx" data-as="x" aria-label="Cancelar">✕</button><div class="asr"><b style="font-size:26px">Necesito la cámara</b><small>Permite el acceso a la cámara en el navegador y vuelve a intentar. No se pueden subir fotos de la galería.</small><button type="button" class="y" data-as="go">Reintentar</button></div>';
 }
 function asDraw(src,w,h){
   const k=Math.min(1,480/Math.max(w,h)),c=document.createElement('canvas');c.width=Math.round(w*k);c.height=Math.round(h*k);
@@ -4140,17 +4157,13 @@ function asisShot(){
   const v=document.getElementById('asv');if(!v||!v.videoWidth){return}
   const img=asDraw(v,v.videoWidth,v.videoHeight);asStop();asisSend(img);
 }
-function asFile(f){
-  if(!f)return;const u=URL.createObjectURL(f),im=new Image();
-  im.onload=()=>{const d=asDraw(im,im.naturalWidth,im.naturalHeight);URL.revokeObjectURL(u);asisSend(d)};
-  im.onerror=()=>{URL.revokeObjectURL(u);asClose();toast('No pude leer esa foto',1)};im.src=u;
-}
 function asBox(h){let o=document.getElementById('asc');if(!o){o=document.createElement('div');o.id='asc';document.body.appendChild(o)}o.innerHTML=h}
 async function asisSend(img){
   AS.busy=1;asBox('<div id="asm" class="t">Guardando…</div>');
-  const rec={cid:Math.random().toString(36).slice(2,10),img:img,tcms:Date.now()};
+  const rec={cid:Math.random().toString(36).slice(2,10),img:img,tcms:Date.now(),q:AS.who||''};
+  try{const g=await Promise.race([AS.gp||Promise.resolve(null),new Promise(z=>setTimeout(()=>z(null),5000))]);if(g){rec.la=g.la;rec.lo=g.lo;rec.pr=g.pr}}catch(e){}
   let r=null;
-  try{r=await api('asis',{img:rec.img,cid:rec.cid,dev:devId()})}catch(e){r=null}
+  try{r=await api('asis',{img:rec.img,cid:rec.cid,dev:devId(),q:rec.q,la:rec.la,lo:rec.lo,pr:rec.pr})}catch(e){r=null}
   if(r&&r.ok){asOk(r);return}
   if(r&&r.err==='auth'){asClose();showLogin('Tu sesión venció, entra otra vez.');const q=asQGet();q.push(rec);asQSet(q);return}
   const q=asQGet();q.push(rec);asQSet(q);
@@ -4158,8 +4171,8 @@ async function asisSend(img){
   asisRows();
 }
 function asOk(r){
-  AS.mark=r;const tipo=r.tipo==='salida'?'Salida':'Entrada';
-  asBox('<div class="asr"><b>✓ '+tipo+' '+esc(asHM(r.hora))+'</b><small>Quedó guardada con tu foto</small><button type="button" class="y" data-as="x">Listo</button><button type="button" data-as="undo">Me equivoqué</button></div>');
+  AS.mark=r;
+  asBox('<div class="asr"><b>✓ '+esc(asHM(r.hora))+'</b><small>'+(r.loc?'Guardada con tu foto y ubicación':'Guardada con tu foto (sin ubicación: activa el permiso)')+'</small><button type="button" class="y" data-as="x">Listo</button><button type="button" data-as="undo">Me equivoqué</button></div>');
   clearTimeout(AS.ct);AS.ct=setTimeout(()=>{if(document.getElementById('asc'))asClose()},4000);
   asisRows();
 }
@@ -4171,7 +4184,7 @@ async function asisUndo(){
 async function asisFlush(){
   if(!ME||!ASIS)return;let q=asQGet();if(!q.length)return;
   const rest=[];
-  for(const rec of q){let r=null;try{r=await api('asis',{img:rec.img,cid:rec.cid,dev:devId(),late:1,tcms:rec.tcms})}catch(e){r=null}if(!(r&&(r.ok||r.err==='foto')))rest.push(rec)}
+  for(const rec of q){let r=null;try{r=await api('asis',{img:rec.img,cid:rec.cid,dev:devId(),late:1,tcms:rec.tcms,q:rec.q,la:rec.la,lo:rec.lo,pr:rec.pr})}catch(e){r=null}if(!(r&&(r.ok||r.err==='foto')))rest.push(rec)}
   asQSet(rest);
   if(rest.length<q.length)asisRows();
 }
@@ -4184,16 +4197,15 @@ async function asisRows(){
   if(!r||!r.ok){b2.innerHTML=h+'<div class="asn">No pude cargar las marcas de hoy.</div>';return}
   const L=r.marks||[],hoy=r.hoy||'';
   const mine=L.filter(x=>(x.d||hoy)===hoy);const last=(r.adm?mine.filter(x=>x.c===ME):mine).slice(-1)[0];
-  const go=document.getElementById('asgo');if(go)go.textContent=last&&last.t==='entrada'?'Marcar salida':'Marcar entrada';
-  if(!L.length){b2.innerHTML=h+'<div class="asn">Todavía no hay marcas.</div>';return}
+    if(!L.length){b2.innerHTML=h+'<div class="asn">Todavía no hay marcas.</div>';return}
   const days=[...new Set(L.map(x=>x.d||hoy))].sort().reverse();
   const MS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
   const dl=d=>d===hoy?'Hoy':d.slice(8)+' '+MS[(+d.slice(5,7))-1];
-  b2.innerHTML=h+days.map(d=>'<div class="asn" style="margin-top:12px"><b>'+dl(d)+'</b></div><div class="asl">'+L.filter(x=>(x.d||hoy)===d).sort((a,b)=>String(a.h).localeCompare(String(b.h))).map(x=>{const tx=(r.adm?'<span>'+esc(DN(x.c))+'</span>':'')+'<b>'+(x.t==='salida'?'Salida':'Entrada')+'</b><span>'+esc(asHM(x.h))+'</span>';return r.adm&&x.f?'<a target="_blank" rel="noopener" href="'+esc(x.f)+'">'+tx+'</a>':'<div>'+tx+'</div>'}).join('')+'</div>').join('');
+  b2.innerHTML=h+days.map(d=>'<div class="asn" style="margin-top:12px"><b>'+dl(d)+'</b></div><div class="asl">'+L.filter(x=>(x.d||hoy)===d).sort((a,b)=>String(a.h).localeCompare(String(b.h))).map(x=>{const lk=r.adm?((x.f?'<a target="_blank" rel="noopener" href="'+esc(x.f)+'">📷</a>':'')+(x.la?'<a target="_blank" rel="noopener" href="https://maps.google.com/?q='+x.la+','+x.lo+'">📍</a>':'<small style="opacity:.5"> sin ubic.</small>')):(x.la?' 📍':'');return '<div><span>'+(r.adm?'<b>'+esc(DN(x.c))+'</b>':'<b>Checaste</b>')+'</span><span>'+esc(asHM(x.h))+lk+'</span></div>'}).join('')+'</div>').join('');
 }
 function asisView(){
   const m=document.getElementById('menu');
-  m.innerHTML='<div class="in asw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b>Asistencia</b></div><button type="button" class="asgo" id="asgo" data-as="go">Marcar con foto</button><div id="asr"><div class="asn">Cargando…</div></div></div>';
+  m.innerHTML='<div class="in asw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b>Asistencia</b></div><button type="button" class="asgo" id="asgo" data-as="go">Checar asistencia</button><div id="asr"><div class="asn">Cargando…</div></div></div>';
   m.style.display='block';asisFlush().then(asisRows);asisRows();
 }
 document.addEventListener('click',e=>{
@@ -4201,9 +4213,9 @@ document.addEventListener('click',e=>{
   const a=b.dataset.as;
   if(a==='x'){clearTimeout(AS.ct);return asClose()}
   if(a==='shot'){return asisShot()}
-  if(a==='go'){return asisCam()}
+  if(a==='go'){return asisCam(AS.who!==undefined&&AS.who!==''?AS.who:undefined)}
+  if(a==='who'){return asisCam(b.dataset.n||'')}
   if(a==='undo'){return asisUndo()}
-  if(a==='file'){const f=document.getElementById('asf');if(f){f.onchange=()=>asFile(f.files&&f.files[0]);f.click()}return}
 });
 window.addEventListener('online',()=>{try{asisFlush()}catch(e){}});
 
