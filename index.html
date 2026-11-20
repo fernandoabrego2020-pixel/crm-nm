@@ -1857,7 +1857,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v191';
+const APPV='v192';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3035,8 +3035,9 @@ function sgDl(b64,name,mime){
 function sgDone(r){
   const o=document.getElementById('sgR'),f=document.getElementById('sgF'),qb=document.getElementById('sgQ');
   f.style.display='none';qb.style.display='none';
-  o.innerHTML=`<div class="sgc sgok"><h4>Póliza emitida</h4><div class="sgs"><b>${esc(r.poliza)}</b><br>${sgMx(r.total)}<br>${r.correo?'Enviada al correo ✓':'<span class="bad">No se envió al correo: descárgala.</span>'}</div><button class="sgbtn" id="sgDl" type="button">Descargar PDF</button><button class="sgbtn sec" id="sgNew" type="button">Nueva póliza</button></div>`;
+  o.innerHTML=`<div class="sgc sgok"><h4>Póliza emitida</h4><div class="sgs"><b>${esc(r.poliza)}</b><br>${sgMx(r.total)}<br>${r.correo?'Enviada al correo ✓':'<span class="bad">No se envió al correo: descárgala.</span>'}</div><button class="sgbtn" id="sgDl" type="button">Descargar PDF</button><button class="sgbtn sec" id="sgDx" type="button">Descargar Excel</button><button class="sgbtn sec" id="sgNew" type="button">Nueva póliza</button></div>`;
   document.getElementById('sgDl').onclick=()=>sgDl(r.pdf,r.nombre,'application/pdf');
+  document.getElementById('sgDx').onclick=async e=>{const b=e.currentTarget,t=b.textContent;b.disabled=true;b.textContent='…';let g;try{g=await api('seg_get',{poliza:r.poliza,xlsx:1})}catch(x){g=null}b.disabled=false;b.textContent=t;if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargar el Excel.')};
   document.getElementById('sgNew').onclick=()=>{o.innerHTML='';SG.q={anio:'',marca:'',tipo:'',version:'',uso:'Particular',valorCap:''};SG.pk=1;SG.quote=null;sgBuild()};
   sgHist();
   try{o.scrollIntoView({block:'start',behavior:'smooth'})}catch(e){}
@@ -3049,8 +3050,8 @@ async function sgHist(){
   const adm=ME==='Fer';
   const cfg=adm&&false?`<div class="sgcfg"><small>Último consecutivo real usado (la siguiente póliza será el número siguiente)</small><div style="display:flex;gap:8px"><input id="sgLast" inputmode="numeric" placeholder="Ej. 245"><button class="sgbtn sec" id="sgSave" type="button">Guardar</button></div><div id="sgCfgM" class="note"></div></div>`:'';
   h.className='';
-  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-pol="${esc(x.poliza)}" type="button">PDF</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
-  h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.pol})}catch(e){g=null}bt.disabled=false;bt.textContent='PDF';if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
+  h.innerHTML=(r.rows.length?r.rows.map(x=>`<div class="sgh"><div><b>${esc(x.cliente)}</b></div><div class="sgr"><b>${sgMx(x.total)}</b><button class="sgmini" data-pol="${esc(x.poliza)}" type="button">PDF</button><button class="sgmini" data-pol="${esc(x.poliza)}" data-x="1" type="button">Excel</button></div></div>`).join(''):'<div class="note">Todavía no hay pólizas emitidas.</div>')+cfg;
+  h.querySelectorAll('.sgmini').forEach(bt=>{bt.onclick=async()=>{const lb=bt.textContent;bt.disabled=true;bt.textContent='…';let g;try{g=await api('seg_get',{poliza:bt.dataset.pol,xlsx:bt.dataset.x?1:0})}catch(e){g=null}bt.disabled=false;bt.textContent=lb;if(g&&g.ok)sgDl(g.data,g.nombre,g.mime);else alert('No pude descargarla.')}});
   h.querySelectorAll('.sgdel').forEach(bt=>{bt.onclick=async()=>{if(!confirm('\u00bfBorrar esta p\u00f3liza? Se quita de la lista y los archivos van a la papelera. El correo que ya se mand\u00f3 no se puede recuperar.'))return;bt.disabled=true;bt.textContent='\u2026';let g;try{g=await api('seg_del',{poliza:bt.dataset.pdel})}catch(e){g=null}if(g&&g.ok)sgHist();else{bt.disabled=false;bt.textContent='Borrar';alert('No pude borrarla.')}}});
   const sv=document.getElementById('sgSave');
   if(sv)sv.onclick=async()=>{const v=sgV('sgLast').replace(/[^0-9]/g,'');if(!v)return;let g;try{g=await api('seg_cfg',{last:v})}catch(e){g=null}document.getElementById('sgCfgM').textContent=g&&g.ok?'Listo. La siguiente póliza será '+g.next:'No se pudo guardar.'};
