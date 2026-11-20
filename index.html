@@ -1289,13 +1289,13 @@ const AG=['Fer','Lerma Zayuri','Lerma Mario','Lerma Leo','Santiago Katy','Santia
 const ACC={Fer:'fer','Lerma Zayuri':'lerma','Lerma Mario':'lerma','Lerma Leo':'lerma','Santiago Katy':'santiago','Santiago Maggy':'santiago','Valle Andrea':'valle','Valle Carlos':'valle','Valle Aodes Karla':'aodes','Valle Aodes Armando':'aodes',Atlacomulco:'atlacomulco',Almoloya:'almoloya','Tenancingo Alexis':'tenancingo','Tenancingo Toño':'tenancingo'};
 const REN={Zayuri:'Lerma Zayuri',Lerma:'Lerma Zayuri',Mario:'Lerma Mario',Santiago:'Santiago Katy',Tenancingo:'Tenancingo Alexis','Valle de Bravo':'Valle Andrea',Aodes:'Valle Aodes Karla',Maggy:'Santiago Maggy'};
 let SP='',LMODE='enter',LFIRST='',UNDO_ADD=false,FULL=false,FULLS=true;
-const PROT=n=>n==='Administrativo';
+const PROT=n=>false;
 const NEEDPIN=new Set(['mv','rm','back']);const FREEA=new Set(['nxw','nxv','locmap']);const free0=f=>f();let LASTAG={};
-function isFull(){try{const b=TOK.split('.')[0].replace(/-/g,'+').replace(/_/g,'/');return FULLS&&atob(b+'='.repeat((4-b.length%4)%4)).split('|')[2]==='f'}catch(e){return false}}
+function isFull(){return true}
 function lgTitle(m){const c=document.getElementById('ct');if(!c)return;c.innerHTML=m==='create'?(LFORGOT?'Crea un NIP nuevo<small>Elige 4 a 8 n\u00fameros. El due\u00f1o de la cuenta recibir\u00e1 una alerta durante dos d\u00edas.</small>':'Crear NIP<small>Elige 4 a 8 números. Úsalo siempre que entres.</small>'):m==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':''}
 async function lgProbe(){try{const r=await api('login',{name:LU,pin:''});if(r.err==='setpin'&&document.getElementById('ct')&&LMODE==='enter'){LMODE='create';lgTitle('create')}if(r.err==='pin'&&r.pl){LPL=r.pl;lset('crm-pl-'+LU,String(r.pl))}}catch(e){}}
 async function viewLogin(n){
-  try{const r=await api('login',{name:n,view:1});if(r.err){LU=n;showLogin(r.err==='bloq'?'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.':'Entra con tu NIP');return}
+  try{const r=await api('login',{name:n,view:1});if(r.err){LU=n;showLogin(r.err==='bloq'?'Tu cuenta est\u00e1 bloqueada. Habla con Fer para desbloquearla.':'No se pudo entrar. Elige tu cuenta otra vez.');return}
     TOK=r.token;ME=r.name;LU=ME;lset('crm-tok',TOK);lset('crm-user',ME);saveTok(ME,TOK);
     const x=await pull();if(x==='err'){offScreen();return}if(x==='auth'){showLogin('No se pudo cargar los datos');return}
     finishBoot();
@@ -1327,25 +1327,7 @@ function nipBar(){
 function nipBlocked(why){NIPMSG=NONIP?'Esto necesita NIP: eliminar, mover o cambiar precios':'No pude '+(why||'hacer ese cambio')+' sin NIP';clearTimeout(NIPTM);NIPTM=setTimeout(()=>{NIPMSG='';nipBar()},7000);nipBar()}
 document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('[data-nip]');if(!b)return;nipNoSet(0);NIPFORCE=1;NIPMSG='';nipBar();needFull(()=>{nipBar();toast('Listo, ya puedes hacer cambios',1)},'crear tu NIP')});
 setInterval(nipBar,3000);
-function needFull(cb,why,free){
-  if(isFull()){FULL=true;return cb()}
-  if(free&&NONIP){NIPNEXT='';return cb()}
-  why=why||NIPNEXT;NIPNEXT='';
-  if(nipNo()&&!NIPFORCE){nipBlocked(why);return}
-  let m=document.getElementById('pm');
-  if(!m){m=document.createElement('div');m.id='pm';document.body.appendChild(m)}
-  PM={cb:cb,mode:'enter',first:'',why:why};
-  const hk='crm-hp-'+ME,pm0=PM;
-  if(lget(hk)==='1'){m.style.display='flex';pmPad();api('login',{name:ME,pin:''}).then(r=>{if(r&&r.err==='pin'&&r.pl){lset('crm-pl-'+ME,String(r.pl));if(PM===pm0)PM.n=r.pl}}).catch(()=>{});return}
-  m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">Un momento\u2026</div></div>';m.style.display='flex';
-  api('login',{name:ME,pin:''}).then(r=>{
-    if(PM!==pm0)return;
-    if(r&&r.err==='setpin'&&NIPFORCE){NIPFORCE=0;PM.mode='create';pmPad();return}
-    if(r&&r.err==='setpin'){PM.mode='create';pmPad();return}
-    if(r&&r.err==='pin'){lset(hk,'1');if(r.pl){lset('crm-pl-'+ME,String(r.pl));PM.n=r.pl}}
-    pmPad();
-  }).catch(()=>{if(PM===pm0)m.innerHTML='<button class="x" data-pk="x">Cancelar</button><div class="lg2"><div class="ct">Sin conexi\u00f3n<small>Revisa tu internet e intenta otra vez.</small></div></div>'});
-}
+function needFull(cb){FULL=true;return cb()}
 function askFull(){return new Promise(res=>{needFull(()=>res(true));if(PM)PM.cancel=()=>res(false)})}
 function pmTitle(){const t=document.getElementById('pmt');if(!t||!PM)return;if(PM.forgot&&PM.mode==='create'){t.innerHTML='Crea un NIP nuevo<small>Elige 4 a 8 n\u00fameros. El due\u00f1o de la cuenta recibir\u00e1 una alerta durante dos d\u00edas.</small>';return}t.innerHTML=PM.mode==='create'?'Crear NIP<small>Elige 4 a 8 números. Solo te lo pido para mover de cuenta, borrar o prender y apagar. Una vez por celular.</small>':PM.mode==='repeat'?'Repite tu NIP<small>Escríbelo otra vez para confirmar</small>':'Pon tu NIP<small>Para hacer cambios en prospectos y en el sistema. Se pide una vez por celular</small>'}
 function pmDraw(){const i=document.getElementById('pmv'),d=document.getElementById('pmd');if(!i||!d)return;const v=i.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,k)=>`<i class="${k<v?'f':''}"></i>`).join('')}
@@ -1875,7 +1857,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v190';
+const APPV='v191';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -2546,15 +2528,9 @@ function showLogin(msg){
   SP='';
   if(!LU&&FERPH()){LU='Fer';LR='vendedor';if(!msg){lset('crm-user','Fer');lset('crm-role','vendedor');viewLogin('Fer');return}}
   if(LU&&!LR)LR=roleOf(LU);
-  if(!LU){
-    LR='';
-    const t=portal();
-    el.innerHTML=`<div class="lg2">${LOGO}${msg?`<div class="lm">${esc(msg)}</div>`:''}<div class="pgw">${t}</div></div>`;
-  }else{
-    const n=pname(LU),ks=['1','2','3','4','5','6','7','8','9','del','0','go'].map(k=>`<button class="kk ${k==='go'?'ok':''}" data-k="${k}" aria-label="${k}">${k==='del'?'\u232B':k==='go'?'\u2713':k}</button>`).join('');
-    el.innerHTML=`<div class="lg2">${LOGO}<div class="lw">${FERPH()?(LU==='Fer'?'':'<button class="lb" data-r="fer" aria-label="Volver a Fer">\u2190</button>'):'<button class="lb" data-r="" aria-label="Atrás">\u2190</button>'}<div class="ln"><small>${esc(n[1]||(LU==='Fer'&&LR==='vendedor'?'Lerma':''))}</small>${esc(n[0])}</div></div><div class="ct" id="ct"></div><div class="dots" id="dots"></div><div class="lm" id="le">${esc(msg||'')}</div><input type="hidden" id="pin" value=""><div class="kp">${ks}</div>${NOFG(LU)?'<div class="pmn">Tu NIP de administrador solo se restablece desde la hoja de Cuentas.</div>':'<button class="pmf" data-fg="1">Olvid\u00e9 mi NIP</button>'}</div>`;
-    lgDraw();LMODE='enter';LFIRST='';LFORGOT=0;lgProbe();
-  }
+  if(LU&&!msg){viewLogin(LU);return}
+  LU='';LR='';
+  el.innerHTML=`<div class="lg2">${LOGO}${msg?`<div class="lm">${esc(msg)}</div>`:''}<div class="pgw">${portal()}</div></div>`;
   el.style.display='flex';
 }
 function lgDraw(){const pi=document.getElementById('pin'),d=document.getElementById('dots');if(!pi||!d)return;const v=pi.value.length,n=Math.max(4,v);d.innerHTML=Array.from({length:n},(_,i)=>`<i class="${i<v?'f':''}"></i>`).join('')}
