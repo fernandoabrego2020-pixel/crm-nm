@@ -1875,7 +1875,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v188';
+const APPV='v189';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -4131,7 +4131,7 @@ function asQSet(a){try{if(a.length)localStorage.setItem(asQK(),JSON.stringify(a.
 function asHM(h){return String(h||'').slice(0,5)}
 function asStop(){clearInterval(AS.tm);AS.tm=0;if(AS.st){try{AS.st.getTracks().forEach(t=>t.stop())}catch(e){}AS.st=null}}
 function asClose(){asStop();AS.busy=0;const o=document.getElementById('asc');if(o)o.remove()}
-function asisGo(){navGo('asis');asisCam()}
+function asisGo(){navGo('asis');if(!ADMIN)asisCam()}
 function asisCam(){
   if(AS.busy)return;asClose();
   const o=document.createElement('div');o.id='asc';
@@ -4195,16 +4195,19 @@ async function asisFlush(){
 }
 async function asisRows(){
   const box=document.getElementById('asr');if(!box)return;
-  let r=null;try{r=await api('asis_get')}catch(e){r=null}
+  let r=null;try{r=await api('asis_get',{dias:7})}catch(e){r=null}
   const b2=document.getElementById('asr');if(!b2)return;
   const q=asQGet();let h='';
   if(q.length)h+='<div class="asn">'+q.length+(q.length===1?' marca guardada en el teléfono, pendiente de mandar':' marcas guardadas en el teléfono, pendientes de mandar')+'</div>';
   if(!r||!r.ok){b2.innerHTML=h+'<div class="asn">No pude cargar las marcas de hoy.</div>';return}
-  const L=r.marks||[];
-  const last=L.filter(x=>r.adm||true).slice(-1)[0];
-  const go=document.getElementById('asgo');if(go&&!r.adm)go.textContent=last&&last.t==='entrada'?'Marcar salida':'Marcar entrada';
-  if(!L.length){b2.innerHTML=h+'<div class="asn">Hoy todavía no hay marcas.</div>';return}
-  b2.innerHTML=h+'<div class="asl">'+L.map(x=>{const tx=(r.adm?'<span>'+esc(DN(x.c))+'</span>':'')+'<b>'+(x.t==='salida'?'Salida':'Entrada')+'</b><span>'+esc(asHM(x.h))+'</span>';return r.adm&&x.f?'<a target="_blank" rel="noopener" href="'+esc(x.f)+'">'+tx+'</a>':'<div>'+tx+'</div>'}).join('')+'</div>';
+  const L=r.marks||[],hoy=r.hoy||'';
+  const mine=L.filter(x=>(x.d||hoy)===hoy);const last=(r.adm?mine.filter(x=>x.c===ME):mine).slice(-1)[0];
+  const go=document.getElementById('asgo');if(go)go.textContent=last&&last.t==='entrada'?'Marcar salida':'Marcar entrada';
+  if(!L.length){b2.innerHTML=h+'<div class="asn">Todavía no hay marcas.</div>';return}
+  const days=[...new Set(L.map(x=>x.d||hoy))].sort().reverse();
+  const MS=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const dl=d=>d===hoy?'Hoy':d.slice(8)+' '+MS[(+d.slice(5,7))-1];
+  b2.innerHTML=h+days.map(d=>'<div class="asn" style="margin-top:12px"><b>'+dl(d)+'</b></div><div class="asl">'+L.filter(x=>(x.d||hoy)===d).sort((a,b)=>String(a.h).localeCompare(String(b.h))).map(x=>{const tx=(r.adm?'<span>'+esc(DN(x.c))+'</span>':'')+'<b>'+(x.t==='salida'?'Salida':'Entrada')+'</b><span>'+esc(asHM(x.h))+'</span>';return r.adm&&x.f?'<a target="_blank" rel="noopener" href="'+esc(x.f)+'">'+tx+'</a>':'<div>'+tx+'</div>'}).join('')+'</div>').join('');
 }
 function asisView(){
   const m=document.getElementById('menu');
