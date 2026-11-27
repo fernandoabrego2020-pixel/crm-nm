@@ -1934,7 +1934,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v203';
+const APPV='v204';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -2200,6 +2200,7 @@ function p2Seen(l){if(RO||!l)return;const n=Date.now();let ch=0;if(!l.vis){l.vis
 function p2WaGo(l){
   if(!l||!l.tel)return;
   copyTel(l.tel);p2Seen(l);
+  if(!RO&&l.id&&String(l.id).indexOf('tmp')!==0){const n=Date.now(),w=l.wh||(l.wh=[]);if(!w.length||anDay(w[w.length-1])!==anDay(n)){w.push(n);if(w.length>120)w.splice(0,w.length-120);save()}}
   const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
   if(l.id&&String(l.id).indexOf('tmp')!==0)p2Re(l.id)
 }
@@ -4152,15 +4153,16 @@ function anDay(t){const d=new Date(t);return d.getFullYear()+'-'+String(d.getMon
 function anCalc(){
   const ag=S.ag,LL=S.leads.filter(l=>l.own===ag&&(!l.ph||l.fld)&&p2cat(l)!=='eli');
   const now=Date.now(),D=AN.d,days=[];
-  for(let i=D-1;i>=0;i--){const t=now-i*864e5;days.push({k:anDay(t),t:t,n:0,ap:0})}
+  for(let i=D-1;i>=0;i--){const t=now-i*864e5;days.push({k:anDay(t),t:t,n:0,ap:0,wa:0})}
   const ix={};days.forEach((d,i)=>ix[d.k]=i);
-  let tn=0,ta=0;
+  let tn=0,ta=0,tw=0;
   LL.forEach(l=>{
     const ph=p2Phase(l),ap=!!(ph&&P2GRP[ph[2]]==='visita'),i=ix[anDay(l.c||0)];
     if(ap)ta++;
+    (l.wh||[]).forEach(t=>{const j=ix[anDay(t)];if(j!==undefined){days[j].wa++;tw++}});
     if(i!==undefined){days[i].n++;if(ap)days[i].ap++}
   });
-  return{days:days,ta:ta,tot:LL.length}
+  return{days:days,ta:ta,tot:LL.length,tw:tw}
 }
 function anBars(days,f,col){
   const w=340,h=96,pb=18,n=days.length,bw=Math.max(4,Math.floor((w-8)/n)-3),mx=Math.max(1,...days.map(d=>d[f]));
@@ -4170,12 +4172,13 @@ function anBars(days,f,col){
     if(n<=16||i%5===0||i===n-1){const dt=new Date(d.t);g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(h-4)+'" text-anchor="middle" font-size="8.5" fill="currentColor" opacity=".6">'+dt.getDate()+'/'+(dt.getMonth()+1)+'</text>'}});
   return '<svg viewBox="0 0 '+w+' '+h+'" class="anchart" role="img">'+g+'</svg>'}
 function anView(){
-  const m=document.getElementById('menu'),A=anCalc(),tt=A.days.reduce((a,d)=>({n:a.n+d.n,ap:a.ap+d.ap}),{n:0,ap:0});
+  const m=document.getElementById('menu'),A=anCalc(),tt=A.days.reduce((a,d)=>({n:a.n+d.n,ap:a.ap+d.ap,wa:a.wa+d.wa}),{n:0,ap:0,wa:0});
   const P=[7,14,30,60].map(n=>'<button type="button" class="'+(AN.d===n?'on':'')+'" data-an="'+n+'">'+n+' d\u00edas</button>').join('');
   m.innerHTML='<div class="in anw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b>An\u00e1lisis</b></div>'
    +'<div class="anp">'+esc(DN(S.ag))+'<span>'+P+'</span></div>'
    +'<div class="anc"><h4>Leads nuevos por d\u00eda <small><b class="anbig">'+tt.n+'</b> en '+AN.d+' d\u00edas</small></h4>'+anBars(A.days,'n','var(--g1)')+'<div class="ann">Se cuenta el d\u00eda en que se registr\u00f3 cada lead. Total en la cuenta: '+A.tot+'.</div></div>'
    +'<div class="anc"><h4>Aprobados por d\u00eda <small><b class="anbig">'+tt.ap+'</b> en '+AN.d+' d\u00edas</small></h4>'+anBars(A.days,'ap','var(--g8)')+'<div class="ann">Aprobados = los que est\u00e1n en Buscar visita (hoy son '+A.ta+'). Cada uno se cuenta el d\u00eda en que se registr\u00f3 por primera vez.</div></div>'
+   +'<div class="anc"><h4>WhatsApp: leads a los que escribiste por d\u00eda <small><b class="anbig">'+tt.wa+'</b> en '+AN.d+' d\u00edas</small></h4>'+anBars(A.days,'wa','var(--g4)')+'<div class="ann">Cuenta cada lead una vez por d\u00eda, cuando picas su bot\u00f3n de WhatsApp. Se empieza a contar desde hoy.</div></div>'
    +'</div>';
   m.style.display='block';
 }
