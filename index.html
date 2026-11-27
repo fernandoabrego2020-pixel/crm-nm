@@ -732,6 +732,23 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 .lc .p2nm{font-size:16px;font-weight:700;color:var(--tx)}
 .lc .p2ub{font-size:15px;font-weight:500;color:var(--mu)}
 .lc .p2no{font-weight:400;font-style:italic;opacity:.6}
+.anw{padding-bottom:30px}
+.anp{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:15px;margin:2px 0 10px}
+.anp span{display:flex;gap:4px}.anp button{border:1.5px solid var(--ln);background:var(--card);color:var(--tx);border-radius:999px;padding:5px 10px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.anp button.on{background:var(--g1);border-color:var(--g1);color:#fff}
+.ang{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.ank{border:1.5px solid var(--ln);border-left:4px solid var(--k);background:var(--card);border-radius:12px;padding:9px 10px}
+.ank b{display:block;font-size:24px;line-height:1.1;color:var(--k)}.ank span{font-size:11.5px;color:var(--mu,#667681)}
+.anc{border:1.5px solid var(--ln);background:var(--card);border-radius:14px;padding:12px;margin-bottom:12px}
+.anc h4{margin:0 0 10px;font-size:14px;display:flex;justify-content:space-between;gap:8px}.anc h4 small{font-weight:600;color:var(--mu,#667681);font-size:12px}
+.anst{display:flex;height:26px;border-radius:8px;overflow:hidden;background:var(--ln)}.anst i{display:flex;align-items:center;justify-content:center;color:#fff;font-style:normal;font-size:12px;font-weight:700}
+.anlg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:9px;font-size:12.5px}.anlg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.anr{display:grid;grid-template-columns:minmax(0,1.7fr) 2fr 26px;gap:8px;align-items:center;font-size:13px;margin-bottom:7px}
+.anr span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.anr div{height:12px;border-radius:6px;background:var(--ln);overflow:hidden}.anr div i{display:block;height:100%;border-radius:6px}.anr b{text-align:right}
+.anchart{width:100%;height:auto;display:block;color:var(--tx)}
+.ant{width:100%;border-collapse:collapse;font-size:12.5px}.ant th,.ant td{padding:6px 3px;text-align:center;border-bottom:1px solid var(--ln)}.ant th:first-child,.ant td:first-child{text-align:left}.ant th{font-size:11px;color:var(--mu,#667681)}
+.ann{font-size:12px;color:var(--mu,#667681);margin-top:8px}
+.lc .p2sg{font-style:normal;font-size:11px;font-weight:700;line-height:1;color:#fff;background:var(--g8);border-radius:999px;padding:3px 8px;margin-left:8px;vertical-align:2px;white-space:nowrap}
 .lc .p2nw{font-style:normal;font-size:11px;font-weight:700;line-height:1;color:#fff;background:var(--g1);border-radius:999px;padding:3px 8px;margin-left:8px;vertical-align:2px;letter-spacing:.02em}
 .p2t .p2c span.p2nb,.p2t .p2c.on span.p2nb{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--g1);border-radius:999px;padding:2px 7px;margin-left:5px;line-height:1.3}
 .p2lp{font-size:12px;color:var(--mu);margin:-4px 2px 10px}
@@ -904,6 +921,7 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 #mdock #msave{order:-1}
 .lc .lt b{font-size:16px;line-height:21px}
 .lc .p2nw{font-size:10px;padding:2px 7px}
+.lc .p2sg{font-size:10px;padding:2px 7px}
 
 #menu.pfon{padding:0;--bg:#e9ebee;background:#e9ebee;overflow-x:hidden}
 .pf{position:relative;display:flex;flex-direction:column;min-height:100%;max-width:560px;margin:0 auto;padding:calc(8px + env(safe-area-inset-top,0px)) 6px 8px;background:repeating-linear-gradient(135deg,#f6f7f9 0 44px,#e1e4e8 44px 88px);color:#18202b}
@@ -1121,6 +1139,7 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .lc .lt b{font-size:12.5px;line-height:16px}
 .lc .lt b.no{font-size:12px}
 .lc .p2nw{font-size:9px;padding:2px 6px;margin-left:6px}
+.lc .p2sg{font-size:9px;padding:2px 6px;margin-left:6px}
 .pfm img.pfp{height:100%;max-height:none;top:0;bottom:auto;object-fit:contain;object-position:center;background:#fff}
 .pfhero img.pfp{object-fit:contain;background:#fff}
 #p2tl .tlq{width:100%;box-sizing:border-box;border:1px solid var(--ln);background:var(--bg);color:var(--tx);border-radius:12px;padding:10px 12px;font-size:15px;margin:2px 0 6px;font-family:inherit}
@@ -1539,6 +1558,9 @@ const p2cat=l=>l.cat==='imp'?'imp':l.cat==='bas'?'bas':l.cat==='ven'?'ven':l.cat
 const p2real=l=>{const n=String(l.name||'').trim();return n&&!/^[\d\s+()-]{6,}$/.test(n)&&!/^sin nombre$/i.test(n)?n:''};
 const p2Title=l=>{const i=String(l.idf||'').trim();if(i)return i;const n=p2real(l);if(n)return n;const m=String(l.moto||'').trim().replace(/^sin moto$/i,'');if(m)return m;return fmt(l.tel||'')||'Sin datos'};
 const NEWBASE=1794426417435,LABV=2;
+const p2SgT=a=>a<36e5?Math.max(1,Math.floor(a/6e4))+' min':Math.floor(a/36e5)+' h';
+const p2Sg=l=>{const a=Date.now()-(l.seg||0);return(!l.seg||a>432e5||a<-6e4)?'':'<i class="p2sg" data-t="'+l.seg+'">hace '+p2SgT(a)+'</i>'};
+setInterval(()=>{document.querySelectorAll('.p2sg').forEach(e=>{const a=Date.now()-(+e.dataset.t||0);if(a>432e5||a<-6e4)e.remove();else e.textContent='hace '+p2SgT(a)})},20000);
 const p2New=l=>!l.vis&&(!l.ph||l.fld)&&(l.c||0)>NEWBASE&&p2cat(l)!=='eli';
 function p2Hash(x){let h=5381;x=String(x);for(let i=0;i<x.length;i++)h=((h<<5)+h+x.charCodeAt(i))|0;return (h>>>0).toString(36)}
 function p2Mias(l){const a=[];if(l.ctxu&&l.ctxu!==l.rs)a.push(l.ctxu);if(l.note)a.push(l.note);(l.ctx||[]).filter(e=>e.x&&!e.auto).slice(-5).forEach(e=>{if(e.x!==l.ctxu&&e.x!==l.rs)a.push(e.x)});return a.map(x=>String(x).replace(/\s+/g,' ').trim()).filter(Boolean).slice(-6)}
@@ -1645,7 +1667,7 @@ function p2Card(l,c){
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
   const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA</button>'+chip+'</div>':'')+'</div>':'';
-  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+((P2.q||P2.f)&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span>'+(op?'<small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">\u25b4</i></small>':'')+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
+  return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+((P2.q||P2.f)&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+p2Sg(l)+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span>'+(op?'<small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">\u25b4</i></small>':'')+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l)))+D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
   const b=document.getElementById('p2b');if(!b)return;
@@ -1905,7 +1927,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v197';
+const APPV='v198';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -2167,59 +2189,15 @@ function p2TlPersist(items,msg){
   const prev=P2.tools;P2.tools=items;p2TlDraw();
   needFull(()=>{api('tools_set',{items:items}).then(r=>{if(r&&r.ok){P2.tools=r.items;toast(msg||'Guardado',1)}else{P2.tools=prev;toast(r&&r.err==='needpin'?'Falta tu NIP':'No se pudo guardar',1)}p2TlDraw()}).catch(()=>{P2.tools=prev;p2TlDraw();toast('No se pudo guardar',1)})});
 }
-function p2Win(r,l){
-  const tx=document.getElementById('p2tx'),bt=document.getElementById('p2send'),wn=document.getElementById('p2win');if(!tx||!bt)return;
-  const ok=!!(r&&r.ok&&r.cli&&Date.now()-r.cli<864e5);
-  P2.win=ok?1:0;
-  tx.readOnly=!ok;bt.classList.toggle('off',!ok);
-  tx.placeholder=ok?'Escribe un mensaje':'No disponible en este chat';
-  if(wn)wn.textContent=ok?'Puedes escribirle: contestó hace menos de 24 h':(!r||!r.ok?'No pude revisar la ventana de 24 h':r.nu?'Lead nuevo: todavía no ha escrito':'Pasaron más de 24 h desde su último mensaje');
-}
-function p2Send(l){
-  const tx=document.getElementById('p2tx'),bt=document.getElementById('p2send');
-  if(!tx||!P2.win)return toast('No disponible en este chat',1);
-  const t=tx.value.trim();if(!t||P2.sending)return;
-  P2.sending=1;bt.textContent='Enviando…';
-  let fin=0;
-  const back=()=>{P2.sending=0;const b=document.getElementById('p2send');if(b)b.textContent='Enviar'};
-  const ok=()=>{const bd=document.getElementById('p2cb');if(bd){bd.insertAdjacentHTML('beforeend','<div class="wm out"><small>T\u00fa</small>'+esc(t)+'</div>');bd.scrollTop=bd.scrollHeight}const x=document.getElementById('p2tx');if(x&&x.value.trim()===t){x.value='';x.style.height=''}P2.act[l.tel]=Date.now();toast('Enviado',1)};
-  const tm=setTimeout(()=>{if(fin)return;fin=1;back();toast('No se sabe si se envi\u00f3. Revisa el chat antes de reintentar',1)},35000);
-  api('wa_send',{tel:l.tel,texto:t}).then(r=>{
-    clearTimeout(tm);
-    if(fin){if(r&&r.ok)ok();return}
-    fin=1;back();
-    if(r&&r.ok)return ok();
-    const e=r&&r.err;toast(e==='nosend'?'El env\u00edo todav\u00eda no est\u00e1 conectado':e==='ventana'||e==='nolead'?'No disponible en este chat':e==='perm'?'Ese chat no es tuyo':'No se pudo enviar, intenta otra vez',1);
-  }).catch(()=>{clearTimeout(tm);if(fin)return;fin=1;back();toast('Sin conexi\u00f3n. No se sabe si se envi\u00f3: revisa el chat antes de reintentar',1)});
-}
-function p2Wa(l){
-  copyTel(l.tel);
-  if(DEFRX.has(ME)||DEFRX.has(l.own)||DEFRX.has(S.ag))return p2Chat(l);
+function p2Seen(l){if(RO||!l)return;const n=Date.now();let ch=0;if(!l.vis){l.vis=n;ch=1}if(!l.seg||n-l.seg>15000){l.seg=n;ch=1}if(ch)save()}
+function p2WaGo(l){
+  if(!l||!l.tel)return;
+  copyTel(l.tel);p2Seen(l);
   const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
+  if(l.id&&String(l.id).indexOf('tmp')!==0)p2Re(l.id)
 }
-function p2WaDirect(l){
-  copyTel(l.tel);
-  const a=document.createElement('a');a.href='https:\x2F\x2Fwa.me/52'+l.tel;a.target='_blank';a.rel='noopener';a.style.display='none';document.body.appendChild(a);a.click();a.remove();
-}
-function p2Chat(l){
-  p2Close();P2.win=0;P2.sending=0;P2.cl=l;p2ToolsLoad();
-  const w=document.createElement('div');w.id='p2chat';
-  const nm=p2Name(l),sub='',sm=p2Sum(l);
-  w.innerHTML='<div class="wh"><button class="wb" data-p2="back" aria-label="Volver">‹</button><div class="wav">'+esc(nm.charAt(0).toUpperCase())+'</div><div class="wt"><b>'+esc(nm)+'</b><small>'+esc(sub)+'</small></div></div><div class="wbd" id="p2cb">'+(sm?'<div class="wnote">Contexto: '+esc(sm)+'</div>':'')+'<div class="wnote" id="p2ld">Cargando conversación…</div></div><div class="wc"><button class="wpl" data-p2="tools" aria-label="Herramientas">+</button><textarea id="p2tx" rows="1" readonly placeholder="No disponible en este chat"></textarea><button id="p2send" class="off" data-p2="send" data-id="'+l.id+'">Enviar</button></div><div class="wwin" id="p2win">Revisando ventana de 24 h…</div><div class="wf"><button class="wcp" data-p2="copy" data-id="'+l.id+'">Copiar número</button><a class="wwa" href="https:\x2F\x2Fwa.me/52'+l.tel+'" target="_blank" rel="noopener">Abrir en WhatsApp</a></div>';
-  document.body.appendChild(w);document.body.classList.add('p2lock');
-  const tx=document.getElementById('p2tx');
-  tx.addEventListener('input',()=>{tx.style.height='auto';tx.style.height=Math.min(110,tx.scrollHeight)+'px'});
-  tx.addEventListener('click',()=>{if(tx.readOnly)toast('No disponible en este chat',1)});
-  const show=(msg,html)=>{const bd=document.getElementById('p2cb'),ld=document.getElementById('p2ld');if(!bd||!ld)return;if(html){ld.remove();bd.insertAdjacentHTML('beforeend',html);bd.scrollTop=bd.scrollHeight}else ld.textContent=msg};
-  api('lead_chat',{tel:l.tel,fresh:1}).then(r=>{
-    p2Win(r,l);
-    if(!r||!r.ok){show('No pude cargar la conversación ahora. Abre WhatsApp con el botón de abajo.');return}
-    const ms=p2Parse(r.h);
-    if(!ms.length){show(r.tmo?'Make tardó demasiado buscando este número. Intenta de nuevo en un momento.':'Todavía no hay conversación guardada de este número.');return}
-    show('',ms.map(x=>x.who==='nota'?'<div class="wnote">'+esc(x.text)+'</div>':'<div class="wm '+(x.who==='cliente'?'in':'out')+'">'+(x.who==='cliente'?'':'<small>'+esc(x.lab)+'</small>')+esc(x.text)+'</div>').join(''));
-  }).catch(()=>{p2Win(null,l);show('Sin conexión: no pude cargar la conversación. Abre WhatsApp con el botón de abajo.')});
-}
-function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;if(P2.open){const l0=S.leads.find(x=>x.id===id);if(l0&&!l0.vis&&!RO){l0.vis=Date.now();save()}}if(P2.mo&&P2.mo!==P2.open)P2.mo=0;if(P2.ph&&P2.ph!==P2.open)P2.ph=null;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
+const p2Wa=p2WaGo,p2WaDirect=p2WaGo,p2Chat=p2WaGo;
+function p2Tog(id){if(P2.ed)return;P2.open=P2.open===id?null:id;if(P2.open){const l0=S.leads.find(x=>x.id===id);if(l0)p2Seen(l0)}if(P2.mo&&P2.mo!==P2.open)P2.mo=0;if(P2.ph&&P2.ph!==P2.open)P2.ph=null;const l=S.leads.find(x=>x.id===id),el=document.querySelector('.lc[data-id="'+id+'"]');if(l&&el){const d=document.createElement('div');d.innerHTML=p2Card(l,el.dataset.c||P2.cat);el.replaceWith(d.firstChild)}else p2Render();document.querySelectorAll('.lc.op').forEach(x=>{if(x.dataset.id!==P2.open){const l2=S.leads.find(y=>y.id===x.dataset.id);if(l2){const d=document.createElement('div');d.innerHTML=p2Card(l2,x.dataset.c||P2.cat);x.replaceWith(d.firstChild)}}})}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='p2q'){P2.q=e.target.value;P2.lim=50;p2Render()}});
 document.addEventListener('click',e=>{
   {const fm=document.getElementById('p2fm2');if(fm&&!fm.hidden&&!(e.target.closest&&e.target.closest('[data-p2="fab"],#p2fm2')))fm.hidden=true}
@@ -2261,7 +2239,6 @@ document.addEventListener('click',e=>{
   if(a==='chat')return p2Wa(l);
   if(a==='wq')return p2WaDirect(l);
   if(a==='copy')return copyTel(l.tel);
-  if(a==='send')return p2Send(l);
   if(a==='imp'||a==='neu'||a==='bas'||a==='ven'||a==='eli')return p2Move(l,a);
 });
 
@@ -4146,13 +4123,73 @@ function masView(){
   const QUIEN=N('Clientes que escribieron','quien'),ASI=ASIS?[N('Checar asistencia','asis')]:[];
   const H=t=>'<div class="mxh">'+t+'</div>',Gs=s=>s.map((x,i)=>H(x[0])+'<div class="mxg">'+(i===s.length-1?x[1].concat(TAIL):x[1]).join('')+'</div>').join('');
   let h='';
-  if(role==='vendedor')h=Gs((ASI.length?[['Asistencia',ASI]]:[]).concat([['Tr\u00e1mites',[N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')]],['Mi trabajo',(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat(ANAT,[N('Ubicación','ubic')])],['Cliente',[N('Invitaci\u00f3n para el cliente','vip')]],['Portales',[L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]]]));
+  if(role==='vendedor')h=Gs((ASI.length?[['Asistencia',ASI]]:[]).concat([['Tr\u00e1mites',[N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')]],['Mi trabajo',(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat([N('An\u00e1lisis','analisis')],ANAT,[N('Ubicación','ubic')])],['Cliente',[N('Invitaci\u00f3n para el cliente','vip')]],['Portales',[L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin')]]]));
   else if(role==='tecnico')h=G(ASI.concat([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')],ANAT,[N('Invitación para el cliente','vip'),L('Panel de control',NLINK.panel())]));
-  else if(role==='director')h=G(ASI.concat([N('Invitación para el cliente','vip'),L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]));
+  else if(role==='director')h=G(ASI.concat([N('An\u00e1lisis','analisis'),N('Invitación para el cliente','vip'),L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]));
   else h=G([N('Trámites','tram'),N('Invitación para el cliente','vip'),L('Inventario disponible',NLINK.inv())]);
   m.innerHTML='<div class="in p2">'+h+'<div style="text-align:center;color:#8a99a3;font-size:12px;margin:18px 0 6px">CRM '+APPV+'</div></div>';
   m.style.display='block';
 }
+
+
+/* ---------- v198: Analisis del perfil ---------- */
+const AN={d:14};
+function anDay(t){const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function anCalc(){
+  const ag=S.ag,LL=S.leads.filter(l=>l.own===ag&&(!l.ph||l.fld)&&p2cat(l)!=='eli');
+  const now=Date.now(),D=AN.d,days=[];
+  for(let i=D-1;i>=0;i--){const t=now-i*864e5;days.push({k:anDay(t),t:t,n:0,ap:0,vi:0,ve:0,co:0,sg:0})}
+  const ix={};days.forEach((d,i)=>ix[d.k]=i);
+  const bump=(t,f)=>{if(!t)return;const i=ix[anDay(t)];if(i!==undefined)days[i][f]++};
+  const R={ap:/aprobaron con/i,vi:/ya visit[óo]/i,ve:/apart[óo] o firm[óo]|marcado como venta/i,co:/ya contest[óo]/i};
+  const cat={imp:0,neu:0,bas:0,ven:0},fase={'Enviar más fotos':0,'Buscar aprobación':0,'Buscar visita':0,'Sin etapa':0},moto={};
+  let hoy=0,s7=0,s30=0,sin=0,tocH=0,tot=0;
+  const k0=anDay(now);
+  LL.forEach(l=>{
+    const c=p2cat(l);cat[c]=(cat[c]||0)+1;tot++;
+    if(c!=='ven'&&c!=='bas'){const ph=p2Phase(l);const f=ph?P2PH[ph[2]][0]:'Sin etapa';fase[f]=(fase[f]||0)+1}
+    const m=String(l.moto||'').trim().replace(/^sin moto$/i,'');if(m&&c!=='bas')moto[m]=(moto[m]||0)+1;
+    const age=now-(l.c||0);if(age<864e5||anDay(l.c)===k0)hoy++;if(age<7*864e5)s7++;if(age<30*864e5)s30++;
+    if(!l.vis&&!l.seg&&c!=='bas'&&c!=='ven')sin++;
+    if(l.seg&&anDay(l.seg)===k0)tocH++;
+    bump(l.c,'n');if(l.seg)bump(l.seg,'sg');
+    (l.ctx||[]).forEach(e=>{if(!e||e.auto||!e.x)return;for(const f in R)if(R[f].test(e.x))bump(e.t,f)})
+  });
+  const top=Object.keys(moto).map(k=>[k,moto[k]]).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  return{ag:ag,tot:tot,hoy:hoy,s7:s7,s30:s30,sin:sin,tocH:tocH,cat:cat,fase:fase,days:days,top:top}
+}
+function anBars(days,f,col){
+  const w=340,h=96,pb=18,n=days.length,bw=Math.max(4,Math.floor((w-8)/n)-3),mx=Math.max(1,...days.map(d=>d[f]));
+  let g='';days.forEach((d,i)=>{const x=4+i*((w-8)/n),bh=Math.round((h-pb-14)*d[f]/mx),y=h-pb-bh;
+    g+='<rect x="'+x.toFixed(1)+'" y="'+y+'" width="'+bw+'" height="'+Math.max(d[f]?2:0,bh)+'" rx="2" fill="'+col+'"/>';
+    if(d[f]&&n<=16)g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-3)+'" text-anchor="middle" font-size="9" fill="currentColor">'+d[f]+'</text>';
+    if(n<=16||i%5===0||i===n-1){const dt=new Date(d.t);g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(h-4)+'" text-anchor="middle" font-size="8.5" fill="currentColor" opacity=".6">'+dt.getDate()+'/'+(dt.getMonth()+1)+'</text>'}});
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="anchart" role="img">'+g+'</svg>'}
+function anView(){
+  const m=document.getElementById('menu'),A=anCalc(),tt=A.days.reduce((a,d)=>({n:a.n+d.n,ap:a.ap+d.ap,vi:a.vi+d.vi,ve:a.ve+d.ve,co:a.co+d.co,sg:a.sg+d.sg}),{n:0,ap:0,vi:0,ve:0,co:0,sg:0});
+  const K=(v,t,c)=>'<div class="ank" style="--k:var(--'+c+')"><b>'+v+'</b><span>'+t+'</span></div>';
+  const tc=Math.max(1,A.cat.imp+A.cat.neu+A.cat.bas+A.cat.ven);
+  const seg=(k,t,c)=>A.cat[k]?'<i style="flex:'+A.cat[k]+';background:var(--'+c+')" title="'+t+'">'+(A.cat[k]/tc>.09?A.cat[k]:'')+'</i>':'';
+  const lg=(k,t,c)=>'<span><i style="background:var(--'+c+')"></i>'+t+' <b>'+A.cat[k]+'</b></span>';
+  const fm=Math.max(1,...Object.values(A.fase)),fc={'Enviar más fotos':'g1','Buscar aprobación':'g4','Buscar visita':'g8','Sin etapa':'g1'};
+  const fr=Object.keys(A.fase).map(k=>'<div class="anr"><span>'+k+'</span><div><i style="width:'+Math.round(100*A.fase[k]/fm)+'%;background:var(--'+fc[k]+')"></i></div><b>'+A.fase[k]+'</b></div>').join('');
+  const tm=Math.max(1,...A.top.map(x=>x[1])),mr=A.top.length?A.top.map(x=>'<div class="anr"><span>'+esc(x[0])+'</span><div><i style="width:'+Math.round(100*x[1]/tm)+'%;background:var(--g1)"></i></div><b>'+x[1]+'</b></div>').join(''):'<div class="ann">Todavía no hay motos capturadas.</div>';
+  const rows=A.days.slice().reverse().filter(d=>d.n||d.ap||d.vi||d.ve||d.co||d.sg).map(d=>{const dt=new Date(d.t);return '<tr><td>'+dt.toLocaleDateString('es-MX',{weekday:'short',day:'numeric',month:'short'})+'</td><td>'+(d.n||'·')+'</td><td>'+(d.ap||'·')+'</td><td>'+(d.vi||'·')+'</td><td>'+(d.ve||'·')+'</td><td>'+(d.sg||'·')+'</td></tr>'}).join('');
+  const P=[7,14,30].map(n=>'<button type="button" class="'+(AN.d===n?'on':'')+'" data-an="'+n+'">'+n+' días</button>').join('');
+  m.innerHTML='<div class="in anw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b>Análisis</b></div>'
+   +'<div class="anp">'+esc(DN(A.ag))+'<span>'+P+'</span></div>'
+   +'<div class="ang">'+K(A.tot,'Leads en total','g1')+K(A.hoy,'Nuevos hoy','g8')+K(A.s7,'Nuevos 7 días','g8')+K(A.s30,'Nuevos 30 días','g8')+K(A.sin,'Sin tocar','g4')+K(A.tocH,'Seguidos hoy','g1')+'</div>'
+   +'<div class="anc"><h4>Por categoría</h4><div class="anst">'+seg('imp','Importantes','g8')+seg('neu','Neutros','g1')+seg('bas','Basura','g4')+seg('ven','Ventas','g8')+'</div><div class="anlg">'+lg('imp','Importantes','g8')+lg('neu','Neutros','g1')+lg('bas','Basura','g4')+lg('ven','Ventas','g8')+'</div></div>'
+   +'<div class="anc"><h4>En qué etapa están (sin basura ni ventas)</h4>'+fr+'</div>'
+   +'<div class="anc"><h4>Leads nuevos por día <small>'+tt.n+' en '+AN.d+' días</small></h4>'+anBars(A.days,'n','var(--g1)')+'</div>'
+   +'<div class="anc"><h4>Aprobados por día <small>'+tt.ap+'</small></h4>'+anBars(A.days,'ap','var(--g4)')+'</div>'
+   +'<div class="anc"><h4>Visitas por día <small>'+tt.vi+'</small></h4>'+anBars(A.days,'vi','var(--g8)')+'</div>'
+   +'<div class="anc"><h4>Detalle por fecha</h4>'+(rows?'<table class="ant"><tr><th>Día</th><th>Nuevos</th><th>Aprob.</th><th>Visitas</th><th>Ventas</th><th>Segu.</th></tr>'+rows+'</table>':'<div class="ann">Sin movimientos en este periodo.</div>')+'<div class="ann">Aprobados, visitas y ventas se cuentan cuando se marcó ese paso en el lead. Seguimiento es el último toque de cada lead.</div></div>'
+   +'<div class="anc"><h4>Motos más pedidas</h4>'+mr+'</div>'
+   +'</div>';
+  m.style.display='block';
+}
+document.addEventListener('click',e=>{const b=e.target&&e.target.closest&&e.target.closest('[data-an]');if(!b)return;AN.d=+b.dataset.an||14;if(CUR==='analisis'){const sc=document.getElementById('menu').scrollTop;anView();document.getElementById('menu').scrollTop=sc}});
 
 /* ---------- v185: asistencia (entrada/salida con foto de la camara) ---------- */
 const AS={st:null,tm:0,mark:null,busy:0,rows:null};
@@ -4291,6 +4328,7 @@ function navGo0(id){
   else if(id==='ine10')body='<button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="i10"><ol><li><b>1</b><span>Manda a <u>Ana general</u>: INE, correo y tel\u00e9fono.</span></li><li><b>2</b><span>Ana la tramita y pide el NIP al cliente.</span></li></ol></div><div class="pfva" style="margin-top:12px"><a target="_blank" rel="noopener" href="https:\x2F\x2Fwa.me/'+ANA+'">WhatsApp de Ana</a></div>';
   else if(id==='uso'){usoView();return}
   else if(id==='asis'){asisView();return}
+  else if(id==='analisis'){anView();return}
   else if(id==='venta'){ventaView();return}
   else if(id==='conv'||id==='quien'||id==='make'||id==='onoff'){torreView(id);return}
   else body=`<div class="soonp">Próximamente</div>`;
