@@ -754,8 +754,6 @@ body.hasnav input,body.hasnav textarea,body.hasnav select{font-size:16px!importa
 .anchart{width:100%;height:auto;display:block;color:var(--tx)}
 .ant{width:100%;border-collapse:collapse;font-size:12.5px}.ant th,.ant td{padding:6px 3px;text-align:center;border-bottom:1px solid var(--ln)}.ant th:first-child,.ant td:first-child{text-align:left}.ant th{font-size:11px;color:var(--mu,#667681)}
 .anbig{font-size:18px;color:var(--tx)}
-.anx{font-size:13.5px;line-height:1.35;margin:-2px 0 8px}
-.anpk{font-size:13px;margin-top:6px;padding:7px 10px;border-radius:10px;background:var(--soft,#eff3f4)}
 .ann{font-size:12px;color:var(--mu,#667681);margin-top:8px}
 .lc .p2fu{font-style:normal;font-size:11px;font-weight:700;line-height:1;color:#fff;background:var(--g8);border-radius:999px;padding:3px 8px;margin-left:8px;vertical-align:2px;white-space:nowrap}
 .lc .p2nw{font-style:normal;font-size:11px;font-weight:700;line-height:1;color:#fff;background:var(--g1);border-radius:999px;padding:3px 8px;margin-left:8px;vertical-align:2px;letter-spacing:.02em}
@@ -1936,7 +1934,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v202';
+const APPV='v203';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -4164,32 +4162,20 @@ function anCalc(){
   });
   return{days:days,ta:ta,tot:LL.length}
 }
-function anBars(days,f,col,id){
-  const w=340,h=150,pl=6,pr=6,pt=26,ph=84,n=days.length,mx=Math.max(1,...days.map(d=>d[f])),st=(w-pl-pr)/Math.max(1,n-1);
-  const X=i=>pl+i*st,Y=v=>pt+ph-ph*v/mx;
-  let pk=0;days.forEach((d,i)=>{if(d[f]>days[pk][f])pk=i});
-  const pts=days.map((d,i)=>X(i).toFixed(1)+','+Y(d[f]).toFixed(1));
-  const area='M'+X(0).toFixed(1)+','+(pt+ph)+' L'+pts.join(' L')+' L'+X(n-1).toFixed(1)+','+(pt+ph)+' Z';
-  let g='<defs><linearGradient id="g'+id+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+col+'" stop-opacity=".55"/><stop offset="1" stop-color="'+col+'" stop-opacity=".04"/></linearGradient></defs>';
-  [0,.5,1].forEach(q=>{const y=pt+ph*(1-q);g+='<line x1="'+pl+'" x2="'+(w-pr)+'" y1="'+y+'" y2="'+y+'" stroke="currentColor" opacity=".12"/>'});
-  g+='<text x="'+pl+'" y="'+(pt-4)+'" font-size="9" fill="currentColor" opacity=".6">'+mx+'</text>';
-  if(days[pk][f]>0){const bw=Math.max(14,st);g+='<rect x="'+(X(pk)-bw/2).toFixed(1)+'" y="'+pt+'" width="'+bw.toFixed(1)+'" height="'+ph+'" rx="4" fill="'+col+'" opacity=".16"/>'}
-  g+='<path d="'+area+'" fill="url(#g'+id+')"/><polyline points="'+pts.join(' ')+'" fill="none" stroke="'+col+'" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>';
-  if(n<=31)days.forEach((d,i)=>{if(d[f])g+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(d[f]).toFixed(1)+'" r="2.4" fill="'+col+'"/>'});
-  if(days[pk][f]>0){const px=X(pk),py=Y(days[pk][f]),tx=Math.min(w-30,Math.max(30,px));g+='<circle cx="'+px.toFixed(1)+'" cy="'+py.toFixed(1)+'" r="5" fill="#fff" stroke="'+col+'" stroke-width="2.5"/><text x="'+tx.toFixed(1)+'" y="'+Math.max(10,py-10).toFixed(1)+'" text-anchor="middle" font-size="11" font-weight="700" fill="currentColor">'+days[pk][f]+'</text>'}
-  const hy=pt+ph+22,hh=12;
-  days.forEach((d,i)=>{const o=d[f]?.15+.85*d[f]/mx:0;g+='<rect x="'+(X(i)-st/2+.5).toFixed(1)+'" y="'+hy+'" width="'+Math.max(2,st-1).toFixed(1)+'" height="'+hh+'" rx="2" fill="'+(d[f]?col:'currentColor')+'" opacity="'+(d[f]?o.toFixed(2):'.08')+'"/>'});
-  const ticks=n<=8?days.map((d,i)=>i):[0,Math.round((n-1)/3),Math.round(2*(n-1)/3),n-1];
-  ticks.forEach(i=>{const dt=new Date(days[i].t);g+='<text x="'+Math.min(w-14,Math.max(14,X(i))).toFixed(1)+'" y="'+(pt+ph+14)+'" text-anchor="middle" font-size="9" fill="currentColor" opacity=".6">'+dt.getDate()+'/'+(dt.getMonth()+1)+'</text>'});
+function anBars(days,f,col){
+  const w=340,h=96,pb=18,n=days.length,bw=Math.max(4,Math.floor((w-8)/n)-3),mx=Math.max(1,...days.map(d=>d[f]));
+  let g='';days.forEach((d,i)=>{const x=4+i*((w-8)/n),bh=Math.round((h-pb-14)*d[f]/mx),y=h-pb-bh;
+    g+='<rect x="'+x.toFixed(1)+'" y="'+y+'" width="'+bw+'" height="'+Math.max(d[f]?2:0,bh)+'" rx="2" fill="'+col+'"/>';
+    if(d[f]&&n<=16)g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(y-3)+'" text-anchor="middle" font-size="9" fill="currentColor">'+d[f]+'</text>';
+    if(n<=16||i%5===0||i===n-1){const dt=new Date(d.t);g+='<text x="'+(x+bw/2).toFixed(1)+'" y="'+(h-4)+'" text-anchor="middle" font-size="8.5" fill="currentColor" opacity=".6">'+dt.getDate()+'/'+(dt.getMonth()+1)+'</text>'}});
   return '<svg viewBox="0 0 '+w+' '+h+'" class="anchart" role="img">'+g+'</svg>'}
-function anPeak(days,f,u){let pk=0;days.forEach((d,i)=>{if(d[f]>days[pk][f])pk=i});if(!days[pk][f])return 'Todav\u00eda no hay datos en este periodo.';const dt=new Date(days[pk].t).toLocaleDateString('es-MX',{weekday:'long',day:'numeric',month:'long'});return '\u2B50 Mejor d\u00eda: <b>'+dt+'</b> con <b>'+days[pk][f]+'</b> '+u+'.'}
 function anView(){
   const m=document.getElementById('menu'),A=anCalc(),tt=A.days.reduce((a,d)=>({n:a.n+d.n,ap:a.ap+d.ap}),{n:0,ap:0});
   const P=[7,14,30,60].map(n=>'<button type="button" class="'+(AN.d===n?'on':'')+'" data-an="'+n+'">'+n+' d\u00edas</button>').join('');
   m.innerHTML='<div class="in anw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b>An\u00e1lisis</b></div>'
    +'<div class="anp">'+esc(DN(S.ag))+'<span>'+P+'</span></div>'
-   +'<div class="anc"><h4>Leads nuevos <small><b class="anbig">'+tt.n+'</b> en '+AN.d+' d\u00edas</small></h4><div class="anx">Cu\u00e1ntos clientes nuevos registraste cada d\u00eda. Entre m\u00e1s alta la curva, m\u00e1s leads entraron ese d\u00eda.</div>'+anBars(A.days,'n','#36738f','n')+'<div class="anpk">'+anPeak(A.days,'n','leads nuevos')+'</div><div class="ann">Franja de abajo: un cuadro por d\u00eda, m\u00e1s oscuro = m\u00e1s leads. Total en la cuenta: '+A.tot+'.</div></div>'
-   +'<div class="anc"><h4>Aprobados <small><b class="anbig">'+tt.ap+'</b> en '+AN.d+' d\u00edas</small></h4><div class="anx">De tus clientes aprobados de hoy (los que est\u00e1n en Buscar visita), cu\u00e1ntos registraste cada d\u00eda. Entre m\u00e1s alta la curva, ese d\u00eda trajo m\u00e1s clientes que acabaron aprobados.</div>'+anBars(A.days,'ap','#20754d','a')+'<div class="anpk">'+anPeak(A.days,'ap','aprobados')+'</div><div class="ann">Franja de abajo: m\u00e1s oscuro = m\u00e1s aprobados ese d\u00eda. Aprobados de hoy en la cuenta: '+A.ta+'.</div></div>'
+   +'<div class="anc"><h4>Leads nuevos por d\u00eda <small><b class="anbig">'+tt.n+'</b> en '+AN.d+' d\u00edas</small></h4>'+anBars(A.days,'n','var(--g1)')+'<div class="ann">Se cuenta el d\u00eda en que se registr\u00f3 cada lead. Total en la cuenta: '+A.tot+'.</div></div>'
+   +'<div class="anc"><h4>Aprobados por d\u00eda <small><b class="anbig">'+tt.ap+'</b> en '+AN.d+' d\u00edas</small></h4>'+anBars(A.days,'ap','var(--g8)')+'<div class="ann">Aprobados = los que est\u00e1n en Buscar visita (hoy son '+A.ta+'). Cada uno se cuenta el d\u00eda en que se registr\u00f3 por primera vez.</div></div>'
    +'</div>';
   m.style.display='block';
 }
