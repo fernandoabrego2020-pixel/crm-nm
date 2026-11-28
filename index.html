@@ -1976,7 +1976,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v212';
+const APPV='v213';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3791,7 +3791,7 @@ function pfDraw3(){
   const d=MV.d,m=d&&d.m.find(x=>x.n===PFS.m);if(!m){pfShow(PFS.k?2:1);return}
   const L=pfLab(m),si=PFS.s?MSUC.findIndex(x=>x[0]===PFS.s):-1;
   const ex=m.e?MSUC.map((x,i)=>'<span class="pfx'+(m.e[i]?' on':'')+(i===si?' me':'')+'">'+(m.e[i]?'✓ ':'')+x[1]+'</span>').join(''):'<span class="pfxn">Sin dato</span>';
-  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="2">← Similares</button></div>'
+  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="'+(PFS.fr===4?4:2)+'">'+(PFS.fr===4?'← Catálogo':'← Similares')+'</button></div>'
   +'<div class="mxhd"><b>'+esc(L[0])+'</b>'+(L[1]?'<small>'+esc(L[1])+'</small>':'')+'<span class="mxp">'+(m.p?mxn(m.p):'')+'</span></div>'
   +'<div class="pfc"><h4>Fotos</h4><div class="mxph" id="mxph"></div><input id="mxpf" type="file" accept="image/*" multiple hidden></div>'
   +'<div class="pfc"><h4>Videos</h4><div class="mxvd" id="mxvd"></div></div>'
@@ -3838,7 +3838,9 @@ async function pfOpen(k){
   if(!MV.d||!MV.d.m){const p=document.getElementById('pf');if(p)toast('Cargando cat\u00e1logo\u2026',1);try{const r=await api('motos');if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}catch(e){}}
   if(!MV.d){toast('No se pudo cargar el cat\u00e1logo',1);return}
   const m=MV.d.m.find(x=>pfSlug(x.n)===k);if(!m){toast('No encontr\u00e9 esa moto en el cat\u00e1logo',1);return}
+  if(PFS.v===4){PFS.k=k;PFS.m=m.n;PFS.fr=4;pfShow(3);return}
   if(PFS.v===2||PFS.v===3){PFS.m=m.n;pfShow(3);return}
+  PFS.fr=0;
   PFS.k=k;if(!PFS.s)PFS.s=mSucKey(S.ag);
   pfShow(2);
   pfJs('pf2.js').then(()=>Promise.all(['pf3.js','pf4.js','pf5.js','pf6.js'].map(pfJs))).then(()=>{if(CUR==='moto'&&PFS.v===2&&document.getElementById('pf'))pfDraw2()})
