@@ -1996,7 +1996,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v233';
+const APPV='v234';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3868,7 +3868,7 @@ function mxAddVideo(){
 }
 function mxPickVid(){
   let i=document.getElementById('mxaf0');if(!i){i=document.createElement('input');i.type='file';i.accept='video/*';i.id='mxaf0';i.hidden=true;document.body.appendChild(i)}
-  i.onchange=()=>{const f=i.files&&i.files[0],m=mxCur();i.value='';if(!f||!m)return;mxUpVideo(f,pfSlug(m.n),m)};i.click()
+  i.onchange=()=>{const f=i.files&&i.files[0],m=mxCur();i.value='';if(!f||!m)return;const k=pfSlug(m.n);if(f.size>250*1024*1024){mxVidLocal(f,k,m,'Muy pesado para compartirlo (m\u00e1s de 250 MB). Quedó solo en este tel\u00e9fono; mejor pega un link');return}mxVidLocal(f,k,m,'Video guardado. Se est\u00e1 subiendo, no cierres la app hasta que termine');mxAuto(k,m)};i.click()
 }
 function mxVidViewer(id){
   const m=mxCur();if(!m)return;const k=pfSlug(m.n),o=MXD[k]||mxNew(),v=id==='tv'?(MXTV.n===m.n&&MXTV.u?{id:'tv',l:MXTV.u,tec:1}:null):o.vd.find(x=>x.id===id);if(!v)return;
