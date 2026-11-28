@@ -955,6 +955,37 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .pfem{padding:40px 20px;text-align:center;font:700 16px/1.3 system-ui,-apple-system,sans-serif;color:#5b6676}
 
 .pf{--card:#fff;--tx:#18202b;--mu:#5b6676;--ln:#dfe3e9;--soft:#eef1f5}
+.pf3 .pfc.mtd .sg>b{display:block;margin:0 0 10px;font:800 13px/1 system-ui,-apple-system,sans-serif;color:#5b6676;text-transform:uppercase;letter-spacing:.04em}
+.mxh{display:flex;align-items:baseline;gap:8px;margin:6px 6px 10px}
+.mxh b{color:#e8481c;font:900 italic 26px/1 system-ui,-apple-system,sans-serif;text-transform:uppercase}
+.mxh small{color:#e8481c;font:800 italic 16px/1 system-ui,-apple-system,sans-serif}
+.mxh .mxp{margin-left:auto;font:900 24px/1 system-ui,-apple-system,sans-serif;color:#18202b}
+.mxph{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;padding-bottom:4px;-webkit-overflow-scrolling:touch}
+.mxt{flex:none;width:112px;height:112px;border-radius:12px;border:0;padding:0;background:#eef1f5;overflow:hidden;scroll-snap-align:start;cursor:pointer}
+.mxt img{width:100%;height:100%;object-fit:cover;display:block}
+.mxad{border:2px dashed #b7c0cc;background:#f6f8fa;color:#5b6676;font:700 30px/1 system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mxvd{display:flex;flex-direction:column;gap:10px}
+.mxav{width:100%;height:48px;border-radius:12px;font-size:15px}
+.mxv{position:relative}.mxvb{border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9}
+.mxvb video,.mxvb iframe{width:100%;height:100%;border:0;display:block}
+.mxvb .pfvp{width:100%;height:100%}
+.mxx{position:absolute;right:6px;top:6px;width:30px;height:30px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:20px;line-height:1;cursor:pointer}
+.mxsv{width:100%;box-sizing:border-box;min-height:96px;border:1.5px solid #dfe3e9;border-radius:12px;padding:10px;font:inherit;font-size:15px;line-height:1.4;resize:vertical;background:#fff;color:#18202b}
+#mxv{position:fixed;inset:0;z-index:95;background:#000;display:flex;flex-direction:column;color:#fff}
+.mxvh{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 10px;font-weight:700}
+.mxvh button{background:none;border:0;color:#fff;font-size:24px;padding:4px 8px}
+.mxvi{flex:1;position:relative;display:flex;align-items:center;justify-content:center;min-height:0}
+.mxvi img{max-width:100%;max-height:100%;object-fit:contain}
+.mxn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:64px;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:34px;border-radius:10px}
+.mxn.l{left:6px}.mxn.r{right:6px}
+.mxvf{display:flex;gap:10px;padding:12px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.mxvf button{flex:1;height:50px;border-radius:999px;border:0;background:#36c281;color:#0c3622;font:700 16px system-ui;cursor:pointer}
+.mxvf button.d{background:#3a3f45;color:#ff9a8c}
+#mxavw{position:fixed;inset:0;z-index:95;background:rgba(0,0,0,.55);display:flex;align-items:flex-end}
+.mxab{width:100%;box-sizing:border-box;background:#fff;color:#18202b;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+.mxab #mxal{height:46px;border:1.5px solid #dfe3e9;border-radius:12px;padding:0 12px;font:inherit;font-size:16px}
+.mxab button{height:46px;border-radius:12px;border:1.5px solid #dfe3e9;background:#f6f8fa;font:700 15px system-ui;color:#18202b;cursor:pointer}
+.mxab button.y{background:#36738f;border-color:#36738f;color:#fff}.mxab button.n{border:0;background:none;color:#5b6676}
 .pfhero{position:relative;height:210px;margin:4px 0 0}
 .pfhero img{position:absolute;left:4%;top:0;width:92%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 8px 6px rgba(0,0,0,.28))}
 .pfhero img.pfp{border-radius:14px;object-fit:cover;filter:none;box-shadow:0 4px 12px rgba(0,0,0,.25)}
@@ -1934,7 +1965,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v204';
+const APPV='v205';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3483,14 +3514,14 @@ async function mStrip(){
   const add=(id,t)=>'<a class="pt add" target="_blank" rel="noopener" href="https:\x2F\x2Fdrive.google.com/drive/folders/'+id+'"><span>+</span><small>Abrir carpeta<br>'+esc(t)+'</small></a>';
   b.innerHTML=top+'<div class="mpn">Fotos reales</div><div class="mps">'+ids.map(id=>'<button class="pt" data-lb="'+esc(id)+'">'+img(mTh(id,900))+'</button>').join('')+add(fid,nm)+(uf?add(uf[1],uf[0]):'')+'</div>'}
 function mLb(id){const o=document.createElement('div');o.className='mlb';o.innerHTML='<img src="'+esc(mTh(id,1600))+'" alt="" referrerpolicy="no-referrer"><button aria-label="Cerrar">\u00d7</button>';o.onclick=()=>o.remove();document.body.appendChild(o)}
-function mFicha(f,n){const ln=u=>u&&u.indexOf('https:\x2F\x2Fnovamotos.com.mx')===0?`<a class="mtl" style="display:inline-block;margin-top:8px" target="_blank" rel="noopener" href="${esc(u)}">Ver en novamotos.com.mx</a>`:'';
-  if(!f||!f.ok)return `<b>Ficha técnica</b><div class="note" style="margin-top:6px">No se pudo cargar la ficha.</div>`+ln('https:\x2F\x2Fnovamotos.com.mx/tienda/');
-  if(f.none)return `<b>Ficha técnica</b><div class="note" style="margin-top:6px">No encontré esta moto en la página de Novamotos.</div>`+ln(f.url);
+function mFicha(f,n){const ln=u=>u&&u.indexOf('https:\x2F\x2Fnovamotos.com.mx')===0?`<a class="mtl" style="display:inline-block;margin-top:8px" target="_blank" rel="noopener" href="${esc(u)}">Ver más</a>`:'';
+  if(!f||!f.ok)return `<b>Ficha técnica</b><div class="note" style="margin-top:6px">Sin datos</div>`+ln('https:\x2F\x2Fnovamotos.com.mx/tienda/');
+  if(f.none)return `<b>Ficha técnica</b><div class="note" style="margin-top:6px">Sin datos</div>`+ln(f.url);
   const UN={'cilindrada':' cc','velocidad maxima':' km/h','peso en seco':' kg','peso':' kg','capacidad de carga':' kg','largo total':' mm','ancho total':' mm','alto total':' mm','altura del asiento':' mm'};
   const un=(k,v)=>/^[\d.,]+$/.test(v)?(UN[mnorm2(k)]||'')+'':'';
   const sp=(f.sp||[]).map(x=>x[0]==='#'?`<tr><th colspan="2" style="padding-top:8px">${esc(x[1])}</th></tr>`:x[0]===''?`<tr><td colspan="2">${esc(x[1])}</td></tr>`:`<tr><td>${esc(x[0].replace(/:\s*$/,''))}</td><td><b>${esc(x[1]+un(x[0].replace(/:\s*$/,''),x[1]))}</b></td></tr>`).join('');
   const dd=(f.d||'').replace(/\s+/g,' ').trim(),d2=dd.length>300?dd.slice(0,300).replace(/\s+\S*$/,'')+'…':dd;
-  return `<b>Ficha técnica</b>${d2?`<div class="note" style="margin:6px 0">${esc(d2)}</div>`:''}${sp?`<table>${sp}</table>`:'<div class="note">La página no trae datos técnicos de esta moto.</div>'}${ln(f.url)}`}
+  return `<b>Ficha técnica</b>${sp?`<table>${sp}</table>`:'<div class="note">Sin datos</div>'}${ln(f.url)}`}
 async function mOpen(n){const m=MV.d&&MV.d.m.find(x=>x.n===n);if(!m)return;MV.sel=n;mDraw();window.scrollTo(0,0);
   let f=null;try{f=await api('ficha',{n:n})}catch(e){f=null}
   const b=document.getElementById('mtf');if(b&&MV.sel===n)b.innerHTML=mFicha(f,n)}
@@ -3570,8 +3601,8 @@ function pfCopy(t,msg){
 }
 function pfSeg(m){
   const sg=mSeg(m.n);
-  if(sg)return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(sg[2])+'</td><td>'+mxn(sg[5])+'</td></tr><tr><td>Recomendado</td><td><b>'+mxn(sg[3])+'</b></td><td><b>'+mxn(sg[6])+'</b></td></tr><tr><td>Mayor protección</td><td>'+mxn(sg[4])+'</td><td>'+mxn(sg[7])+'</td></tr></table><div class="note" style="margin-top:6px">Prima anual de contado, IVA incluido. Recomendado = Seguros Azteca (robo y pérdida total).</div>';
-  return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(1852)+'</td><td>'+mxn(2261)+'</td></tr></table><div class="note" style="margin-top:6px">El seguro mínimo es el mismo para todas las motos (anual de contado, IVA incluido).</div>'
+  if(sg)return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(sg[2])+'</td><td>'+mxn(sg[5])+'</td></tr><tr><td>Recomendado</td><td><b>'+mxn(sg[3])+'</b></td><td><b>'+mxn(sg[6])+'</b></td></tr><tr><td>Mayor protección</td><td>'+mxn(sg[4])+'</td><td>'+mxn(sg[7])+'</td></tr></table><div class="note" style="margin-top:6px">Anual · contado · IVA incl.</div>';
+  return '<table><tr><th></th><th>Particular</th><th>Reparto/trabajo</th></tr><tr><td>Mínimo</td><td>'+mxn(1852)+'</td><td>'+mxn(2261)+'</td></tr></table><div class="note" style="margin-top:6px">Anual · contado · IVA incl.</div>'
 }
 function pfVidBox(m,u,k){
   k=k||'';
@@ -3664,24 +3695,100 @@ function pfPlay(k){
   const b=document.getElementById('pfvb'+(k==='2'||k==='3'?k:''));if(!b)return;const v=pfVid(b.dataset.u);
   b.innerHTML=v.k==='mp'?'<video src="'+esc(v.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(v.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'
 }
+
+/* ---------- v205: ficha de moto limpia (fotos, videos, argumento) ---------- */
+const MXD={};let MXDB=null;
+const mxNew=()=>({ph:[],vd:[],sv:'',u:0});
+function mxDb(){return MXDB||(MXDB=new Promise(r=>{try{const q=indexedDB.open('crm-mx',1);q.onupgradeneeded=()=>q.result.createObjectStore('m');q.onsuccess=()=>r(q.result);q.onerror=()=>r(null)}catch(e){r(null)}}))}
+async function mxLoad(k){const d=await mxDb();if(!d){MXD[k]=MXD[k]||mxNew();return MXD[k]}return new Promise(res=>{try{const t=d.transaction('m').objectStore('m').get(k);t.onsuccess=()=>{MXD[k]=t.result||mxNew();res(MXD[k])};t.onerror=()=>{MXD[k]=MXD[k]||mxNew();res(MXD[k])}}catch(e){MXD[k]=MXD[k]||mxNew();res(MXD[k])}})}
+async function mxSave(k){const o=MXD[k];if(!o)return;o.u=Date.now();const d=await mxDb();if(d){try{d.transaction('m','readwrite').objectStore('m').put(o,k)}catch(e){toast('No se pudo guardar en este teléfono',1)}}clearTimeout(mxSave.tm);mxSave.tm=setTimeout(()=>mxPush(k),1500)}
+async function mxPush(k){const o=MXD[k];if(!o)return;try{await api('moto_set',{k:k,d:{sv:o.sv,u:o.u,vd:o.vd.filter(v=>v.l).map(v=>({id:v.id,l:v.l,t:v.t,del:v.del})),ph:o.ph.map(p=>({id:p.id,t:p.t,del:p.del,x:p.x?undefined:p.d}))}})}catch(e){}}
+function mxMerge(k,r){const o=MXD[k];if(!o||!r||!r.ok||!r.d)return false;const s=r.d;let ch=false;
+  if((s.u||0)>(o.u||0)&&typeof s.sv==='string'&&s.sv!==o.sv){o.sv=s.sv;ch=true}
+  const mg=(a,b)=>{const m={};a.concat(b||[]).forEach(x=>{if(x&&x.id&&(!m[x.id]||x.del))m[x.id]=Object.assign({},m[x.id],x)});return Object.values(m)};
+  const v2=mg(o.vd,(s.vd||[]).map(v=>v)),p2=mg(o.ph,(s.ph||[]).map(p=>p.u&&!p.d?Object.assign({},p,{d:p.u}):p));
+  if(JSON.stringify(v2.map(x=>x.id))!==JSON.stringify(o.vd.map(x=>x.id))){o.vd=v2;ch=true}
+  if(JSON.stringify(p2.map(x=>x.id))!==JSON.stringify(o.ph.map(x=>x.id))){o.ph=p2;ch=true}
+  return ch}
+const mxId=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+function mxShrink(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onerror=rej;fr.onload=()=>{const im=new Image();im.onerror=rej;im.onload=()=>{const M=1280,s=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);res(c.toDataURL('image/jpeg',.82))};im.src=fr.result};fr.readAsDataURL(file)})}
+function mxCatPh(m){const I=window.PFI||{},k=pfSlug(m.n),a=[];if(I[k])a.push(I[k]);String(m.i||'').split(/[\s,;]+/).filter(u=>/^https?:/i.test(u)).forEach(u=>a.push(u));return a.filter((u,i)=>a.indexOf(u)===i)}
+function mxPhotos(m){const k=pfSlug(m.n),o=MXD[k]||mxNew(),cat=mxCatPh(m).map((u,i)=>({id:'c'+i,d:u,c:1}));return cat.concat(o.ph.filter(p=>!p.del&&p.d))}
+function mxRender(m){
+  const k=pfSlug(m.n),o=MXD[k]||mxNew();
+  const ph=document.getElementById('mxph');if(ph){const L=mxPhotos(m);ph.innerHTML=L.map(p=>'<button type="button" class="mxt" data-mx="view" data-id="'+p.id+'"><img src="'+esc(p.d)+'" alt="" referrerpolicy="no-referrer"></button>').join('')+'<button type="button" class="mxt mxad" data-mx="addph" aria-label="Agregar foto">+</button>'}
+  const vd=document.getElementById('mxvd');if(vd){vd.innerHTML=o.vd.filter(v=>!v.del).map(v=>{const x=v.l?pfVid(v.l):null;const th=x&&x.th?' style="background-image:url('+esc(x.th)+')"':'';const body=v.f?'<video src="'+esc(v.url||'')+'" controls playsinline preload="metadata"></video>':(x&&x.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(v.l)+'">Abrir video</a>':'<button type="button" class="pfvp" data-mx="vplay" data-id="'+v.id+'"'+th+'><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>');return '<div class="mxv" data-vid="'+v.id+'"><div class="mxvb">'+body+'</div><button type="button" class="mxx" data-mx="vdel" data-id="'+v.id+'" aria-label="Quitar">×</button></div>'}).join('')+'<button type="button" class="mxad mxav" data-mx="addvd">+ Video</button>'}
+  const sv=document.getElementById('mxsv');if(sv&&document.activeElement!==sv)sv.value=o.sv||'';
+}
+async function mxOpenM(m){
+  const k=pfSlug(m.n);await mxLoad(k);
+  // fabrica URLs locales para videos de archivo
+  const o=MXD[k];o.vd.forEach(v=>{if(v.f&&!v.url){try{v.url=URL.createObjectURL(v.f)}catch(e){}}});
+  if(PFS.v===3&&PFS.m===m.n)mxRender(m);
+  api('moto_get',{k:k}).then(r=>{if(PFS.v===3&&PFS.m===m.n&&mxMerge(k,r)){mxSave(k);mxRender(m)}},()=>{})
+}
+function mxCur(){const d=MV.d;return d&&d.m.find(x=>x.n===PFS.m)}
+function mxViewer(id){
+  const m=mxCur();if(!m)return;const L=mxPhotos(m);let i=L.findIndex(p=>p.id===id);if(i<0)return;
+  let w=document.getElementById('mxv');if(w)w.remove();w=document.createElement('div');w.id='mxv';document.body.appendChild(w);
+  const draw=()=>{const p=L[i];w.innerHTML='<div class="mxvh"><button type="button" data-mxv="x" aria-label="Cerrar">✕</button><span>'+(i+1)+' / '+L.length+'</span></div><div class="mxvi"><button type="button" class="mxn l" data-mxv="p" aria-label="Anterior">‹</button><img src="'+esc(p.d)+'" alt="" referrerpolicy="no-referrer"><button type="button" class="mxn r" data-mxv="n" aria-label="Siguiente">›</button></div><div class="mxvf"><button type="button" data-mxv="c">Copiar</button>'+(p.c?'':'<button type="button" class="d" data-mxv="d">Borrar</button>')+'</div>'};
+  draw();
+  w.onclick=async e=>{const b=e.target.closest&&e.target.closest('[data-mxv]');if(!b)return;const a=b.dataset.mxv;
+    if(a==='x'){w.remove();return}
+    if(a==='p'){i=(i+L.length-1)%L.length;draw();return}
+    if(a==='n'){i=(i+1)%L.length;draw();return}
+    if(a==='c'){mxCopyImg(L[i].d);return}
+    if(a==='d'){askYN('¿Borrar esta foto?','Borrar',()=>{const k=pfSlug(m.n),o=MXD[k],q=o.ph.find(x=>x.id===L[i].id);if(q){q.del=1;q.d='';mxSave(k)}w.remove();mxRender(m)})}}
+}
+async function mxCopyImg(src){
+  try{
+    let b=await (await fetch(src)).blob();
+    if(b.type!=='image/png'){const bm=await createImageBitmap(b),c=document.createElement('canvas');c.width=bm.width;c.height=bm.height;c.getContext('2d').drawImage(bm,0,0);b=await new Promise(r=>c.toBlob(r,'image/png'))}
+    await navigator.clipboard.write([new ClipboardItem({'image/png':b})]);toast('Foto copiada',1);return
+  }catch(e){}
+  try{const b=await (await fetch(src)).blob(),f=new File([b],'moto.jpg',{type:b.type||'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){}
+  toast('No se pudo copiar. Mantén pulsada la foto.',1)
+}
+function mxAddVideo(){
+  let w=document.getElementById('mxavw');if(w)w.remove();w=document.createElement('div');w.id='mxavw';
+  w.innerHTML='<div class="mxab"><b>Agregar video</b><input id="mxal" inputmode="url" placeholder="Pega el link" autocomplete="off"><button type="button" class="y" data-mxa="l">Agregar link</button><button type="button" data-mxa="f">Elegir archivo</button><input id="mxaf" type="file" accept="video/*" hidden><button type="button" class="n" data-mxa="x">Cancelar</button></div>';
+  document.body.appendChild(w);
+  w.onclick=e=>{const b=e.target.closest&&e.target.closest('[data-mxa]');if(!b&&e.target!==w)return;const a=b&&b.dataset.mxa,m=mxCur();if(!a||a==='x'){w.remove();return}if(!m)return;const k=pfSlug(m.n);
+    if(a==='l'){const u=document.getElementById('mxal').value.trim();if(!/^https?:\/\//i.test(u))return toast('Pega un link que empiece con https',1);MXD[k]=MXD[k]||mxNew();MXD[k].vd.push({id:mxId(),l:u,t:Date.now()});mxSave(k);w.remove();mxRender(m)}
+    if(a==='f')document.getElementById('mxaf').click()};
+  document.getElementById('mxaf').onchange=e=>{const f=e.target.files&&e.target.files[0],m=mxCur();if(!f||!m)return;const k=pfSlug(m.n);MXD[k]=MXD[k]||mxNew();const v={id:mxId(),f:f,t:Date.now()};try{v.url=URL.createObjectURL(f)}catch(x){}MXD[k].vd.push(v);mxSave(k);w.remove();mxRender(m);toast('Video guardado en este teléfono',1)}
+}
+document.addEventListener('click',e=>{
+  const b=e.target&&e.target.closest&&e.target.closest('[data-mx]');if(!b)return;const a=b.dataset.mx,m=mxCur();if(!m)return;const k=pfSlug(m.n);
+  if(a==='view')return mxViewer(b.dataset.id);
+  if(a==='addph'){const i=document.getElementById('mxpf');if(i)i.click();return}
+  if(a==='addvd')return mxAddVideo();
+  if(a==='vdel'){const id=b.dataset.id;return askYN('¿Quitar este video?','Quitar',()=>{const v=(MXD[k]||mxNew()).vd.find(x=>x.id===id);if(v){v.del=1;v.f=null;v.url='';mxSave(k)}mxRender(m)})}
+  if(a==='vplay'){const v=(MXD[k]||mxNew()).vd.find(x=>x.id===b.dataset.id),x=v&&v.l&&pfVid(v.l),box=b.closest('.mxvb');if(x&&box)box.innerHTML=x.k==='mp'?'<video src="'+esc(x.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(x.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'}
+});
+document.addEventListener('change',async e=>{
+  if(!e.target||e.target.id!=='mxpf')return;const fs=[...(e.target.files||[])],m=mxCur();e.target.value='';if(!fs.length||!m)return;const k=pfSlug(m.n);MXD[k]=MXD[k]||mxNew();let n=0;
+  for(const f of fs){try{const d=await mxShrink(f);MXD[k].ph.push({id:mxId(),d:d,t:Date.now()});n++}catch(x){}}
+  if(n){await mxSave(k);mxRender(m);toast(n+(n===1?' foto guardada':' fotos guardadas'),1)}else toast('No se pudo leer la foto',1)
+});
+document.addEventListener('input',e=>{if(!e.target||e.target.id!=='mxsv')return;const m=mxCur();if(!m)return;const k=pfSlug(m.n);MXD[k]=MXD[k]||mxNew();MXD[k].sv=e.target.value;clearTimeout(mxSave.t2);mxSave.t2=setTimeout(()=>mxSave(k),600)});
+
 function pfDraw3(){
   const p=document.getElementById('pf');if(!p)return;p.className='pf pf3';
   const d=MV.d,m=d&&d.m.find(x=>x.n===PFS.m);if(!m){pfShow(PFS.k?2:1);return}
-  const I=window.PFI||{},k=pfSlug(m.n),ph=pfPhoto(m),hero=I[k]?'<img src="'+I[k]+'" alt="">':(ph?'<img class="pfp" src="'+esc(ph)+'" alt="" referrerpolicy="no-referrer">':''),L=pfLab(m);
-  const tr=String(m.t||'').split('·').map(x=>x.trim()).filter(Boolean).slice(0,9),g=pfGrp(m);
-  const si=PFS.s?MSUC.findIndex(x=>x[0]===PFS.s):-1;
-  const sk=PFS.s||mSucKey(S.ag)||'lerma';
-  const ex=m.e?MSUC.map((x,i)=>'<span class="pfx'+(m.e[i]?' on':'')+(i===si?' me':'')+'">'+(m.e[i]?'✓ ':'')+x[1]+'</span>').join(''):'<span class="pfxn">Sin dato de existencia</span>';
-  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="2">← Similares</button></div><div class="pfr">'+esc(PFG[g]||g)+'</div>'
-  +'<div class="pfhero">'+hero+'</div><div class="pft3"><b>'+esc(L[0])+'</b>'+(L[1]?'<small>'+esc(L[1])+'</small>':'')+'</div>'
-  +'<div class="pfc"><div class="pfpr">'+(m.p?mxn(m.p):'Sin precio')+'</div>'+'</div>'
-  +'<div class="pfc"><h4>Video de la moto</h4><div id="pfvw"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
-  +'<div class="pfc"><h4>Video de la tienda</h4><div id="pfvw2"><div class="pfvn"><b>Buscando video…</b></div></div></div>'
-  +'<div class="pfc"><h4>Dónde hay</h4><div class="pfxs">'+ex+'</div></div>'
-  +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">Cargando ficha…</div></div></div>'
-  +'<div class="pfc mtd"><div class="sg"><b>Seguro</b>'+pfSeg(m)+'</div></div>';
-  pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw');if(w)w.innerHTML=pfVidBox(m,M[mnorm(m.n)]||'');const w2=document.getElementById('pfvw2');if(w2)w2.innerHTML=pfVidBox(m,M[mnorm(m.n)+'#2']||'','2')});
-  pfLocVid();
+  const L=pfLab(m),si=PFS.s?MSUC.findIndex(x=>x[0]===PFS.s):-1;
+  const ex=m.e?MSUC.map((x,i)=>'<span class="pfx'+(m.e[i]?' on':'')+(i===si?' me':'')+'">'+(m.e[i]?'✓ ':'')+x[1]+'</span>').join(''):'<span class="pfxn">Sin dato</span>';
+  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="2">← Similares</button></div>'
+  +'<div class="mxh"><b>'+esc(L[0])+'</b>'+(L[1]?'<small>'+esc(L[1])+'</small>':'')+'<span class="mxp">'+(m.p?mxn(m.p):'')+'</span></div>'
+  +'<div class="pfc"><h4>Fotos</h4><div class="mxph" id="mxph"></div><input id="mxpf" type="file" accept="image/*" multiple hidden></div>'
+  +'<div class="pfc"><h4>Videos</h4><div class="mxvd" id="mxvd"></div></div>'
+  +'<div class="pfc"><h4>Video técnico</h4><div id="pfvw"><div class="pfvn"><b>…</b></div></div></div>'
+  +'<div class="pfc"><h4>Argumento de venta</h4><textarea id="mxsv" class="mxsv" rows="4" placeholder="Escribe aquí"></textarea></div>'
+  +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">…</div></div></div>'
+  +'<div class="pfc mtd"><div class="sg"><b>Seguro</b>'+pfSeg(m)+'</div></div>'
+  +'<div class="pfc"><h4>En sucursales</h4><div class="pfxs">'+ex+'</div></div>';
+  mxRender(m);mxOpenM(m);
+  pfVids().then(M=>{if(PFS.v!==3||PFS.m!==m.n)return;const w=document.getElementById('pfvw'),u=M[mnorm(m.n)]||'';if(w)w.innerHTML=u?pfVidBox(m,u):'<div class="pfvn"><b>Sin video</b></div>'});
   api('ficha',{n:m.n}).then(f=>f,()=>null).then(f=>{if(PFS.v!==3||PFS.m!==m.n)return;const b=document.getElementById('pff');if(b)b.innerHTML=mFicha(f,m.n)})
 }
 const PFS={k:'',s:'',v:1,m:''};
