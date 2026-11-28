@@ -1976,7 +1976,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v210';
+const APPV='v211';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3577,14 +3577,14 @@ const pfSlug=n=>String(n||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u
 function pfJs(f){return PFL[f]||(PFL[f]=new Promise(r=>{const e=document.createElement('script');e.src=f+'?v=1';e.onload=()=>r(1);e.onerror=()=>{PFL[f]=0;r(0)};document.head.appendChild(e)}))}
 function pfDraw1(){
   const p=document.getElementById('pf');if(!p)return;const I=window.PFI||{};p.className='pf';
-  p.innerHTML='<button type="button" class="pfall" data-pfb="4">Cat\u00e1logo completo</button>'+PF1.map(([t,L])=>'<div class="pfr">'+esc(t)+'</div><div class="pfg" style="--n:'+Math.ceil(L.length/3)+'">'+L.map(x=>'<button class="pfm" data-pf="'+x[0]+'"><span class="pfi">'+(I[x[0]]?'<img src="'+I[x[0]]+'" alt="">':'<span class="pfh"></span>')+'</span><b>'+esc(x[1])+'</b>'+(x[2]?'<small>'+esc(x[2])+'</small>':'')+'</button>').join('')+'</div>').join('')
+  p.innerHTML=PF1.map(([t,L])=>'<div class="pfr">'+esc(t)+'</div><div class="pfg" style="--n:'+Math.ceil(L.length/3)+'">'+L.map(x=>'<button class="pfm" data-pf="'+x[0]+'"><span class="pfi">'+(I[x[0]]?'<img src="'+I[x[0]]+'" alt="">':'<span class="pfh"></span>')+'</span><b>'+esc(x[1])+'</b>'+(x[2]?'<small>'+esc(x[2])+'</small>':'')+'</button>').join('')+'</div>').join('')
 }
 function pfView(){
   const m=document.getElementById('menu');m.classList.add('pfon');PFS.v=1;PFS.k='';PFS.m='';PFS.s=mSucKey(S.ag);
   m.innerHTML='<div class="pf" id="pf"></div>';m.style.display='block';m.scrollTop=0;
   const p=document.getElementById('pf');
   p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay(pl.dataset.pfplay);return}const lc=e.target.closest&&e.target.closest('[data-pfloc]');if(lc){pfLoc(lc.dataset.pfloc);return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
-  p.onchange=e=>{if(e.target.id==='pfs'){PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s;pfLocVid()}};
+  p.onchange=e=>{if(e.target.id==='pfs'){if(e.target.value==='__all'){pfShow(4);return}PFS.s=e.target.value;MV.s=PFS.s;pfDraw2()}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s;pfLocVid()}};
   pfDraw1();
   pfJs('pf1.js').then(()=>Promise.all(['pf3.js','pf4.js','pf5.js','pf6.js'].map(pfJs))).then(()=>{if(CUR==='moto'&&PFS.v===1&&document.getElementById('pf'))pfDraw1()});
   if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
@@ -3823,7 +3823,7 @@ function pfDraw2(){
   const L=d.m.filter(m=>m!==sel&&pfGrp(m)===g&&(si<0||(m.e&&m.e[si]))).sort((a,b)=>(a.p||9e9)-(b.p||9e9));
   const hasSel=si<0||(sel.e&&sel.e[si]);
   const all=[sel].concat(L);
-  const bar='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===PFS.s?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>\u25bc</i></label></div>';
+  const bar='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===PFS.s?' selected':'')+'>'+x[1]+'</option>').join('')+'<option value="__all">Cat\u00e1logo completo</option></select><i>\u25bc</i></label></div>';
   p.innerHTML=bar+'<div class="pfr">'+esc(PFG[g]||g)+'</div>'+(L.length||hasSel?'<div class="pfg" style="--n:'+Math.max(1,Math.ceil(all.length/3))+'">'+all.map((m,i)=>pfCell(m,I,i===0,i===0&&!hasSel?sn:'')).join('')+'</div>':'')+(L.length?'':'<div class="pfem">No hay m\u00e1s motos de este tipo en '+esc(sn)+'</div>')
 }
 function pfDraw4(){
@@ -3831,7 +3831,7 @@ function pfDraw4(){
   if(!d||!d.m){p.innerHTML='<div class="pfem">Cargando motos\u2026</div>';api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now();if(PFS.v===4)pfDraw4()}}).catch(()=>{});return}
   const G={};d.m.forEach(m=>{const g=pfGrp(m);(G[g]=G[g]||[]).push(m)});
   const ks=Object.keys(G).sort((a,b)=>{const i=PFGO.indexOf(a),j=PFGO.indexOf(b);return (i<0?99:i)-(j<0?99:j)||a.localeCompare(b)});
-  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><b class="pfct">Cat\u00e1logo completo \u00b7 '+d.m.length+'</b></div>'+ks.map(g=>'<div class="pfr">'+esc(PFG[g]||g)+'</div><div class="pfg">'+G[g].sort((a,b)=>(a.p||9e9)-(b.p||9e9)).map(m=>pfCell(m,I,false,'')).join('')+'</div>').join('')
+  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+''+'>'+x[1]+'</option>').join('')+'<option value="__all" selected>Cat\u00e1logo completo</option></select><i>\u25bc</i></label></div>'+ks.map(g=>'<div class="pfr">'+esc(PFG[g]||g)+'</div><div class="pfg">'+G[g].sort((a,b)=>(a.p||9e9)-(b.p||9e9)).map(m=>pfCell(m,I,false,'')).join('')+'</div>').join('')
 }
 function pfShow(v){PFS.v=v;const m=document.getElementById('menu');if(m)m.scrollTop=0;if(v===1)pfDraw1();else if(v===2)pfDraw2();else if(v===4)pfDraw4();else pfDraw3()}
 async function pfOpen(k){
