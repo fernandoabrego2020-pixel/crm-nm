@@ -974,10 +974,16 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .mxph{display:flex;flex-wrap:wrap;gap:8px}
 .mxhero{flex:0 0 100%;aspect-ratio:4/3;border:0;padding:0;border-radius:18px;background:linear-gradient(160deg,#fbfcfd,#e4e9f0);overflow:hidden;cursor:pointer;box-shadow:0 6px 18px rgba(24,32,43,.12)}
 .mxhero img{width:100%;height:100%;object-fit:contain;display:block}
-.mxf{flex:0 0 calc((100% - 16px)/3);aspect-ratio:1;border-radius:12px;border:0;padding:0;background:#eef1f5;overflow:hidden;scroll-snap-align:start;cursor:pointer}
+.mxf{flex:0 0 calc((100% - 24px)/4);aspect-ratio:1;border-radius:12px;border:0;padding:0;background:#eef1f5;overflow:hidden;scroll-snap-align:start;cursor:pointer}
 .mxf img{width:100%;height:100%;object-fit:cover;display:block}
-.mxph .mxad{flex:0 0 calc((100% - 16px)/3);aspect-ratio:1;height:auto;width:auto}
+.mxph .mxad{flex:0 0 calc((100% - 24px)/4);aspect-ratio:1;height:auto;width:auto}
 .mxad{border:2px dashed #b7c0cc;background:#f6f8fa;color:#5b6676;font:700 30px/1 system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.mxf{position:relative}.mxvt{background:#18202b}
+.mxvt video,.mxvt img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.mxpl{position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;pointer-events:none}
+.mxpl svg{width:16px;height:16px;fill:#fff;margin-left:2px}
+.mxvi video{width:100%;max-height:100%;background:#000}
+.mxvi iframe{width:100%;aspect-ratio:16/9;height:auto;border:0}
 .mxvd{display:flex;flex-direction:column;gap:10px}
 .mxav{width:100%;height:48px;border-radius:12px;font-size:15px}
 .mxv{position:relative}.mxvb{border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9}
@@ -1980,7 +1986,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v225';
+const APPV='v226';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3732,8 +3738,11 @@ function mxCatPh(m){const I=window.PFI||{},k=pfSlug(m.n),a=String(m.i||'').split
 function mxPhotos(m){const k=pfSlug(m.n),o=MXD[k]||mxNew(),cat=mxCatPh(m).map((u,i)=>({id:'c'+i,d:u,c:1,fb:(window.PFI||{})[k]||''}));return cat.concat(o.ph.filter(p=>!p.del&&p.d))}
 function mxRender(m){
   const k=pfSlug(m.n),o=MXD[k]||mxNew();
-  const ph=document.getElementById('mxph');if(ph){const L=mxPhotos(m);const im=p=>'<img src="'+esc(p.d)+'" alt="" decoding="async" referrerpolicy="no-referrer"'+(p.fb?' data-fb="'+esc(p.fb)+'" onerror="if(this.dataset.fb){this.src=this.dataset.fb;this.dataset.fb=\'\'}"':'')+'>';ph.innerHTML=(L.length?'<button type="button" class="mxhero" data-mx="view" data-id="'+L[0].id+'">'+im(L[0])+'</button>':'')+L.slice(1).map(p=>'<button type="button" class="mxf" data-mx="view" data-id="'+p.id+'">'+im(p)+'</button>').join('')+'<button type="button" class="mxt mxad" data-mx="addph" aria-label="Agregar foto">+</button>'}
-  const vd=document.getElementById('mxvd');if(vd){vd.innerHTML=o.vd.filter(v=>!v.del).map(v=>{const x=v.l?pfVid(v.l):null;const th=x&&x.th?' style="background-image:url('+esc(x.th)+')"':'';const body=v.f?'<video src="'+esc(v.url||'')+'" controls playsinline preload="metadata"></video>':(x&&x.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(v.l)+'">Abrir video</a>':'<button type="button" class="pfvp" data-mx="vplay" data-id="'+v.id+'"'+th+'><span class="pfpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span></button>');return '<div class="mxv" data-vid="'+v.id+'"><div class="mxvb">'+body+'</div><button type="button" class="mxx" data-mx="vdel" data-id="'+v.id+'" aria-label="Quitar">×</button></div>'}).join('')+'<button type="button" class="mxad mxav" data-mx="addvd">+ Video</button>'}
+  const ph=document.getElementById('mxph');if(ph){const L=mxPhotos(m);const im=p=>'<img src="'+esc(p.d)+'" alt="" decoding="async" referrerpolicy="no-referrer"'+(p.fb?' data-fb="'+esc(p.fb)+'" onerror="if(this.dataset.fb){this.src=this.dataset.fb;this.dataset.fb=\'\'}"':'')+'>';ph.innerHTML=L.map(p=>'<button type="button" class="mxf" data-mx="view" data-id="'+p.id+'">'+im(p)+'</button>').join('')+'<button type="button" class="mxt mxad" data-mx="addph" aria-label="Agregar foto">+</button>'}
+  const vt=v=>{const x=v.l?pfVid(v.l):null;const pl='<span class="mxpl"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>';let inn='';if(v.f){if(!v.url){try{v.url=URL.createObjectURL(v.f)}catch(e){}}inn='<video src="'+esc(v.url||'')+'#t=0.1" preload="metadata" muted playsinline></video>'}else if(x&&x.k==='mp')inn='<video src="'+esc(x.em)+'#t=0.1" preload="metadata" muted playsinline></video>';else if(x&&x.th)inn='<img src="'+esc(x.th)+'" alt="" referrerpolicy="no-referrer" onerror="this.remove()">';return '<button type="button" class="mxf mxvt" data-mx="vview" data-id="'+v.id+'">'+inn+pl+'</button>'};
+  const LV=o.vd.filter(v=>!v.del),isF=v=>v.f||(v.l&&pfVid(v.l).k==='dr');
+  const vd=document.getElementById('mxvd');if(vd)vd.innerHTML=LV.filter(isF).map(vt).join('')+'<button type="button" class="mxt mxad" data-mx="addvf" aria-label="Agregar video">+</button>';
+  const vn=document.getElementById('mxvn');if(vn)vn.innerHTML=LV.filter(v=>!isF(v)).map(vt).join('')+'<button type="button" class="mxt mxad" data-mx="addvd" aria-label="Agregar video de internet">+</button>'
   const sv=document.getElementById('mxsv');if(sv&&document.activeElement!==sv)sv.value=o.sv||'';
 }
 async function mxOpenM(m){
@@ -3792,18 +3801,34 @@ async function mxUpVideo(f,k,m){
 }
 function mxAddVideo(){
   let w=document.getElementById('mxavw');if(w)w.remove();w=document.createElement('div');w.id='mxavw';
-  w.innerHTML='<div class="mxab"><b>Agregar video</b><input id="mxal" inputmode="url" placeholder="Pega el link" autocomplete="off"><button type="button" class="y" data-mxa="l">Agregar link</button><button type="button" data-mxa="f">Elegir archivo</button><input id="mxaf" type="file" accept="video/*" hidden><button type="button" class="n" data-mxa="x">Cancelar</button></div>';
+  w.innerHTML='<div class="mxab"><b>Agregar video de internet</b><input id="mxal" inputmode="url" placeholder="Pega el link" autocomplete="off"><button type="button" class="y" data-mxa="l">Agregar link</button><button type="button" class="n" data-mxa="x">Cancelar</button></div>';
   document.body.appendChild(w);
   w.onclick=e=>{const b=e.target.closest&&e.target.closest('[data-mxa]');if(!b&&e.target!==w)return;const a=b&&b.dataset.mxa,m=mxCur();if(!a||a==='x'){w.remove();return}if(!m)return;const k=pfSlug(m.n);
-    if(a==='l'){const u=document.getElementById('mxal').value.trim();if(!/^https?:\/\//i.test(u))return toast('Pega un link que empiece con https',1);MXD[k]=MXD[k]||mxNew();MXD[k].vd.push({id:mxId(),l:u,t:Date.now()});mxSave(k);w.remove();mxRender(m)}
-    if(a==='f')document.getElementById('mxaf').click()};
-  document.getElementById('mxaf').onchange=e=>{const f=e.target.files&&e.target.files[0],m=mxCur();if(!f||!m)return;const k=pfSlug(m.n);w.remove();mxUpVideo(f,k,m)}
+    if(a==='l'){const u=document.getElementById('mxal').value.trim();if(!/^https?:\/\//i.test(u))return toast('Pega un link que empiece con https',1);MXD[k]=MXD[k]||mxNew();MXD[k].vd.push({id:mxId(),l:u,t:Date.now()});mxSave(k);w.remove();mxRender(m)}}
+}
+function mxPickVid(){
+  let i=document.getElementById('mxaf0');if(!i){i=document.createElement('input');i.type='file';i.accept='video/*';i.id='mxaf0';i.hidden=true;document.body.appendChild(i)}
+  i.onchange=()=>{const f=i.files&&i.files[0],m=mxCur();i.value='';if(!f||!m)return;mxUpVideo(f,pfSlug(m.n),m)};i.click()
+}
+function mxVidViewer(id){
+  const m=mxCur();if(!m)return;const k=pfSlug(m.n),o=MXD[k]||mxNew(),v=o.vd.find(x=>x.id===id);if(!v)return;
+  const x=v.l?pfVid(v.l):null;if(v.f&&!v.url){try{v.url=URL.createObjectURL(v.f)}catch(e){}}
+  let w=document.getElementById('mxv');if(w)w.remove();w=document.createElement('div');w.id='mxv';document.body.appendChild(w);
+  const body=v.f?'<video src="'+esc(v.url||'')+'" controls autoplay playsinline></video>':(x&&x.k==='mp'?'<video src="'+esc(x.em)+'" controls autoplay playsinline></video>':(x&&x.k==='ot'?'<a class="pfvo" target="_blank" rel="noopener" href="'+esc(v.l)+'">Abrir video</a>':'<iframe src="'+esc(x?x.em:'')+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'));
+  w.innerHTML='<div class="mxvh"><button type="button" data-mxv="x" aria-label="Cerrar">✕</button><span>Video</span></div><div class="mxvi">'+body+'</div><div class="mxvf">'+(v.l?'<button type="button" data-mxv="c">Copiar link</button>':'<button type="button" data-mxv="s">Compartir</button>')+'<button type="button" class="d" data-mxv="d">Quitar</button></div>';
+  w.onclick=async e=>{const b=e.target.closest&&e.target.closest('[data-mxv]');if(!b)return;const a=b.dataset.mxv;
+    if(a==='x'){w.remove();return}
+    if(a==='c'){pfCopy(v.l,'Link copiado');return}
+    if(a==='s'){try{if(navigator.canShare&&navigator.canShare({files:[v.f]})){await navigator.share({files:[v.f]});return}}catch(er){}toast('Este navegador no deja compartir el archivo',1);return}
+    if(a==='d'){askYN('¿Quitar este video?','Quitar',()=>{v.del=1;v.f=null;v.url='';mxSave(k);w.remove();mxRender(m)})}}
 }
 document.addEventListener('click',e=>{
   const b=e.target&&e.target.closest&&e.target.closest('[data-mx]');if(!b)return;const a=b.dataset.mx,m=mxCur();if(!m)return;const k=pfSlug(m.n);
   if(a==='view')return mxViewer(b.dataset.id);
   if(a==='addph'){const i=document.getElementById('mxpf');if(i)i.click();return}
   if(a==='addvd')return mxAddVideo();
+  if(a==='addvf')return mxPickVid();
+  if(a==='vview')return mxVidViewer(b.dataset.id);
   if(a==='vdel'){const id=b.dataset.id;return askYN('¿Quitar este video?','Quitar',()=>{const v=(MXD[k]||mxNew()).vd.find(x=>x.id===id);if(v){v.del=1;v.f=null;v.url='';mxSave(k)}mxRender(m)})}
   if(a==='vplay'){const v=(MXD[k]||mxNew()).vd.find(x=>x.id===b.dataset.id),x=v&&v.l&&pfVid(v.l),box=b.closest('.mxvb');if(x&&box)box.innerHTML=x.k==='mp'?'<video src="'+esc(x.em)+'" controls autoplay playsinline></video>':'<iframe src="'+esc(x.em)+'" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>'}
 });
@@ -3822,7 +3847,8 @@ function pfDraw3(){
   p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="'+(PFS.fr===4?4:2)+'">'+(PFS.fr===4?'← Catálogo':'← Similares')+'</button></div>'
   +'<div class="mxhd"><b>'+esc(L[0])+'</b>'+(L[1]?'<small>'+esc(L[1])+'</small>':'')+'<span class="mxp">'+(m.p?mxn(m.p):'')+'</span></div>'
   +'<div class="pfc"><h4>Fotos</h4><div class="mxph" id="mxph"></div><input id="mxpf" type="file" accept="image/*" multiple hidden></div>'
-  +'<div class="pfc"><h4>Videos</h4><div class="mxvd" id="mxvd"></div></div>'
+  +'<div class="pfc"><h4>Videos</h4><div class="mxph" id="mxvd"></div><input id="mxaf0" type="file" accept="video/*" hidden></div>'
+  +'<div class="pfc"><h4>Videos de internet</h4><div class="mxph" id="mxvn"></div></div>'
   +'<div class="pfc"><h4>Video técnico</h4><div id="pfvw"><div class="pfvn"><b>…</b></div></div></div>'
   +'<div class="pfc"><h4>Argumento de venta</h4><textarea id="mxsv" class="mxsv" rows="4" placeholder="Escribe aquí"></textarea></div>'
   +'<div class="pfc mtd"><div class="sg" id="pff"><b>Ficha técnica</b><div class="note" style="margin-top:6px">…</div></div></div>'
