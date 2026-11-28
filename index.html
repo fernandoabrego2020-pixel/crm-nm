@@ -1980,7 +1980,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v224';
+const APPV='v225';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3765,6 +3765,31 @@ async function mxCopyImg(src){
   try{const b=await (await fetch(src)).blob(),f=new File([b],'moto.jpg',{type:b.type||'image/jpeg'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});return}}catch(e){}
   toast('No se pudo copiar. Mantén pulsada la foto.',1)
 }
+function mxVidLocal(f,k,m,msg){MXD[k]=MXD[k]||mxNew();const v={id:mxId(),f:f,t:Date.now()};try{v.url=URL.createObjectURL(f)}catch(x){}MXD[k].vd.push(v);mxSave(k);if(PFS.m===m.n)mxRender(m);toast(msg||'Video guardado en este teléfono',1)}
+async function mxUpVideo(f,k,m){
+  if(f.size>250*1024*1024){mxVidLocal(f,k,m,'Muy pesado para compartirlo. Quedó solo en este teléfono; mejor pega un link');return}
+  let box=document.getElementById('mxup');if(box)box.remove();box=document.createElement('div');box.id='mxup';
+  box.style.cssText='position:fixed;left:12px;right:12px;bottom:96px;z-index:99999;background:#14202a;color:#fff;border-radius:14px;padding:12px 14px;font:600 14px system-ui;box-shadow:0 8px 24px rgba(0,0,0,.4)';
+  box.textContent='Subiendo video… 0%';document.body.appendChild(box);
+  const CH=1572864;
+  try{
+    const s=await api('moto_vup',{a:'start',name:f.name||'video',mime:f.type||'video/mp4'});if(!s||!s.ok)throw new Error('start');
+    let off=0,id='';
+    while(off<f.size){
+      const part=f.slice(off,Math.min(off+CH,f.size));
+      const b=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]||'');fr.onerror=()=>rej(fr.error);fr.readAsDataURL(part)});
+      let r=null;
+      for(let t=0;t<3&&!r;t++){try{const x=await api('moto_vup',{a:'put',u:s.u,off:off,total:f.size,mime:f.type||'video/mp4',b:b});if(x&&x.ok)r=x}catch(e){}}
+      if(!r)throw new Error('put');
+      off+=part.size;if(r.id)id=r.id;
+      box.textContent='Subiendo video… '+Math.min(99,Math.floor(off/f.size*100))+'%'
+    }
+    if(!id)throw new Error('id');
+    const z=await api('moto_vup',{a:'fin',id:id});if(!z||!z.ok||!z.l)throw new Error('fin');
+    MXD[k]=MXD[k]||mxNew();MXD[k].vd.push({id:mxId(),l:z.l,t:Date.now()});mxSave(k);
+    box.remove();if(PFS.m===m.n)mxRender(m);toast('Video subido. Ya lo ven todos',1)
+  }catch(e){box.remove();mxVidLocal(f,k,m,'No se pudo subir. Quedó solo en este teléfono')}
+}
 function mxAddVideo(){
   let w=document.getElementById('mxavw');if(w)w.remove();w=document.createElement('div');w.id='mxavw';
   w.innerHTML='<div class="mxab"><b>Agregar video</b><input id="mxal" inputmode="url" placeholder="Pega el link" autocomplete="off"><button type="button" class="y" data-mxa="l">Agregar link</button><button type="button" data-mxa="f">Elegir archivo</button><input id="mxaf" type="file" accept="video/*" hidden><button type="button" class="n" data-mxa="x">Cancelar</button></div>';
@@ -3772,7 +3797,7 @@ function mxAddVideo(){
   w.onclick=e=>{const b=e.target.closest&&e.target.closest('[data-mxa]');if(!b&&e.target!==w)return;const a=b&&b.dataset.mxa,m=mxCur();if(!a||a==='x'){w.remove();return}if(!m)return;const k=pfSlug(m.n);
     if(a==='l'){const u=document.getElementById('mxal').value.trim();if(!/^https?:\/\//i.test(u))return toast('Pega un link que empiece con https',1);MXD[k]=MXD[k]||mxNew();MXD[k].vd.push({id:mxId(),l:u,t:Date.now()});mxSave(k);w.remove();mxRender(m)}
     if(a==='f')document.getElementById('mxaf').click()};
-  document.getElementById('mxaf').onchange=e=>{const f=e.target.files&&e.target.files[0],m=mxCur();if(!f||!m)return;const k=pfSlug(m.n);MXD[k]=MXD[k]||mxNew();const v={id:mxId(),f:f,t:Date.now()};try{v.url=URL.createObjectURL(f)}catch(x){}MXD[k].vd.push(v);mxSave(k);w.remove();mxRender(m);toast('Video guardado en este teléfono',1)}
+  document.getElementById('mxaf').onchange=e=>{const f=e.target.files&&e.target.files[0],m=mxCur();if(!f||!m)return;const k=pfSlug(m.n);w.remove();mxUpVideo(f,k,m)}
 }
 document.addEventListener('click',e=>{
   const b=e.target&&e.target.closest&&e.target.closest('[data-mx]');if(!b)return;const a=b.dataset.mx,m=mxCur();if(!m)return;const k=pfSlug(m.n);
