@@ -158,6 +158,7 @@ details.pz > summary::-webkit-details-marker{display:none}
 .mpn i{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 .mpm{font-size:13px;color:var(--mu);word-break:break-word}
 .mpa{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.mpa.one{grid-template-columns:1fr}
 #mdock{padding:10px 12px calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);display:grid;gap:8px}
 #mdock .r2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 #mdock .r2 button{padding:13px 4px;font-size:14px}
@@ -172,6 +173,8 @@ details.pz > summary::-webkit-details-marker{display:none}
 .mfs .res{overflow:auto;display:grid;gap:6px;align-content:start;flex:1}
 .mfs .mrow{text-align:left;border:1px solid var(--ln);background:var(--card);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--tx);font-size:14px}
 .mfs .mrow small{display:block;color:var(--mu);font-size:12px}
+.mfs .mrow.lc{display:block;width:100%;box-sizing:border-box;text-align:left;margin:0;font:inherit;padding:9px 12px}
+.mfs .mrow.lc .mrs{color:var(--mu);font-size:12.5px;margin-top:3px}
 .mfs .mh{display:flex;align-items:center;justify-content:space-between}
 .mfs .mh button{background:none;border:0;font-size:26px;line-height:1;color:var(--mu);cursor:pointer;padding:2px 8px}
 
@@ -1347,7 +1350,7 @@ body.hasnav .page{padding-bottom:calc(90px + var(--xb,0px))}
 <div id="mapv">
   <div id="mtop"><button id="mback">← Clientes</button><b id="mtt">Cambaceo</b><div id="mseg"><button data-md="pros">Prospectos</button><button data-md="rutas">Rutas</button></div></div>
   <div id="mwrap"><canvas id="mc"></canvas><div id="mst"></div><div id="mpt"></div><div id="mtr"><b id="mtn">Traza la calle</b><div class="mtb"><button id="mtg">Centrar en mí</button><button id="mtu">Deshacer punto</button><button id="mtx">Cancelar</button><button id="mtok" class="p">Listo</button></div></div><div id="mleg"><span><i style="background:#36738f"></i>Enviar más fotos</span><span><i style="background:#b74131"></i>Buscar aprobación</span><span><i style="background:#20754d"></i>Buscar visita</span></div></div>
-  <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">Ubicar lead</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="msave">Guardar ubicación</button></div>
+  <div id="mdock"><div class="r2"><button id="mloc">Ubicarme</button><button id="mvis">Por visitar</button><button id="mfind">¿Cuál lead es?</button></div><div class="r2b"><button id="mtrk">Rastrear ruta</button><button id="mrts">Rutas</button><button id="mbg" onclick="bgRuta()" style="grid-column:1/-1">Ruta con pantalla bloqueada</button></div><button id="msave">Guardar ubicación</button></div>
   <div class="mfs" id="mfs"><div class="mh"><b id="mft">Lead sin ubicación</b><button id="mfx" aria-label="Cerrar">×</button></div><input id="mfq" placeholder="Buscar por nombre o teléfono" autocomplete="off"><div class="note" id="mfn">Toca un lead para guardarle tu ubicación.</div><div class="res" id="mfr"></div></div>
   <div class="mfs" id="mrs"><div class="mh"><b>Rutas de cambaceo</b><button id="mrx" aria-label="Cerrar">×</button></div><label class="note"><input type="checkbox" id="mrshow" checked style="width:auto;padding:0"> Mostrar rutas en el mapa</label><div class="note" id="mrn"></div><div class="res" id="mrr"></div></div>
 </div>
@@ -1712,7 +1715,7 @@ function p2Render(){
   if(p2DBusy()){P2G.rr=1;return}
   const L={},T=[['bas','Basura'],['neu','Neutros'],['imp','Importantes']];
   T.forEach(([k])=>{L[k]=p2Pool(k)});const EL=p2Pool('eli');
-  const flt=!!(P2.f||P2.q);const srch=!!String(P2.q||'').trim();const pool=!!(srch||P2.f);const ALL=L.bas.concat(L.neu,L.imp).filter((x,i,A)=>A.findIndex(y=>y.id===x.id)===i);const list=(pool?ALL.sort((a,b)=>p2Last(b)-p2Last(a)):L[P2.cat]).filter(p2Keep),show=list.slice(0,P2.lim);
+  const flt=!!(P2.f||P2.q);const srch=!!String(P2.q||'').trim();const pool=!!(srch||P2.f);const ALL=L.bas.concat(L.neu,L.imp).filter((x,i,A)=>A.findIndex(y=>y.id===x.id)===i);const list=(pool?ALL.sort((a,b)=>((b.pin?1:0)-(a.pin?1:0))||(b.pin&&a.pin?b.pin-a.pin:0)||p2Last(b)-p2Last(a)):L[P2.cat]).filter(p2Keep),show=list.slice(0,P2.lim);
   const fo=document.activeElement&&document.activeElement.id==='p2q'?document.activeElement.selectionStart:-1;
   P2E.imp=ADMIN_TXT();
   S.leads.filter(l=>l.ph&&l.own===S.ag&&!l.pn).forEach(l=>{l.pn=phNext()});
@@ -1965,7 +1968,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v205';
+const APPV='v206';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -4657,9 +4660,8 @@ const MAPM=(function(){
   function hideCard(){sel=null;armQ=false;clearTimeout(armT);$('mpt').className='';}
   function showPh(l){
     sel=l.id;armQ=false;
-    $('mpt').innerHTML=`<div class="mpn"><i style="background:#ee8931"></i><b>Sin datos</b></div><div class="mpm">Guardado ${ago(l.c)}</div><div class="mpa"><button class="b p" id="mpf">Llenar con IA</button><button class="b" id="mpe">Usar un lead</button><button class="b" id="mpm">Mover</button><button class="b dg" id="mpq">Borrar</button></div>`;
+    $('mpt').innerHTML=`<div class="mpn"><i style="background:#ee8931"></i><b>Sin datos</b></div><div class="mpm">Guardado ${ago(l.c)}</div><div class="mpa one"><button class="b p" id="mpe">Usar un lead</button><button class="b" id="mpm">Mover</button><button class="b dg" id="mpq">Borrar</button></div>`;
     $('mpt').className='show';
-    $('mpf').onclick=()=>openSheet(null,AI?'foto':'manual',l.id);
     $('mpe').onclick=()=>{hideCard();draw();openFind('adopt',l.id)};
     $('mpm').onclick=()=>free0(()=>{mv=l.id;hideCard();draw();say('Toca en el mapa el lugar correcto.')});
     $('mpq').onclick=()=>{
@@ -4707,10 +4709,10 @@ const MAPM=(function(){
   function renderFind(){
     const q=($('mfq').value||'').trim().toLowerCase(),d=q.replace(/\D/g,'');
     const vm=fm==='visit',pm=fm==='ph',ad=fm==='adopt',dd=l=>l.loc&&me?Math.hypot(mx(l.loc[1])-mx(me[1]),my(l.loc[0])-my(me[0])):1e12;
-    const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||fq(l,q)||(d&&String(l.tel).includes(d.length>10?norm(d):d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):b.c-a.c).slice(0,40);
-    $('mfr').innerHTML=L.length?L.map(l=>l.ph?`<button class="mrow" data-id="${l.id}">Sin datos<small>Guardado ${ago(l.c)}${l.loc?' · ±'+l.loc[2]+' m':''}</small></button>`:`<button class="mrow" data-id="${l.id}">${esc(p2Title(l))}<small>${esc(fmt(l.tel))} · ${PN[baseOf(l)]}${vm&&!l.loc?' · sin ubicación':''}</small></button>`).join(''):'<div class="note">'+(vm?'No hay leads pendientes de visita.':'No hay leads sin ubicación con esa búsqueda.')+'</div>';
+    const L=S.leads.filter(l=>l.own===S.ag&&(pm?l.ph:vm?l.vz:ad?(!l.ph&&!l.loc):!l.loc)&&(!q||fq(l,q)||(d&&String(l.tel).includes(d.length>10?norm(d):d)))).sort((a,b)=>vm&&me?dd(a)-dd(b):(p2Last(b)-p2Last(a))||(b.c-a.c)).slice(0,40);
+    $('mfr').innerHTML=L.length?L.map(l=>l.ph?`<button class="mrow" data-id="${l.id}">Sin datos<small>Guardado ${ago(l.c)}${l.loc?' · ±'+l.loc[2]+' m':''}</small></button>`:`<div class="mrow lc" role="button" data-id="${l.id}"${p2Phase(l)?' style="--k:var(--'+p2Phase(l)[1]+')"':''}><div class="lt"><span class="ln"><b>${esc(p2Title(l))}</b>${p2New(l)?'<i class="p2nw">Nuevo</i>':''}${p2Sg(l)}</span></div><div class="mrs">${esc(fmt(l.tel))} · ${PN[baseOf(l)]}${vm&&!l.loc?' · sin ubicación':''}</div></div>`).join(''):'<div class="note">'+(vm?'No hay leads pendientes de visita.':'No hay leads sin ubicación con esa búsqueda.')+'</div>';
   }
-  function openFind(m,aid){fm=m;adopt=aid||null;mv=null;$('mft').textContent=m==='adopt'?'Poner un lead aqu\u00ed':m==='ph'?'Guardados sin datos':m==='visit'?'Por visitar':'Ubicar un lead que no tiene ubicaci\u00f3n';$('mfn').textContent=m==='adopt'?'Toca el lead que ya tienes y se queda en esta ubicaci\u00f3n.':m==='ph'?'Toca uno para verlo en el mapa y llenar sus datos.':m==='visit'?'Toca el lead para verlo en el mapa. Si ya diste Ubicarme, salen del m\u00e1s cercano al m\u00e1s lejano.':'Toca el lead y despu\u00e9s toca en el mapa donde est\u00e1.';$('mfq').value='';renderFind();$('mfs').className='mfs show'}
+  function openFind(m,aid){fm=m;adopt=aid||null;mv=null;$('mft').textContent=m==='adopt'?'Poner un lead aqu\u00ed':m==='ph'?'Guardados sin datos':m==='visit'?'Por visitar':'\u00bfCu\u00e1l lead es?';$('mfn').textContent=m==='adopt'?'Toca el lead que ya tienes y se queda en esta ubicaci\u00f3n.':m==='ph'?'Toca uno para verlo en el mapa y llenar sus datos.':m==='visit'?'Toca el lead para verlo en el mapa. Si ya diste Ubicarme, salen del m\u00e1s cercano al m\u00e1s lejano.':'Toca el lead y despu\u00e9s toca en el mapa donde est\u00e1.';$('mfq').value='';renderFind();$('mfs').className='mfs show'}
   function closeFind(){$('mfs').className='mfs'}
   function assign(id){
     const l=S.leads.find(x=>x.id===id);if(!l)return;
@@ -4757,7 +4759,7 @@ const MAPM=(function(){
     document.addEventListener('visibilitychange',()=>{if(document.hidden||!trk)return;wake();if(!lastP||Date.now()-lastP[3]>15e4)tick();flush()});
     window.addEventListener('online',flush);
     $('mfq').oninput=renderFind;
-    $('mfr').onclick=e=>{const b=e.target.closest('.mrow');if(!b)return;if(fm==='adopt'){doAdopt(b.dataset.id);return}if(fm==='visit'||fm==='ph'){const l=S.leads.find(x=>x.id===b.dataset.id);closeFind();if(!l)return;if(!l.loc){say('Ese lead no tiene ubicación. Usa Ubicar lead cuando estés con él.');return}V.cx=mx(l.loc[1]);V.cy=my(l.loc[0]);V.s=Math.max(V.s,0.5);showCard(l);draw();return}assign(b.dataset.id)};
+    $('mfr').onclick=e=>{const b=e.target.closest('.mrow');if(!b)return;if(fm==='adopt'){doAdopt(b.dataset.id);return}if(fm==='visit'||fm==='ph'){const l=S.leads.find(x=>x.id===b.dataset.id);closeFind();if(!l)return;if(!l.loc){say('Ese lead no tiene ubicación. Usa ¿Cuál lead es? cuando estés con él.');return}V.cx=mx(l.loc[1]);V.cy=my(l.loc[0]);V.s=Math.max(V.s,0.5);showCard(l);draw();return}assign(b.dataset.id)};
     cv.addEventListener('pointerdown',e=>{cv.setPointerCapture(e.pointerId);const r=cv.getBoundingClientRect(),p=[e.clientX-r.left,e.clientY-r.top];ptr[e.pointerId]=p;last2=0;if(Object.keys(ptr).length===1){moved=0;down0=p}else moved=99});
     cv.addEventListener('pointermove',e=>{
       if(!ptr[e.pointerId])return;
