@@ -1986,7 +1986,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v228';
+const APPV='v229';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3595,6 +3595,7 @@ function pfView(){
   p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay(pl.dataset.pfplay);return}const lc=e.target.closest&&e.target.closest('[data-pfloc]');if(lc){pfLoc(lc.dataset.pfloc);return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
   p.onchange=e=>{if(e.target.id==='pfs'){if(e.target.value==='__all'){pfShow(4);return}PFS.s=e.target.value;MV.s=PFS.s;pfShow(2)}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s;pfLocVid()}};
   pfDraw1();
+  setTimeout(mxSweep,2500);
   pfJs('pf1.js').then(()=>Promise.all(['pf3.js','pf4.js','pf5.js','pf6.js'].map(pfJs))).then(()=>{if(CUR==='moto'&&PFS.v===1&&document.getElementById('pf'))pfDraw1()});
   if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
 }
@@ -3748,6 +3749,17 @@ function mxRender(m){
 }
 let MXCH=Promise.resolve();const MXUPQ={};
 function mxAuto(k,m){const o=MXD[k];if(!o||!navigator.onLine)return;o.vd.filter(v=>v.f&&!v.del&&!MXUPQ[v.id]).forEach(v=>{MXUPQ[v.id]=1;MXCH=MXCH.then(()=>mxUpVideo(v.f,k,m,v.id)).catch(()=>{}).then(()=>{delete MXUPQ[v.id]})})}
+async function mxSweep(){
+  if(mxSweep.d||!navigator.onLine)return;
+  for(let i=0;i<20&&!(MV.d&&MV.d.m);i++)await new Promise(r=>setTimeout(r,500));
+  if(!(MV.d&&MV.d.m))return;mxSweep.d=1;
+  try{const db=await mxDb();if(!db)return;
+    const ks=await new Promise(r=>{try{const q=db.transaction('m').objectStore('m').getAllKeys();q.onsuccess=()=>r(q.result||[]);q.onerror=()=>r([])}catch(e){r([])}});
+    for(const k of ks){if(!MXD[k])await mxLoad(k);const o=MXD[k];if(!o)continue;
+      if((o.ph&&o.ph.some(p=>p.d&&!p.c&&!p.del))||(o.vd&&o.vd.some(v=>v.l&&!v.del))||o.sv)await mxPush(k);
+      const m=MV.d.m.find(x=>pfSlug(x.n)===k);if(m)mxAuto(k,m)}
+  }catch(e){}
+}
 async function mxOpenM(m){
   const k=pfSlug(m.n);await mxLoad(k);
   // fabrica URLs locales para videos de archivo
