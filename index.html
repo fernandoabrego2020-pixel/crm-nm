@@ -1716,7 +1716,7 @@ function p2Card(l,c){
   const chip=P2.ph===l.id?'<div class="lpw pk">'+P2OPT.map(o=>'<button class="lph pb'+(o[0]===gk?' on':'')+'" style="--k:var(--'+o[2]+')" data-p2="setph" data-v="'+o[0]+'" data-id="'+l.id+'">Siguiente paso:&nbsp;<b>'+o[1]+'</b></button>').join('')+'</div>':'<div class="lpw"><button class="lph pb'+(ph?'':' no')+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+' data-p2="ph" data-id="'+l.id+'">Siguiente paso:&nbsp;<b>'+(ph?esc(ph[0]):'elegir')+'</b> <i class="cv">\u25be</i></button></div>';
   const mo=P2.mo===l.id;
   const res=op?'<div class="p2rs">'+D('ctx','ls','<span class="p2lb">Resumen:</span> '+esc(p2SumFull(l)))+'</div>':'';
-  const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+'<button class="p2a ia" data-p2="ia" data-id="'+l.id+'">Preguntar a la IA</button>'+chip+'</div>':'')+'</div>':'';
+  const more=op&&!RO?'<div class="lx"><button class="p2mo" data-p2="mo" data-id="'+l.id+'">M\u00e1s opciones <i class="cv">'+(mo?'\u25b4':'\u25be')+'</i></button>'+(mo?'<div class="p2mb">'+pn+chip+'</div>':'')+'</div>':'';
   return '<div class="lc'+(op?' op':'')+(l.pin?' pinned':'')+'" data-id="'+l.id+'" data-c="'+c+'"'+(ph?' style="--k:var(--'+ph[1]+')"':'')+'><div class="lt"><span class="ln"><b data-p2="ed" data-fld="idf" data-id="'+l.id+'">'+esc(p2Title(l))+'</b>'+((P2.q||P2.f)&&c!=='neu'?'<i class="p2ct">'+(c==='bas'?'Basura':c==='imp'?'Importante':'Eliminado')+'</i>':'')+(p2New(l)?'<i class="p2nw">Nuevo</i>':'')+p2Sg(l)+(l.pin?'<svg class="pinic" viewBox="0 0 24 24" role="img" aria-label="Fijado">'+P2I.pin+'</svg>':'')+'</span>'+(op?'<small class="'+p2Age(l)+'">'+esc(p2Dt(p2Last(l)))+' <i class="cv">\u25b4</i></small>':'')+(op?'':p2Quick(l))+'</div>'+(op?'<div class="p2blk">'+res+'<div class="p2id">'+(String(p2real(l)||'').trim()?D('name','p2nm','<span class="p2lb">Nombre:</span> '+esc(p2real(l))):D('name','p2nm p2e','+ Nombre'))+(String(ub||'').trim()?D('ub','p2ub','<span class="p2lb">Lugar:</span> '+esc(ub)):D('ub','p2ub p2e','+ Lugar'))+'</div>'+(l.tel&&!l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> '+esc(fmt(l.tel))+'</div>':(l.ph?'<div class="p2tel"><span class="p2lb">N\u00famero:</span> sin n\u00famero todav\u00eda</div>':''))+'</div>':'')+(l.ph&&!op?'<div class="ld ph">Sin n\u00famero todav\u00eda'+(l.loc?' \u00b7 guardado en el mapa':'')+(l.pn&&!l.fld?' como '+l.pn:'')+'</div>':'')+(op?'<div class="lr">'+wa+'</div>':'')+(op?'<div class="la">'+mv+'</div>':'')+more+'</div>';
 }
 function p2Render(){
@@ -1977,7 +1977,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v218';
+const APPV='v219';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -2064,7 +2064,6 @@ function regDraw(){
     (th?'<div class="rgp">'+th+'</div>':'')+
     (b||REG.prep?'<div id="rgst" class="rgf info">'+esc(REG.prog||'Leyendo…')+'</div>':'')+
     '<input id="rgl" list="rgpl" class="rgi" placeholder="Lugar (opcional)" value="'+esc(REG.lugar)+'" autocomplete="off"><datalist id="rgpl">'+pl+'</datalist>'+
-    '<textarea id="rgn" class="rgi" rows="1" placeholder="Indicaciones para la IA (opcional)">'+esc(REG.nota)+'</textarea>'+
     '<div class="rgst">'+(REG.line?'<div class="rgf info">Calle trazada ('+REG.line.length+(REG.line.length===1?' punto':' puntos')+'). Los leads se guardan sobre ella.</div><div class="rgb"><button class="p2a" data-rg="street">Cambiar calle</button><button class="p2a" data-rg="nostreet">Quitar</button></div>':'<button class="p2a" data-rg="street">Ubicar en una calle (opcional)</button>')+'</div>'+
     (AI&&REG.photos.length&&!b&&!REG.prep?'<div class="rgb"><button class="p2a st" data-rg="read">Leer '+(REG.photos.length>1?REG.photos.length+' fotos':'la foto')+' con IA</button></div>':'')+
     (REG.err?'<div class="rgf bad">'+esc(REG.err)+'</div>':'')+
