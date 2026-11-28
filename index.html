@@ -986,6 +986,13 @@ html.fdv .nv .bdg{box-shadow:0 0 0 2px var(--dk)}
 .mxvi video{width:100%;height:100%;object-fit:contain;background:#000}
 .mxvi iframe{width:100%;height:100%;border:0;background:#000}
 .mxvi .pfvo{align-self:center;color:#fff;font-weight:700}
+.cdn{font-size:14px;color:#5b6676;margin:2px 4px 6px}.cdn b{color:#18202b;font-size:16px}
+.cdg{font:700 12px system-ui,-apple-system,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#6b7686;margin:16px 4px 8px}
+.cdr{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;padding:12px 14px;border:0;border-radius:14px;background:#fff;margin-bottom:8px;font:600 16px system-ui,-apple-system,sans-serif;color:#18202b;text-align:left;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.07)}
+.cdr small{display:block;font-weight:500;color:#5b6676;font-size:13px;margin-top:2px}
+.cdr .cdk{margin-left:auto;width:32px;height:32px;border-radius:50%;border:2px solid #c3cad4;display:flex;align-items:center;justify-content:center;flex:none;background:#fff}
+.cdr .cdk svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.cdr.on .cdk{background:#36c281;border-color:#36c281}.cdr.on .cdk svg{opacity:1}
 .mxvd{display:flex;flex-direction:column;gap:10px}
 .mxav{width:100%;height:48px;border-radius:12px;font-size:15px}
 .mxv{position:relative}.mxvb{border-radius:12px;overflow:hidden;background:#000;aspect-ratio:16/9}
@@ -1988,7 +1995,7 @@ function p2Stk(){const t=document.querySelector('#p2b .p2t'),n=document.getEleme
 document.addEventListener('scroll',p2Stk,true);
 document.addEventListener('click',e=>{if(P2G.sup&&Date.now()-P2G.sup<500){e.stopPropagation();e.preventDefault()}},true);
 
-const APPV='v230';
+const APPV='v231';
 const REG={line:null,on:0,photos:[],lugar:'',nota:'',rows:[],busy:0,prog:'',err:'',conf:0,sid:0,prep:0};
 function regEl(){let e=document.getElementById('p2reg');if(!e){e=document.createElement('div');e.id='p2reg';document.body.appendChild(e)}return e}
 function regFile(){let f=document.getElementById('rgf');if(!f){f=document.createElement('input');f.type='file';f.id='rgf';f.accept='image/\x2A';f.multiple=true;document.body.appendChild(f)}return f}
@@ -3482,6 +3489,10 @@ document.addEventListener('click',e=>{
 
 
 const MV={sq:0,d:null,t:0,q:'',u:'',s:'',sel:null};
+const DSPN={d:{},t:0,p:null};
+(function(){let _d=null;Object.defineProperty(MV,'d',{get:()=>_d,set:v=>{_d=v;try{dispApply()}catch(e){}},enumerable:true})})();
+function dispApply(){const d=MV.d;if(!d||!d.m)return;d.m.forEach(m=>{const sl=pfSlug(m.n);if(!m.e0)m.e0=m.e?m.e.slice():null;MSUC.forEach((x,i)=>{const o=DSPN.d[x[0]]&&DSPN.d[x[0]][sl];if(o){if(!m.e)m.e=MSUC.map(()=>0);m.e[i]=o.v?1:0}else if(m.e0&&m.e)m.e[i]=m.e0[i]})})}
+function dispLoad(f){if(DSPN.p)return DSPN.p;if(!f&&Date.now()-DSPN.t<6e4)return Promise.resolve();DSPN.p=api('disp_get',{}).then(r=>{if(r&&r.ok&&r.d){DSPN.d=r.d;DSPN.t=Date.now();dispApply()}}).catch(()=>{}).then(()=>{DSPN.p=null});return DSPN.p}
 const MUSOS=['Motoneta','Traslado diario','Trabajo y reparto','Doble propósito','Deportiva','Chopper','Cuatrimoto','UTV','Carga'];
 const MSUC=[['lerma','Lerma'],['atlacomulco','Atlacomulco'],['santiago','Santiago'],['tenancingo','Tenancingo'],['valle','Valle'],['aodes','Aodes'],['almoloya','Almoloya']];
 const mnorm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
@@ -3591,13 +3602,14 @@ function pfDraw1(){
   p.innerHTML=PF1.map(([t,L])=>'<div class="pfr">'+esc(t)+'</div><div class="pfg" style="--n:'+Math.ceil(L.length/3)+'">'+L.map(x=>'<button class="pfm" data-pf="'+x[0]+'"><span class="pfi">'+(I[x[0]]?'<img src="'+I[x[0]]+'" alt="">':'<span class="pfh"></span>')+'</span><b>'+esc(x[1])+'</b>'+(x[2]?'<small>'+esc(x[2])+'</small>':'')+'</button>').join('')+'</div>').join('')
 }
 function pfView(){
-  const m=document.getElementById('menu');m.classList.add('pfon');PFS.v=1;PFS.k='';PFS.m='';PFS.s=mSucKey(S.ag);
+  const m=document.getElementById('menu');m.classList.add('pfon');PFS.v=1;PFS.k='';PFS.m='';PFS.s=pfSuc0();
   m.innerHTML='<div class="pf" id="pf"></div>';m.style.display='block';m.scrollTop=0;
   const p=document.getElementById('pf');
   p.onclick=e=>{const bk=e.target.closest&&e.target.closest('[data-pfb]');if(bk){pfShow(+bk.dataset.pfb||1);return}const pl=e.target.closest&&e.target.closest('[data-pfplay]');if(pl){pfPlay(pl.dataset.pfplay);return}const lc=e.target.closest&&e.target.closest('[data-pfloc]');if(lc){pfLoc(lc.dataset.pfloc);return}const cp=e.target.closest&&e.target.closest('[data-pfcp]');if(cp){pfCopy(cp.dataset.pfcp,'Link del video copiado');return}const b=e.target.closest&&e.target.closest('[data-pf]');if(b)pfOpen(b.dataset.pf)};
-  p.onchange=e=>{if(e.target.id==='pfs'){if(e.target.value==='__all'){pfShow(4);return}PFS.s=e.target.value;MV.s=PFS.s;pfShow(2)}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s;pfLocVid()}};
+  p.onchange=e=>{if(e.target.id==='pfs'){if(e.target.value==='__all'){PFS.s='';pfSucSet('');pfShow(PFS.v===4||!PFS.k?4:2);return}PFS.s=e.target.value;pfSucSet(PFS.s);MV.s=PFS.s;pfShow(PFS.k?2:4)}if(e.target.id==='pfls'){PFS.s=e.target.value;MV.s=PFS.s;pfLocVid()}};
   pfDraw1();
   setTimeout(mxSweep,2500);
+  dispLoad().then(()=>{if(CUR==='moto'&&(PFS.v===2||PFS.v===4)&&document.getElementById('pf'))pfShow(PFS.v)});
   pfJs('pf1.js').then(()=>Promise.all(['pf3.js','pf4.js','pf5.js','pf6.js'].map(pfJs))).then(()=>{if(CUR==='moto'&&PFS.v===1&&document.getElementById('pf'))pfDraw1()});
   if(!MV.d||Date.now()-MV.t>12e4){try{api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}}).catch(()=>{})}catch(e){}}
 }
@@ -3686,6 +3698,35 @@ function ubDraw(){
   pfTi().then(M=>{const w=document.getElementById('ubv');if(w&&UBS.k===k)w.innerHTML=vsBox('Novamotos '+nm,M[k]||'','Video de cómo llegar · ','Aún no hay video de esta tienda','columna B',1)});
   vtodDraw()
 }
+const CD={k:''};
+function catdRows(){
+  const d=MV.d,w=document.getElementById('cdl');if(!w)return;
+  if(!d||!d.m){w.innerHTML='<div class="pfem">Cargando motos…</div>';return}
+  const si=MSUC.findIndex(x=>x[0]===CD.k);let n=0;const G={};
+  d.m.forEach(m=>{const g=pfGrp(m);(G[g]=G[g]||[]).push(m);if(m.e&&m.e[si])n++});
+  const ks=Object.keys(G).sort((a,b)=>{const i=PFGO.indexOf(a),j=PFGO.indexOf(b);return (i<0?99:i)-(j<0?99:j)||a.localeCompare(b)});
+  const ck='<span class="cdk"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
+  w.innerHTML='<div class="cdn"><b>'+n+'</b> de '+d.m.length+' motos con existencia en '+esc(MSUC[si][1])+'</div>'+ks.map(g=>'<div class="cdg">'+esc(PFG[g]||g)+'</div>'+G[g].sort((a,b)=>(a.p||9e9)-(b.p||9e9)).map(m=>'<button type="button" class="cdr'+(m.e&&m.e[si]?' on':'')+'" data-cd="'+pfSlug(m.n)+'"><span>'+esc(m.n)+(m.p?'<small>'+esc(mxn(m.p))+'</small>':'')+'</span>'+ck+'</button>').join('')).join('')
+}
+function catdView(){
+  const m=document.getElementById('menu');
+  const own=mSucKey(S.ag)||'lerma',canAll=(ME==='Fer'||ROLE==='admin'||ROLE==='director');
+  CD.k=canAll?(CD.k||own):own;
+  m.innerHTML='<div class="in" id="cdw"><div class="mh2" style="justify-content:flex-start"><button class="bk" data-nv="mas" aria-label="Volver"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><b style="margin-left:8px">Catálogo</b></div>'+(canAll?'<label class="pfss pfls"><select id="cds">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===CD.k?' selected':'')+'>'+x[1]+'</option>').join('')+'</select><i>▼</i></label>':'<div class="note" style="margin:4px 0 10px">Sucursal '+esc((MSUC.find(x=>x[0]===CD.k)||[0,CD.k])[1])+'</div>')+'<div class="note" style="margin:6px 0 10px">Pica la palomita en las motos que sí hay.</div><div id="cdl"></div></div>';
+  m.style.display='block';m.scrollTop=0;
+  const w=document.getElementById('cdw');
+  w.onchange=e=>{if(e.target.id==='cds'){CD.k=e.target.value;catdRows()}};
+  w.onclick=e=>{const b=e.target.closest&&e.target.closest('[data-cd]');if(!b)return;const sl=b.dataset.cd,d=MV.d;if(!d||!d.m)return;
+    const mo=d.m.find(x=>pfSlug(x.n)===sl),si=MSUC.findIndex(x=>x[0]===CD.k);if(!mo||si<0)return;
+    const v=(mo.e&&mo.e[si])?0:1,u=Date.now();
+    DSPN.d[CD.k]=DSPN.d[CD.k]||{};DSPN.d[CD.k][sl]={v:v,u:u};dispApply();
+    b.classList.toggle('on',!!v);const cn=w.querySelector('.cdn b');if(cn)cn.textContent=d.m.filter(x=>x.e&&x.e[si]).length;
+    api('disp_set',{s:CD.k,k:sl,v:v,u:u}).then(r=>{if(!r||!r.ok)throw 0}).catch(()=>{toast('No se guardó. Intenta de nuevo.',1)})};
+  const go=()=>{if(CUR==='catd')catdRows()};
+  catdRows();
+  dispLoad(true).then(go);
+  if(!MV.d||!MV.d.m){api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now()}go()}).catch(()=>{})}
+}
 function ubicView(){
   const m=document.getElementById('menu');
   const k=UBS.k||mSucKey(S.ag)||'lerma';UBS.k=k;
@@ -3712,7 +3753,7 @@ function vtodView(){
   vtodDraw()
 }
 function pfLoc(a){
-  const sel=document.getElementById('pfls'),k=(sel&&sel.value)||PFS.s||'lerma',t=pfLocTxt(k);
+  const sel=document.getElementById('pfls'),k=(sel&&sel.value)||PFS.s||mSucKey(S.ag)||'lerma',t=pfLocTxt(k);
   if(a==='w'){window.open('https:\x2F\x2Fwa.me/?text='+encodeURIComponent(t),'_blank','noopener');return}
   pfCopy(t,'Ubicación copiada')
 }
@@ -3879,7 +3920,9 @@ function pfDraw3(){
 const PFS={k:'',s:'',v:1,m:''};
 const PFG={'Cuatrimoto':'Cuatrimotos','UTV':'UTV y side by side','Carga':'Veh\u00edculos de carga','Motoneta':'Motonetas','Chopper':'Choppers y custom','Deportiva':'Deportivas','Doble prop\u00f3sito':'Doble prop\u00f3sito','Trabajo y reparto':'Trabajo y reparto','Traslado diario':'Urbanas'};
 const PFGO=['Cuatrimoto','UTV','Carga','Motoneta','Chopper','Deportiva','Doble prop\u00f3sito','Trabajo y reparto','Traslado diario'];
-function pfGrp(m){const u=mUsos(m);for(const g of PFGO)if(u.indexOf(g)>=0)return g;return m.c||'Otras'}
+function pfSuc0(){let v='';try{v=localStorage.getItem('crm-pfs')||''}catch(e){}return v==='all'?'':(MSUC.some(x=>x[0]===v)?v:'')}
+function pfSucSet(v){try{localStorage.setItem('crm-pfs',v||'all')}catch(e){}}
+function pfGrp(m){const u=mUsos(m);for(const g of PFGO)if(u.indexOf(g)>=0)return g;return 'Traslado diario'}
 function pfLab(m){const t=String(m.t||''),c=/(\d{2,4})\s?cc/i.exec(t)||/(\d{2,4})\s?cc/i.exec(m.n);
   let n=String(m.n).replace(/^(Treck|Lifan|Winmex|Segway|AODES)\s+/i,'').replace(/\s*\d{2,4}\s?cc\b/i,'').trim();
   return [n,c?c[1]+' cc':'']}
@@ -3894,15 +3937,15 @@ function pfDraw2(){
   const L=d.m.filter(m=>m!==sel&&pfGrp(m)===g&&(si<0||(m.e&&m.e[si]))).sort((a,b)=>(a.p||9e9)-(b.p||9e9));
   const hasSel=si<0||(sel.e&&sel.e[si]);
   const all=[sel].concat(L);
-  const bar='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===PFS.s?' selected':'')+'>'+x[1]+'</option>').join('')+'<option value="__all">Cat\u00e1logo completo</option></select><i>\u25bc</i></label></div>';
+  const bar='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===PFS.s?' selected':'')+'>'+x[1]+'</option>').join('')+'<option value="__all"'+(PFS.s?'':' selected')+'>Cat\u00e1logo completo</option></select><i>\u25bc</i></label></div>';
   p.innerHTML=bar+'<div class="pfr">'+esc(PFG[g]||g)+'</div>'+(L.length||hasSel?'<div class="pfg" style="--n:'+Math.max(1,Math.ceil(all.length/3))+'">'+all.map((m,i)=>pfCell(m,I,i===0,i===0&&!hasSel?sn:'')).join('')+'</div>':'')+(L.length?'':'<div class="pfem">No hay m\u00e1s motos de este tipo en '+esc(sn)+'</div>')
 }
 function pfDraw4(){
   const p=document.getElementById('pf');if(!p)return;const I=window.PFI||{};p.className='pf pf2';const d=MV.d;
   if(!d||!d.m){p.innerHTML='<div class="pfem">Cargando motos\u2026</div>';api('motos').then(r=>{if(r&&r.ok&&r.m&&r.m.length){MV.d=r;MV.t=Date.now();if(PFS.v===4)pfDraw4()}}).catch(()=>{});return}
-  const G={};d.m.forEach(m=>{const g=pfGrp(m);(G[g]=G[g]||[]).push(m)});
+  const si4=PFS.s?MSUC.findIndex(x=>x[0]===PFS.s):-1,G={};d.m.forEach(m=>{if(si4>=0&&!(m.e&&m.e[si4]))return;const g=pfGrp(m);(G[g]=G[g]||[]).push(m)});
   const ks=Object.keys(G).sort((a,b)=>{const i=PFGO.indexOf(a),j=PFGO.indexOf(b);return (i<0?99:i)-(j<0?99:j)||a.localeCompare(b)});
-  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+''+'>'+x[1]+'</option>').join('')+'<option value="__all" selected>Cat\u00e1logo completo</option></select><i>\u25bc</i></label></div>'+ks.map(g=>'<div class="pfr">'+esc(PFG[g]||g)+'</div><div class="pfg">'+G[g].sort((a,b)=>(a.p||9e9)-(b.p||9e9)).map(m=>pfCell(m,I,false,'')).join('')+'</div>').join('')
+  p.innerHTML='<div class="pfbar"><button class="pfbk" data-pfb="1">\u2190 Motos</button><label class="pfss"><span>Sucursal</span><select id="pfs">'+MSUC.map(x=>'<option value="'+x[0]+'"'+(x[0]===PFS.s?' selected':'')+'>'+x[1]+'</option>').join('')+'<option value="__all"'+(PFS.s?'':' selected')+'>Cat\u00e1logo completo</option></select><i>\u25bc</i></label></div>'+ks.map(g=>'<div class="pfr">'+esc(PFG[g]||g)+'</div><div class="pfg">'+G[g].sort((a,b)=>(a.p||9e9)-(b.p||9e9)).map(m=>pfCell(m,I,false,'')).join('')+'</div>').join('')
 }
 function pfShow(v){PFS.v=v;const m=document.getElementById('menu');if(m)m.scrollTop=0;if(v===1)pfDraw1();else if(v===2)pfDraw2();else if(v===4)pfDraw4();else pfDraw3()}
 async function pfOpen(k){
@@ -3911,7 +3954,7 @@ async function pfOpen(k){
   const m=MV.d.m.find(x=>pfSlug(x.n)===k);if(!m){toast('No encontr\u00e9 esa moto en el cat\u00e1logo',1);return}
   if(PFS.v===4){PFS.k=k;PFS.m=m.n;PFS.fr=4;pfShow(3);return}
   if(PFS.v===2||PFS.v===3){PFS.m=m.n;pfShow(3);return}
-  PFS.k=k;PFS.m=m.n;PFS.fr=0;if(!PFS.s)PFS.s=mSucKey(S.ag);
+  PFS.k=k;PFS.m=m.n;PFS.fr=0;
   pfShow(2);
   pfJs('pf2.js').then(()=>Promise.all(['pf3.js','pf4.js','pf5.js','pf6.js'].map(pfJs))).then(()=>{if(CUR==='moto'&&PFS.v===2&&document.getElementById('pf'))pfDraw2()})
 }
@@ -4338,7 +4381,7 @@ function masView(){
   const QUIEN=N('Clientes que escribieron','quien'),ASI=ASIS?[N('Checar asistencia','asis')]:[];
   const H=t=>'<div class="mxh">'+t+'</div>',Gs=s=>s.map((x,i)=>H(x[0])+'<div class="mxg">'+(i===s.length-1?x[1].concat(TAIL):x[1]).join('')+'</div>').join('');
   let h='';
-  if(role==='vendedor')h=Gs((ASI.length?[['Asistencia',ASI]]:[]).concat([['Tr\u00e1mites',[N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')]],['Mi trabajo',(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat([N('An\u00e1lisis','analisis')],ANAT,[N('Ubicación','ubic')])],['Cliente',[N('Invitaci\u00f3n para el cliente','vip')]]].concat([['Portales',[L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),L('Atrato','https:\x2F\x2Fcomercios.atratopago.com\x2Fv3\x2Fpartner\x2Flogin')]]]).concat(ME==='Fer'?[['Administraci\u00f3n',[N('Chats','conv'),N('Anas','onoff'),N('Gasto','make'),N('Tiempo de uso del panel','uso'),L('Quejas de clientes',NLINK.quejas())]]]:[])));
+  if(role==='vendedor')h=Gs((ASI.length?[['Asistencia',ASI]]:[]).concat([['Tr\u00e1mites',[N('Tramitar venta','tvent'),N('Tramitar seguro','seg'),N('Tramitar INE','ine10')]],['Mi trabajo',(ME!=='Fer'&&ANA_CON.includes(ME)?[QUIEN]:[]).concat([N('An\u00e1lisis','analisis')],ANAT,[N('Ubicación','ubic'),N('Catálogo','catd')])],['Cliente',[N('Invitaci\u00f3n para el cliente','vip')]]].concat([['Portales',[L('Maxikash','https:\x2F\x2Fmaxikash-app.com\x2FMaxiKash\x2F'),L('Galgo','https:\x2F\x2Fgalgo.com\x2Fmx\x2Fdealer\x2Flogin'),L('Atrato','https:\x2F\x2Fcomercios.atratopago.com\x2Fv3\x2Fpartner\x2Flogin')]]]).concat(ME==='Fer'?[['Administraci\u00f3n',[N('Chats','conv'),N('Anas','onoff'),N('Gasto','make'),N('Tiempo de uso del panel','uso'),L('Quejas de clientes',NLINK.quejas())]]]:[])));
   else if(role==='tecnico')h=G(ASI.concat([QUIEN,N('Registrar una venta','venta'),N('Tramitar venta','tvent'),N('Tiempo de uso del panel','uso')],ANAT,[N('Invitación para el cliente','vip'),L('Panel de control',NLINK.panel())]));
   else if(role==='director')h=G(ASI.concat([N('An\u00e1lisis','analisis'),N('Invitación para el cliente','vip'),L('Quejas de clientes',NLINK.quejas()),L('Panel de control',NLINK.panel())]));
   else h=G([N('Trámites','tram'),N('Invitación para el cliente','vip'),L('Inventario disponible',NLINK.inv())]);
@@ -4507,6 +4550,7 @@ function navGo0(id){
   if(id==='mas'){masView();return}
   if(id==='anam'){anaMenuView();return}
   if(id==='ubic'){ubicView();return}
+  if(id==='catd'){catdView();return}
   if(id==='vtod'){vtodView();return}
   if(id==='mapa'){m.style.display='none';MAPM.show();return}
   if(id==='lead'){m.style.display='none';navSet('pros');openSheet();return}
